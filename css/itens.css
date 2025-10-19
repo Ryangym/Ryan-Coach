@@ -81,3 +81,22 @@ body{
   transition: all 500ms ease-in-out;
 }
 /* ------------------end checkmark------------------ */
+
+/* ------------------ background------------------ */
+
+/* background: radial-gradient(circle at top left, #930925, transparent 60%),
+    radial-gradient(circle at bottom right, #000000, transparent 60%);
+  background-size: 400% 400%;
+  animation: bg 12s ease infinite; */
+@keyframes bg {
+  0% {
+    background-position: 8, 50%;
+  }
+  50% {
+    background-position: 100%, 100%;
+  }
+  100% {
+    background-position: 8%, 50%;
+  }
+}
+/* ------------------end background------------------ */
