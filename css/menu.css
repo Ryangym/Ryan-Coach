@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap");
+
+/* --- Estilização da Barra de Rolagem --- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #c70000 #222;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #222; 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #c70000; 
+  border-radius: 10px;
+  border: 2px solid #222; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #e04444; 
+}
+::-webkit-scrollbar-corner {
+  background: #222;
+}
+/* --- Fim Estilização da Barra de Rolagem --- */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
+  color: #fff;
+  overflow-x: hidden;
+}
+:root {
+ --vinho: #360a03;
+ --black: #000000;
+}
+
+/* ----------------- Navbar ----------------- */
+
+.desktop-navbar {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    width: calc(100% - 2rem);
+    max-width: 1200px;
+}
+.glass-morphism {
+    display: flex;
+    justify-content: space-between;
+    background: var(--black);
+    backdrop-filter: blur(20px);
+    /* Efeito de desfoque do fundo */
+    border: 1px solid #ac0f0f;
+    border-radius: 3rem;
+    box-shadow: 0 8px 32px 0 rgba(194, 9, 9, 0.549);
+    /* Sombra sutil */
+}
+.logo{
+
+}
+.links-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+.login-nav{
+  width: 50px;
+  height: 60px;
+  margin-right: 10px;
+}
+.desktop-navbar a{
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif, sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+.mobile-navbar {
+  display: none;
+}
+
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #ff0033;
+}
+/* ------------------ Fim Navbar ----------------- */

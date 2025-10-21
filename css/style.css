@@ -1,113 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap");
-
-/* --- Estilização da Barra de Rolagem --- */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #c70000 #222;
-}
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: #222; 
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #c70000; 
-  border-radius: 10px;
-  border: 2px solid #222; 
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: #e04444; 
-}
-::-webkit-scrollbar-corner {
-  background: #222;
-}
-
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "Roboto", sans-serif;
-  background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
-  color: #fff;
-  overflow-x: hidden;
-}
-:root {
- --vinho: #360a03;
- --black: #000000;
-}
-
-
-.desktop-navbar {
-    position: fixed;
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    transition: all 0.3s ease;
-    width: calc(100% - 2rem);
-    max-width: 1200px;
-}
-.glass-morphism {
-    display: flex;
-    justify-content: space-between;
-    background: var(--black);
-    backdrop-filter: blur(20px);
-    /* Efeito de desfoque do fundo */
-    border: 1px solid #ac0f0f;
-    border-radius: 3rem;
-    box-shadow: 0 8px 32px 0 rgba(194, 9, 9, 0.549);
-    /* Sombra sutil */
-}
-.logo{
-
-}
-.links-content{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-}
-.login-nav{
-  width: 50px;
-  height: 60px;
-  margin-right: 10px;
-}
-.desktop-navbar a{
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif, sans-serif;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-}
-
-.mobile-navbar {
-  display: none;
-}
-
-header h1 {
-  font-family: "Orbitron", sans-serif;
-  font-size: 1.8rem;
-  color: #ff0033;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  margin: 0 15px;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-nav a:hover {
-  color: #ff0033;
-}
-
-.hero {
+.landing-page {
   margin-top: 6rem;
   display: flex;
   align-items: flex-end;
@@ -119,12 +10,11 @@ nav a:hover {
   height: 80vh;
   padding: 0;
 }
-.hero-text{
+.landing-text{
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 b{
   color: #fff0f0;
   animation: wine-glow 2s infinite alternate;
@@ -166,7 +56,7 @@ h2 {
   color: #ffffff;
   margin-bottom: 20px;
 }
-.hero-text p {
+.landing-text p {
   max-width: 70%;
   text-shadow: #000000 4px 4px 6px;
   margin-bottom: 30px;
@@ -236,12 +126,6 @@ h2 {
   background: rgb(81, 13, 13); 
 }
 
-.hero img {
-  max-width: 350px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px #ff0033;
-}
-
 section {
   padding: 60px 20px;
   text-align: center;
@@ -291,14 +175,84 @@ h3 {
   object-fit: cover;
 }
 .info-card {
-  padding: 10px;
+  padding: 15px;
   margin-top: 15px;
   text-align: left;
 }
 .info-card h4 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 1.5rem;
   margin-bottom: 10px;
 }
+.info-card p {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #ccc;
+}
+
+/* --------------- Diferenciais --------------- */
+.card-box-diferenciais{
+  margin-top: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  justify-content: center;
+}
+.problemas, .solucoes {
+  max-width: 25%;
+}
+.problemas{
+  border-radius: 1em;
+  padding: 15px;
+  background-color: #0a0a0a;
+  border: solid 2px #641212;
+}
+.solucoes{
+  border-radius: 1em;
+  padding: 15px;
+  background-color: #0a0a0a;
+  border: solid 2px #12641a;
+}
+
+.problemas h4, .solucoes h4 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+.problemas ul, .solucoes ul {
+  text-align: left;
+  margin-top: 1rem;
+  list-style-type: none;
+  padding-left: 20px;
+}
+.problemas ul li, .solucoes ul li {
+  font-family: Arial, sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+li{
+  display: flex;
+  align-items: center;
+}
+.x-icon {
+  width: 25px;
+  height: 25px;
+  fill: #ff4d4d;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+.v-icon {
+  width: 25px;
+  height: 25px;
+  fill: #4CAF50;
+  margin-right: 22px;
+  vertical-align: middle;
+}
+/* --------------- Fim Diferenciais --------------- */
+
+
 
 footer {
   text-align: center;
