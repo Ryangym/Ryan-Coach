@@ -1,0 +1,63 @@
+aside#main-aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; 
+    width: 20%;
+    background-color: #020e20;
+    border: 2px #FFBA42 solid;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto; 
+    padding-top: 20px;
+    padding-bottom: 3rem;
+    z-index: 999; 
+}
+/* main, .conteudo, #conteudo {
+    margin-left: 20%; 
+    padding: 20px;
+    box-sizing: border-box;
+} */
+aside img{
+     display: none; 
+}
+aside button {
+    position: relative;
+    color: #FFBA42;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    font-family: 'AlteHaasGroteskBold', Times, serif;
+    text-decoration: none;
+    margin-left: 2vw;
+    margin-right: auto;
+    cursor: pointer;
+    padding: 0px;
+    white-space: nowrap; 
+    text-align: left; 
+}
+
+aside button::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: #FFD700;
+    transition: width 0.3s ease;
+}
+
+aside button:hover::after,
+aside button.active::after {
+    width: 100%;
+    transform: scale(1.1);
+}
+
+aside button:hover,
+aside button.active {
+    color: #FFD700;
+}
