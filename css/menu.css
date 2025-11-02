@@ -1,3 +1,4 @@
+/* Conteúdo original de menu.css */
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap");
 
 /* --- Estilização da Barra de Rolagem --- */
@@ -111,6 +112,397 @@ nav a:hover {
 }
 /* ------------------ Fim Navbar ----------------- */
 
-/* ==================== Footer ================= */
+/* ================================================= */
+/* === CÓDIGO MOVIDO DE STYLE.CSS PARA CÁ ABAIXO === */
+/* ================================================= */
 
+.btnLogin-popup-mobile {
+    margin-right: 2rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 10rem;
+    height: 50px;
+    background: transparent;
+    border: 2px solid #FFBA42;
+    outline: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #FFBA42;
+    transition: 0.5s;
+    gap: 1rem;
+    font-family: 'MinhaFonte', sans-serif;
+}
+
+.btnLogin-popup-mobile p {
+    font-size: 1.7rem;
+}
+
+.btnLogin-popup-mobile img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* === MEDIA QUERY PARA RESPONSIVIDADE === */
+@media (max-width: 768px) {
+    .desktop-navbar {
+        display: none; /* Esconde o menu de desktop */
+    }
+    #logoicon{
+        display: block;
+        margin-left: 2vw;
+        height: calc(8vw + 2rem);
+    }
+
+    .mobile-navbar {
+        top: 0;
+        position: fixed;
+        width: 100%;
+        background-color: #360a03; /* Você pode mudar isso para 'var(--vinho)' */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+    }
+
+
+    .menu-toggle {
+        margin-right: 4vw;
+        width: 40px;
+        height: 25px;
+        position: relative;
+        cursor: pointer;
+        border: none;
+        background: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 0;
+        z-index: 1101;
+    }
+
+    .menu-toggle span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background: white;
+        border-radius: 3px;
+        transition: transform 0.4s, opacity 0.4s;
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+        transform: rotate(50deg) translate(6px, 6px);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+        transform: rotate(-50deg) translate(9px, -9px);
+    }
+
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000033;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1100;
+        animation: none;
+    }
+
+    .mobile-nav.active {
+        display: flex;
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .mobile-nav {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease;
+    }
+
+    .mobile-nav.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        opacity: 1;
+        visibility: visible;
+        background: linear-gradient(-45deg, #340404, #540606, #580f0f, #360303, #000000);
+        background-size: 400% 400%;
+        animation: bg 12s ease infinite, fadeInUp 0.8s ease-out forwards;
+
+    }
+
+    .mobile-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .mobile-nav li {
+        margin: 1.5rem 0;
+    }
+
+    .mobile-nav a {
+        color: white;
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+        text-decoration: none;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif, sans-serif;
+    }
+
+    /* .btnLogin-popup {
+        margin: 0;
+    } */
+
+    .redes-mobilenavbar {}
+
+    body.noscroll {
+        overflow: hidden;
+    }
+}
+/*------------- FIM NAVBAR--------------
+
+/* ==================== Footer ================= */
+/* ==================== FOOTER ================= */
+/* ==================== FOOTER v2 (Design Caprichado) ==================== */
+.site-footer-v2 {
+    background-color: #000;
+    color: #ccc;
+    padding: 5rem 2rem 1.5rem 2rem;
+    margin-top: 4rem;
+    position: relative; /* Necessário para a barra de glow */
+    overflow: hidden; /* Previne que o glow vaze */
+}
+
+/* A barra vermelha/dourada no topo */
+.footer-glow-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #a30c0c, #FFBA42, #a30c0c);
+    box-shadow: 0 0 15px #c70000, 0 0 10px #FFBA42;
+    animation: glow-bar-animation 5s ease-in-out infinite;
+}
+
+/* Animação para a barra de glow */
+@keyframes glow-bar-animation {
+    0% {
+        background: linear-gradient(90deg, #a30c0c, #FFBA42, #a30c0c);
+    }
+    50% {
+        background: linear-gradient(90deg, #FFBA42, #a30c0c, #FFBA42);
+    }
+    100% {
+        background: linear-gradient(90deg, #a30c0c, #FFBA42, #a30c0c);
+    }
+}
+
+.footer-container-v2 {
+    display: grid;
+    /* Cria 3 colunas que se adaptam. Mínimo de 300px, máximo de 1fr (fração do espaço) */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative; /* Garante que fique acima do glow */
+    z-index: 2;
+}
+
+.footer-col {
+    padding: 0 1rem;
+}
+
+/* Coluna 1: Marca */
+#footer-brand p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 350px;
+}
+/* Puxa o estilo do logo que já existe no seu menu.css */
+#footer-brand .logo {
+    margin-left: 0;
+    margin-bottom: 1rem;
+    font-size: 2.8rem;
+    text-shadow: #760e0e 4px 4px 6px;
+}
+
+/* Coluna 2: Links */
+.footer-col h4 {
+    font-family: "Orbitron", sans-serif;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    border-bottom: 2px solid #a30c0c;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+#footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+#footer-links li {
+    margin-bottom: 1rem;
+}
+
+#footer-links a {
+    text-decoration: none;
+    color: #ccc;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#footer-links a:hover {
+    color: #FFBA42; /* Destaque dourado */
+    padding-left: 8px; /* Efeito de "slide" */
+}
+
+/* Coluna 3: Formulário */
+.input-group-v2 {
+    margin-bottom: 1.2rem;
+}
+
+.input-group-v2 input,
+.input-group-v2 textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #444; /* Linha inferior sutil */
+    color: #fff;
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    padding: 0.75rem 0.25rem;
+    transition: border-color 0.3s ease;
+}
+
+/* Remove o "placeholder" feio do Chrome/Firefox */
+.input-group-v2 input::placeholder,
+.input-group-v2 textarea::placeholder {
+    color: #888;
+    opacity: 1;
+}
+
+.input-group-v2 input:focus,
+.input-group-v2 textarea:focus {
+    outline: none;
+    border-bottom-color: #FFBA42; /* Foco dourado */
+}
+
+.input-group-v2 textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.footer-submit-btn-v2 {
+    background-color: #a30c0c;
+    color: #ffffff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.footer-submit-btn-v2:hover {
+    background-color: #c70000;
+    box-shadow: 0 0 15px rgba(163, 12, 12, 0.7);
+    transform: translateY(-2px);
+}
+
+/* Ícones de Redes Sociais */
+.social-links-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.social-links-v2 a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.social-links-v2 a svg {
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
+    transition: fill 0.3s ease;
+}
+
+.social-links-v2 a:hover {
+    transform: scale(1.1) translateY(-3px);
+    /* A mágica de usar a cor da variável definida no HTML */
+    background-color: var(--social-color, #a30c0c); 
+    box-shadow: 0 0 10px var(--social-color, #a30c0c);
+}
+
+/* Copyright */
+.footer-bottom-v2 {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #222;
+    color: #888;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Responsividade para Celular */
+@media (max-width: 768px) {
+    .site-footer-v2 {
+        padding: 4rem 1rem 1.5rem 1rem;
+    }
+
+    .footer-container-v2 {
+        grid-template-columns: 1fr; /* Força 1 coluna */
+        gap: 2.5rem;
+    }
+
+    #footer-brand {
+        text-align: center;
+    }
+    #footer-brand .logo {
+        margin: 0 auto 1rem auto;
+    }
+    .social-links-v2 {
+        justify-content: center;
+    }
+}
 /* ==================== Footer FIM ================= */
