@@ -244,3 +244,66 @@ li{
 }
 /* --------------- Fim Diferenciais --------------- */
 
+
+
+
+
+
+/* ================================================= */
+/* ===  MEDIA QUERY PARA RESPONSIVIDADE DO CONTEÚDO (INDEX) === */
+/* ================================================= */
+
+@media (max-width: 768px) {
+
+    /* --- Seção Landing Page --- */
+    .landing-page {
+        height: auto; /* Altura automática para caber o texto */
+        padding: 8rem 0 4rem 0; /* Mais preenchimento */
+        background-size: cover; /* Cobre o fundo inteiro */
+        background-position: center center;
+    }
+
+    .texto-maior {
+        font-size: 1.9rem; /* Diminui a fonte principal */
+        text-align: center;
+    }
+
+    .texto-menor {
+        font-size: 1.1rem; /* Diminui a fonte secundária */
+        text-align: center;
+    }
+
+    .landing-text p {
+        max-width: 90%; /* Texto ocupa mais da tela */
+    }
+
+    /* --- Seção de Serviços (Cards) --- */
+    .card-box {
+        flex-direction: column; /* FAZ OS CARDS EMPILHAREM! */
+        gap: 2.5rem; /* Aumenta o espaço entre os cards empilhados */
+    }
+
+    /* --- Seção Diferenciais (Problemas/Soluções) --- */
+    .card-box-diferenciais {
+        flex-direction: column; /* FAZ AS COLUNAS EMPILHAREM! */
+        gap: 2.5rem;
+    }
+
+    .problemas, .solucoes {
+        max-width: 95%; /* Colunas ocupam quase 100% da tela */
+    }
+
+    .problemas h4, .solucoes h4 {
+        font-size: 1.5rem; /* Diminui fonte dos títulos */
+    }
+
+    .problemas ul li, .solucoes ul li {
+        font-size: 1rem; /* Diminui fonte dos itens da lista */
+        line-height: 1.5;
+    }
+
+    /* --- Títulos Gerais da Seção --- */
+    h3 {
+        font-size: 1.8rem; /* Diminui os títulos principais da seção */
+    }
+}

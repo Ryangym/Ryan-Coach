@@ -160,6 +160,7 @@ nav a:hover {
         top: 0;
         position: fixed;
         width: 100%;
+        padding: 14px;
         background-color: #360a03; /* Você pode mudar isso para 'var(--vinho)' */
         display: flex;
         justify-content: space-between;
