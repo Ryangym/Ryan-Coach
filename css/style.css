@@ -30,15 +30,7 @@ b{
         text-shadow: 0 0 2px #a31e1e, 0 0 4px #800000, 0 0 6px #800000, 0 0 8px #800000, 0 0 10px #800000;
     }
 }
-h2 {
-  margin-left: 20px;
-  font-family: "Ms Madi", cursive;
-  font-weight: 500;
-  text-shadow: #760e0e 6px 6px 8px;
-  font-style: normal;
-  font-size: 3rem;
-  color: #ffffff;
-}
+
 .texto-maior{
   font-family: "Copse", serif;
   font-weight: 400;

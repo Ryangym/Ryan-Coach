@@ -67,8 +67,15 @@ body {
     /* Sombra sutil */
 }
 .logo{
-
+  margin-left: 20px;
+  font-family: "Ms Madi", cursive;
+  font-weight: 500;
+  text-shadow: #760e0e 6px 6px 8px;
+  font-style: normal;
+  font-size: 3rem;
+  color: #ffffff;
 }
+
 .links-content{
     display: flex;
     justify-content: center;

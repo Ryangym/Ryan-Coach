@@ -1,3 +1,7 @@
+.desktop-navbar{
+    display: none;
+}
+/* Estilos existentes da aside#main-aside... */
 aside#main-aside {
     position: fixed;
     top: 0;
@@ -16,13 +20,23 @@ aside#main-aside {
     padding-bottom: 3rem;
     z-index: 999; 
 }
-/* main, .conteudo, #conteudo {
+
+/* Regra de layout principal */
+main#conteudo {
     margin-left: 20%; 
     padding: 20px;
     box-sizing: border-box;
-} */
+    padding-top: 100px; /* Para a navbar fixa */
+}
+
+/* Estilos existentes de aside img e button... */
 aside img{
-     display: none; 
+        width: calc(7rem + 10vw);
+        height: calc(7rem + 10vw);
+        object-fit: cover;
+        display: block;
+        align-self: center;
+        border-radius: 50%;
 }
 aside button {
     position: relative;
@@ -60,4 +74,14 @@ aside button.active::after {
 aside button:hover,
 aside button.active {
     color: #FFD700;
+}
+
+
+/* === NOVOS ESTILOS PARA LOADING (OPCIONAL) === */
+main#conteudo .loading,
+main#conteudo .error {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #FFBA42; /* Ou outra cor da sua paleta */
+    padding: 50px 0;
 }

@@ -1,0 +1,140 @@
+h1 {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 500;
+    text-shadow: #760e0e 6px 6px 8px;
+    font-style: normal;
+    font-size: 4rem;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 10rem;
+}
+.planos-container {
+    margin-top: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #1b1b1b, #0a0a0a);
+    width: 100%;
+}
+
+.card{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 60rem;
+    padding-bottom: 10px;
+    margin:1%;
+    border:1px solid #ff2929;
+    border-radius:10px;
+    vertical-align: middle;
+}
+.card img{
+    height: 500px;
+    width: 100%;
+    align-items: center;
+    
+}
+/* Textos */
+.headline h2{
+    font-weight: 900;
+    font-size:20px;
+    color: white;
+    padding: 0;
+    margin: 0;
+}
+.h2{
+    font-size: 200%;
+    color: white;
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+}
+.card h3{
+    color: white;
+    text-align: center;
+    padding: 10px;
+    background-color: #660808;
+    font-size: 25px;
+}
+.card h2{
+    font-size: 30px; color: white; text-align: center;
+}
+strong{
+    color: #dd3c3c;
+    font-size: 30px;
+    text-decoration: line-through;
+}
+.textbeneficios{
+    display: flex;
+    flex-direction: column;
+    margin-left: 5%;
+    font-size: 1.5rem;
+    /* border: green solid 2px; */
+    height: 10rem;
+}
+/* Ofertada pelo plano */
+.have{
+    color:white;
+    text-shadow: 2px 2px 5px #ffd700;
+    margin: 0;
+}
+/* Coisas não ofertadas pelo plano */
+.nohave{
+    color: red;
+    margin: 0;
+    text-decoration: line-through;
+}
+/* Texto premium */
+@keyframes glow {
+    0% {
+        text-shadow: 0 0 2px #fff, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520, 0 0 10px #daa520;
+    }
+    50% {
+        text-shadow: 0 0 4px #fff, 0 0 8px #daa520, 0 0 12px #daa520, 0 0 16px #daa520, 0 0 20px #daa520;
+    }
+    100% {
+        text-shadow: 0 0 2px #fff, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520, 0 0 10px #daa520;
+    }
+}
+@keyframes wine-glow {
+    0% {
+        text-shadow: 0 0 2px #fff, 0 0 4px #800000, 0 0 6px #800000, 0 0 8px #800000, 0 0 10px #800000;
+    }
+    50% {
+        text-shadow: 0 0 4px #fff, 0 0 8px #800000, 0 0 12px #800000, 0 0 16px #800000, 0 0 20px #800000;
+    }
+    100% {
+        text-shadow: 0 0 2px #fff, 0 0 4px #800000, 0 0 6px #800000, 0 0 8px #800000, 0 0 10px #800000;
+    }
+}
+.premium {
+    font-weight: bold;
+    color: white; 
+    animation: glow 1.5s infinite alternate;
+}
+/* Texto dieta */
+#dieta{
+    font-weight: bold;
+    color: white; 
+    animation: wine-glow 1.5s infinite alternate;
+    margin: 0;
+}
+.contact-btn{
+    text-align: center;
+    background: #660808;
+    padding: 20px 2px 20px 2px;
+    color:white;
+    text-transform: uppercase;
+    border-radius:5px;
+    text-decoration: none;
+    border: 2px solid red;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: auto;
+    margin-bottom: 15px;
+}
+.contact-btn:hover{
+    background:rgb(158, 125, 35);
+    box-shadow: 10px 10px 30px #660808;
+}
