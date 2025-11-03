@@ -42,37 +42,29 @@ window.addEventListener('scroll', () => {
 });
 
 
-// --- Script do Dropdown do Usuário (Versão Melhorada) ---
-
+// --- Script do Dropdown de Perfil (Modelo Novo) ---
 document.addEventListener('DOMContentLoaded', () => {
-    const userMenuToggle = document.getElementById('userMenuToggle');
-    const userMenuDropdown = document.getElementById('userMenuDropdown');
+    const profileIcon = document.getElementById('userMenuToggle');
+    const profileMenu = document.getElementById('profileMenu');
 
-    if (userMenuToggle && userMenuDropdown) {
-        
+    if (profileIcon && profileMenu) {
+
         // 1. Abrir/Fechar ao clicar no ícone
-        userMenuToggle.addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            // Adiciona/Remove a classe 'active' de AMBOS os elementos
-            userMenuToggle.classList.toggle('active');
-            userMenuDropdown.classList.toggle('active');
+        profileIcon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+            profileMenu.classList.toggle('show');
         });
 
-        // 2. Fechar ao clicar em um item do menu
-        userMenuDropdown.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
-                userMenuToggle.classList.remove('active');
-                userMenuDropdown.classList.remove('active');
-            }
-        });
-
-        // 3. Fechar ao clicar fora (em qualquer outro lugar da página)
+        // 2. Fechar ao clicar em qualquer lugar fora do menu
         window.addEventListener('click', (e) => {
-            // Verifica se o menu está ativo ANTES de fechar
-            if (userMenuDropdown.classList.contains('active')) {
-                userMenuToggle.classList.remove('active');
-                userMenuDropdown.classList.remove('active');
+            if (profileMenu.classList.contains('show')) {
+                profileMenu.classList.remove('show');
             }
+        });
+
+        // 3. Impedir que cliques dentro do menu fechem ele
+        profileMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
     }
 });
