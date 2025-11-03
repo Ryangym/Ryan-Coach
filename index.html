@@ -56,12 +56,43 @@
                 <h2 class="logo">Ryan Coach</h2>
             </a>
             <div class="links-content">
-                <a href="#servicos">Serviços</a>
+                <a href="index.html#servicos">Serviços</a>
                 <a href="usuario.php">Usuario</a>
-                <a href="#contato">Contato</a>
+                <a href="index.html#contato">Contato</a>
             </div>
-            <img src="img/login.png" alt="" class="login-nav">
-        </div>
+
+            <img src="img/login.png" alt="Login" class="login-nav" id="userMenuToggle">
+            <div id="profileMenu" class="profile-dropdown-menu">
+                <div class="profile-card">
+                    <ul class="profile-list">
+                        <li class="profile-element">
+                            <a href="/NeoBarber/Login/Login.php" class="profile-link">
+                                <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-user-icon lucide-user">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                <p class="profile-label">Entrar/Cadastro</p>
+                            </a>
+                        </li>
+                        <li class="profile-element">
+                            <a href="/NeoBarber/Login/LoginAdmin.php" class="profile-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-user-lock-icon lucide-user-lock">
+                                    <circle cx="10" cy="7" r="4" />
+                                    <path d="M10.3 15H7a4 4 0 0 0-4 4v2" />
+                                    <path d="M15 15.5V14a2 2 0 0 1 4 0v1.5" />
+                                    <rect width="8" height="5" x="13" y="16" rx=".899" />
+                                </svg>
+                                <p class="profile-label">Admin Login</p>
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
     </nav>
 
     <section class="landing-page">

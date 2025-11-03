@@ -40,3 +40,39 @@ window.addEventListener('scroll', () => {
 
   lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
 });
+
+
+// --- Script do Dropdown do Usuário (Versão Melhorada) ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+    if (userMenuToggle && userMenuDropdown) {
+        
+        // 1. Abrir/Fechar ao clicar no ícone
+        userMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            // Adiciona/Remove a classe 'active' de AMBOS os elementos
+            userMenuToggle.classList.toggle('active');
+            userMenuDropdown.classList.toggle('active');
+        });
+
+        // 2. Fechar ao clicar em um item do menu
+        userMenuDropdown.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                userMenuToggle.classList.remove('active');
+                userMenuDropdown.classList.remove('active');
+            }
+        });
+
+        // 3. Fechar ao clicar fora (em qualquer outro lugar da página)
+        window.addEventListener('click', (e) => {
+            // Verifica se o menu está ativo ANTES de fechar
+            if (userMenuDropdown.classList.contains('active')) {
+                userMenuToggle.classList.remove('active');
+                userMenuDropdown.classList.remove('active');
+            }
+        });
+    }
+});

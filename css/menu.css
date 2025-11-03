@@ -151,6 +151,235 @@ nav a:hover {
     border-radius: 50%;
 }
 
+
+/* MODELO */
+/* === MENU DE PERFIL === */
+.profile-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    width: 220px;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.profile-dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-card {
+    background-color: radial-gradient(circle at 20% 30%, rgba(57, 255, 20, 0.08), transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.06), transparent 25%),
+                linear-gradient(180deg, #15161A, #0f1013);
+    background-image: radial-gradient(circle at 20% 30%, rgba(57, 255, 20, 0.08), transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.06), transparent 25%),
+                linear-gradient(180deg, #15161A, #0f1013);
+    /* background-color: rgb(36, 50, 41); tava assim antes, analisar se vai permanecer do jeito que está acima ou nesse estilo
+    background-image: linear-gradient(139deg,
+            rgb(36, 50, 41) 0%,
+            rgb(36, 50, 42) 0%,
+            rgb(28, 40, 30) 100%);*/
+    border-radius: 15px;
+    padding: 15px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.profile-separator {
+    border-top: 1.5px solid #42434a;
+}
+
+.profile-element:hover{
+    background: rgb(20, 255, 59);
+}
+
+.profile-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0px 10px;
+    margin: 0;
+}
+
+.profile-element {
+    display: flex;
+    align-items: center;
+    color: #7e8590;
+    gap: 10px;
+    transition: all 0.3s ease-out;
+    padding: 4px 7px;
+    border-radius: 6px;
+}
+
+.profile-element svg {
+    width: 19px;
+    height: 19px;
+    transition: all 0.3s ease-out;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    padding: 4px 7px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-element:hover .profile-link {
+    color: #000000;
+    /* Mantém o estilo de hover existente */
+}
+.profile-element:hover {
+    transform: translate(1px, -1px);
+}
+
+.profile-element:active {
+    transform: scale(0.99);
+}
+
+.profile-list:last-child svg {
+    stroke: #7e8590;
+}
+
+.profile-list:last-child:hover svg {
+    stroke: #000000;
+}
+
+/* ==================== User Dropdown Menu (Estilo Moderno) ==================== */
+
+/* 1. Container para alinhar o ícone e o menu */
+.user-menu-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-right: 15px; /* Leve ajuste de margem */
+}
+
+/* 2. Ícone de perfil com 'glow' no hover */
+.login-nav {
+    width: 55px; /* Um pouco menor para elegância */
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 2px solid transparent; /* Borda transparente para o 'glow' */
+    padding: 2px; /* Evita que a borda "pule" */
+    box-sizing: border-box;
+}
+
+.login-nav:hover {
+    transform: scale(1.05);
+    /* Glow vermelho intenso, combinando com seu site */
+    border-color: rgba(194, 9, 9, 0.5);
+    box-shadow: 0 0 15px rgba(194, 9, 9, 0.7);
+}
+
+/* 2.1. Estado 'ativo' quando o menu está aberto */
+.login-nav.active {
+    transform: scale(1.05);
+    border-color: #ac0f0f; /* Borda vermelha sólida */
+    box-shadow: 0 0 15px rgba(194, 9, 9, 0.7);
+}
+
+/* 3. O menu dropdown (Estilo Glassmorphism) */
+.user-dropdown {
+    /* Começa escondido */
+    display: block; 
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95); /* Animação de 'subir' e 'crescer' */
+    
+    position: absolute;
+    top: calc(100% + 10px); /* Mais espaço (10px) abaixo do ícone */
+    right: 0;
+    width: 220px; /* Um pouco mais largo */
+    
+    /* Efeito Glassmorphism */
+    background: rgba(10, 10, 10, 0.8); /* Fundo escuro quase opaco */
+    backdrop-filter: blur(10px); /* Desfoque de fundo */
+    
+    border: 1px solid #ac0f0f; /* Borda vermelha do seu tema */
+    border-radius: 12px; /* Mais arredondado */
+    box-shadow: 0 8px 32px 0 rgba(194, 9, 9, 0.3); /* Sombra mais suave */
+    z-index: 1100;
+    overflow: hidden;
+    
+    /* Transição suave */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s;
+}
+
+/* 4. Classe 'active' que o JS vai usar para MOSTRAR o menu */
+.user-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1); /* Posição final da animação */
+}
+
+/* 5. Links dentro do dropdown */
+.user-dropdown a {
+    display: block;
+    padding: 14px 18px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1rem;
+    font-family: "Roboto", sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    
+    /* Remove estilos da navbar principal */
+    text-align: left;
+    letter-spacing: 0;
+    margin: 0; 
+}
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    padding: 4px 7px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+}
+
+/* 6. Hover dos links */
+.user-dropdown a:hover {
+    background-color: rgba(163, 12, 12, 0.5); /* Vermelho com transparência */
+    color: #ffffff;
+    padding-left: 22px; /* Efeito sutil de 'slide' no texto */
+}
+
+/* 7. Linha divisória entre os links (Opcional, mas elegante) */
+.user-dropdown a:first-of-type {
+    border-bottom: 1px solid rgba(172, 15, 15, 0.3);
+}
+
+/* ==================== Fim User Dropdown Menu ==================== */
+
+
+
+
+
+
 /* === MEDIA QUERY PARA RESPONSIVIDADE === */
 @media (max-width: 768px) {
     .desktop-navbar {
