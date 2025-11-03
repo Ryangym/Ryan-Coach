@@ -67,7 +67,7 @@ body {
     box-shadow: 0 8px 32px 0 rgba(194, 9, 9, 0.549);
     /* Sombra sutil */
 }
-.logo{
+.logo {
   margin-left: 20px;
   font-family: "Ms Madi", cursive;
   font-weight: 500;
@@ -75,6 +75,12 @@ body {
   font-style: normal;
   font-size: 3rem;
   color: #ffffff;
+  transition: color 0.3s ease, text-shadow 0.3s ease; 
+}
+
+.logo:hover {
+  color: #FFBA42; 
+  text-shadow: #760e0e 6px 6px 8px, 0 0 10px rgba(255, 186, 66, 0.7); 
 }
 
 .links-content{
@@ -377,12 +383,29 @@ nav a:hover {
     text-decoration: none;
     color: #ccc;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
+    position: relative; /* Necessário para o ::after funcionar */
+    padding-bottom: 3px; /* Espaço para o sublinhado não grudar no texto */
+}
+
+/* Cria a linha "escondida" */
+#footer-links a::after {
+    content: '';
+    position: absolute;
+    width: 0%; /* Começa com largura 0 */
+    height: 2px;
+    background-color: #FFBA42; /* Cor dourada */
+    bottom: 0;
+    left: 0; /* Começa da esquerda */
+    transition: width 0.3s ease; /* Anima apenas a largura */
 }
 
 #footer-links a:hover {
     color: #FFBA42; /* Destaque dourado */
-    padding-left: 8px; /* Efeito de "slide" */
+}
+
+#footer-links a:hover::after {
+    width: 100%; /* Expande a linha para 100% no hover */
 }
 
 /* Coluna 3: Formulário */
@@ -459,11 +482,10 @@ nav a:hover {
     transition: all 0.3s ease;
 }
 
-.social-links-v2 a svg {
+.social-links-v2 a img {
     width: 20px;
     height: 20px;
-    fill: #ffffff;
-    transition: fill 0.3s ease;
+    filter: invert(100%) brightness(100%); /* Força o ícone a ficar branco */
 }
 
 .social-links-v2 a:hover {
