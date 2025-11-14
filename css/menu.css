@@ -482,7 +482,6 @@ nav a:hover {
 .footer-col {
     padding: 0 1rem;
 }
-
 /* Coluna 1: Marca */
 #footer-brand p {
     font-size: 0.95rem;
@@ -663,8 +662,18 @@ nav a:hover {
     #footer-brand .logo {
         margin: 0 auto 1rem auto;
     }
+    #footer-brand p {
+        margin: 0 auto 1.5rem auto;
+    }
     .social-links-v2 {
         justify-content: center;
+    }
+
+    #footer-form {
+    order: -2;
+    }
+    #footer-brand {
+    order: -3;
     }
 }
 /* ==================== Footer FIM ================= */
