@@ -1,6 +1,52 @@
 /* Conteúdo original de menu.css */
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap");
 
+/* ---------------FONTES---------------------- */
+@font-face {
+    font-family: 'cinema-sunday';
+    src: url('../fontes/cinema-sunday.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'hookride';
+    src: url('../fontes/hookride.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'jackoe';
+    src: url('../fontes/Jackoe.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'karlotte';
+    src: url('../fontes/Karlotte.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'monda';
+    src: url('../fontes/Monda.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'poppins-bold';
+    src: url('../fontes/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'rociroll';
+    src: url('../fontes/Rociroll.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
 /* --- Estilização da Barra de Rolagem --- */
 html {
   scrollbar-width: thin;
@@ -295,17 +341,16 @@ nav a:hover {
     .desktop-navbar {
         display: none; /* Esconde o menu de desktop */
     }
-    #logoicon{
-        display: block;
-        margin-left: 2vw;
-        height: calc(8vw + 2rem);
+    .logo-mobilenav{
+        height: 55px; width: 55px;
+        filter: drop-shadow(0 0 6px #ff0000);
     }
 
     .mobile-navbar {
         top: 0;
         position: fixed;
         width: 100%;
-        padding: 14px;
+        padding: 16px;
         background-color: #360a03; /* Você pode mudar isso para 'var(--vinho)' */
         display: flex;
         justify-content: space-between;

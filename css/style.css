@@ -2,7 +2,7 @@
   margin-top: 6rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-end;
   background-image: url(../img/background/1000097489.png);
   background-size: 70%;
@@ -27,14 +27,43 @@
 }
 @media (max-width: 768px) {
     .landing-page {
-        background-size: cover; /* Cobre o fundo inteiro */
+        background-size: cover; 
         background-position: center center;
     }
 }
-@media (max-width: 500px) {
-    .landing-page {
-      
+ @media (max-width: 500px) {
+  .landing-page{
+    background-image: url(../img/background/Picsart_25-11-15_21-41-10-619.png);
+    background-position: top;
+  }
+    /* .landing-page {
+        background-image: none !important; 
+        
+        height: auto; 
+        justify-content: flex-start; 
+        
+        align-items: center; 
     }
+
+    .landing-page::before {
+        content: '';
+        display: block; 
+        width: 100%;
+        
+
+        height: 50vh; 
+        background-image: url(../img/background/1000097489.png);
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        margin-bottom: 200px;
+    }
+    .landing-text {
+      position: absolute;
+      top: 400px;
+      width: 100%;
+      padding: 0px 20px; 
+    } */
 }
 .landing-text{
   display: flex;
@@ -59,11 +88,8 @@ b{
 }
 
 .texto-maior{
-  font-family: "Copse", serif;
-  font-weight: 400;
-  font-style: normal;
+  font-family: 'cinema-sunday', "Copse", serif;
   font-size: calc(1.4vw + 1rem);
-  font-weight: 500;
   text-shadow: #000000 6px 6px 8px;
   color: #ffffff;
 }
