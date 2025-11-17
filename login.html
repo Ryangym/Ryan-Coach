@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ryan Coach</title>
+    
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="icon" type="image/png" href="img/icones/favicon3.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <a href="index.html" class="logo-link">
+        <h2 class="logo">Ryan Coach</h2>
+    </a>
+
+    <div class="container" id="container">
+
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Criar Conta</h1>
+                <span>Use seu email para se cadastrar</span>
+                <div class="input-group">
+                    <input type="text" id="reg-name" placeholder=" " required />
+                    <label for="reg-name">Nome</label>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="reg-email" placeholder=" " required />
+                    <label for="reg-email">Email</label>
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="reg-phone" placeholder=" " required />
+                    <label for="reg-phone">Telefone</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="reg-pass" placeholder=" " required />
+                    <label for="reg-pass">Senha</label>
+                </div>
+                <button type="submit" class="btn-submit">Cadastrar</button>
+                
+                <p class="form-bottom-text mobile-only">
+                    Já é membro? <a href="#" class="form-link" id="signInMobile">Faça Login</a>
+                </p>
+            </form>
+        </div>
+
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Entrar</h1>
+                <span>Use sua conta</span>
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder=" " required />
+                    <label for="login-email">Email</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-pass" placeholder=" " required />
+                    <label for="login-pass">Senha</label>
+                </div>
+                <a href="#" class="form-link forgot-pass">Esqueceu sua senha?</a>
+                <button type="submit" class="btn-submit">Entrar</button>
+
+                <p class="form-bottom-text mobile-only">
+                    Não tem conta? <a href="#" class="form-link" id="signUpMobile">Cadastre-se</a>
+                </p>
+            </form>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <video autoplay loop muted playsinline class="overlay-video">
+                    <source src="img/treino.mp4" type="video/mp4">
+                    Seu navegador não suporta vídeos.
+                </video>
+                <div class="overlay-panel overlay-left">
+                    <h2>Bem-vindo de Volta!</h2>
+                    <p>Para se manter conectado conosco, por favor, faça o login com suas informações pessoais</p>
+                    <button class="btn-ghost" id="signIn">Entrar</button>
+                </div>
+
+                <div class="overlay-panel overlay-right">
+                    <h2>Olá, Amigo!</h2>
+                    <p>Entre com seus dados e comece sua jornada de transformação conosco</p>
+                    <button class="btn-ghost" id="signUp">Cadastre-se</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('container');
+            
+            // Botões do Desktop (Overlay)
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+
+            // Links de texto do Mobile
+            const signUpLinkMobile = document.getElementById('signUpMobile');
+            const signInLinkMobile = document.getElementById('signInMobile');
+
+            const showSignUp = () => {
+                container.classList.add('active');
+            };
+
+            const showSignIn = () => {
+                container.classList.remove('active');
+            };
+
+            // Listeners para Desktop
+            signUpButton.addEventListener('click', showSignUp);
+            signInButton.addEventListener('click', showSignIn);
+
+            // Listeners para Mobile
+            signUpLinkMobile.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSignUp();
+            });
+            signInLinkMobile.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSignIn();
+            });
+        });
+    </script>
+</body>
+</html>
