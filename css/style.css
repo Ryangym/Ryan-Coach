@@ -100,11 +100,23 @@ b{
 }
 .texto-menor{
   font-size: calc(0.8vw + 0.8rem);
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: 'Story Script', Verdana, Geneva, sans-serif;
   font-weight: 400;
-  text-shadow: #000000 8px 8px 12px;
   color: #ffffff;
   margin-bottom: 20px;
+  animation: dark-shadow-pulse 3s infinite alternate;
+}
+@keyframes dark-shadow-pulse {
+  0% {
+    text-shadow: 4px 2px 5px #000000;
+  }
+  50% {
+    text-shadow: 0 0 15px #000000;
+  }
+  100% {
+    text-shadow: 0 0 5px #000000;
+  }
+  
 }
 .landing-text p {
   max-width: 70%;

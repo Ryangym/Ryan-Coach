@@ -1,6 +1,6 @@
 /* --- TÍTULO DA PÁGINA --- */
 h1.section-title { /* Mudei o seletor para ser mais específico */
-    font-family: "Orbitron", sans-serif;
+    font-family: 'Copse', sans-serif;
     font-weight: 500;
     text-shadow: #760e0e 6px 6px 8px;
     font-style: normal;
@@ -46,7 +46,7 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
     position: absolute;
     height: 100%;
     width: 100%;
-    background-image: conic-gradient(from var(--angle), transparent 70%, rgb(104, 33, 33), #931616, #d21212 );
+    background-image: conic-gradient(from var(--angle), transparent 70%, rgb(252, 0, 0), #931616, #d21212 );
     top: 50%;
     left: 50%;
     translate: -50% -50%;
@@ -64,26 +64,23 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
     flex-grow: 1; 
     max-width: 400px; 
     position: relative;
-    background: #000000;
+    background: linear-gradient(black 60%, #330000 100%);
     border-radius: 10px;
 }
 
 
-/* --- IMAGEM DENTRO DO CARD --- */
 .card img {
     width: 100%;
-    height: 300px; /* Altura fixa para todas as imagens */
-    object-fit: cover; /* Garante que a imagem cubra a área sem distorcer */
+    height: 350px; 
 }
-
-/* --- TÍTULO DENTRO DO CARD (Plano Básico, etc.) --- */
 .card h2 {
     color: white;
     text-align: center;
     padding: 1rem;
-    font-size: 1.4rem; /* Aumentei o título do plano */
+    font-size: 1.6rem; 
+    letter-spacing: 1px;
     margin: 0;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: 'cinema-sunday', sans-serif;
 }
 
 /* Título Premium */
@@ -101,7 +98,8 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
     text-align: center;
     padding: 1rem;
     margin: 0;
-    font-family: "Orbitron", sans-serif;
+    font-family: 'Copse', sans-serif;
+    letter-spacing: 3px;
 }
 
 .card .price strong {
@@ -125,6 +123,7 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
     margin-bottom: 0.75rem; /* Espaço entre os itens */
     display: flex;
     align-items: center;
+    font-family: cursive;
 }
 
 /* Adiciona ícones de ✔ e ✘ */
@@ -154,11 +153,11 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
 #dieta {
     color: white;
     font-weight: bold;
-    animation: wine-glow 1.5s infinite alternate;
+    animation: glow 1.5s infinite alternate;
 }
 #dieta::before {
     content: '✔';
-    color: #daa520; /* Dourado/Amarelo */
+    color: #45da20; /* Dourado/Amarelo */
     animation: glow 1.5s infinite alternate;
 }
 
@@ -169,7 +168,8 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
     
     display: block; /* Faz o <a> ocupar a largura */
     text-align: center;
-    background: #796e0e;
+    background: #810e0e;
+    box-shadow: 0 0 20px #660808;
     padding: 1rem 0.8rem;
     color: white;
     text-transform: uppercase;
@@ -186,8 +186,8 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
 }
 
 .contact-btn:hover {
-    background: #810e0e;
-    box-shadow: 0 0 20px #660808;
+    background: #979700;
+    box-shadow: 0 0 20px #dcf30c;
 }
 
 
@@ -195,23 +195,12 @@ h1.section-title { /* Mudei o seletor para ser mais específico */
 /* --- ANIMAÇÕES (Glow) --- */
 @keyframes glow {
     0% {
-        text-shadow: 0 0 2px #fff, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520, 0 0 10px #daa520;
+        text-shadow: 0 0 2px #fff, 0 0 3px #daa520, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520;
     }
     50% {
-        text-shadow: 0 0 4px #fff, 0 0 8px #daa520, 0 0 12px #daa520, 0 0 16px #daa520, 0 0 20px #daa520;
+        text-shadow: 0 0 4px #fff, 0 0 6px #daa520, 0 0 9px #daa520, 0 0 12px #daa520, 0 0 15px #daa520;
     }
     100% {
-        text-shadow: 0 0 2px #fff, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520, 0 0 10px #daa520;
-    }
-}
-@keyframes wine-glow {
-    0% {
-        text-shadow: 0 0 2px #fff, 0 0 4px #800000, 0 0 6px #800000, 0 0 8px #800000, 0 0 10px #800000;
-    }
-    50% {
-        text-shadow: 0 0 4px #fff, 0 0 8px #800000, 0 0 12px #800000, 0 0 16px #800000, 0 0 20px #800000;
-    }
-    100% {
-        text-shadow: 0 0 2px #fff, 0 0 4px #800000, 0 0 6px #800000, 0 0 8px #800000, 0 0 10px #800000;
+        text-shadow: 0 0 2px #fff, 0 0 3px #daa520, 0 0 4px #daa520, 0 0 6px #daa520, 0 0 8px #daa520;
     }
 }
