@@ -458,6 +458,7 @@ form {
     }
     .form-bottom-text.mobile-only .form-link {
         font-weight: bold;
+        color: rgb(22, 76, 213);
     }
 }
 

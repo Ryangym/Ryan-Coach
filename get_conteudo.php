@@ -7,6 +7,14 @@ $pagina = $_GET['pagina'] ?? 'treinos';
 // Apenas o HTML que deve ir dentro da <main id="conteudo">.
 
 switch ($pagina) {
+    case 'dashboard':
+        echo '
+            <section id="dashboard">
+                <h1>Dashboard</h1>
+                <p>Visão geral das suas atividades, progresso e notificações.</p>
+            </section>
+        ';
+        break;
     case 'treinos':
         echo '
             <section id="treinos">

@@ -6,26 +6,28 @@
     <title>Usuário</title>
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="css/usuario.css">
+
+    <link rel="icon" type="image/png" href="img/icones/favicon3.png">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Copse&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Cream+Soda&display=swap" rel="stylesheet">
 </head>
 <body>
     
-    <nav class="desktop-navbar">
-        <div class="glass-morphism">
-            <a href="index.html" class="logo">
-                <h2>Ryan Coach</h2>
-            </a>
-            <div class="links-content">
-                <a href="index.html#servicos">Serviços</a>
-                <a href="usuario.php">Usuario</a>
-                <a href="index.html#contato">Contato</a>
-            </div>
-            <img src="img/login.png" alt="" class="login-nav">
-        </div>
-    </nav>
-
     <aside id="main-aside">
-        <img src="img/ryan_coach_atualizado.png" alt="Ryan Coach" style="width: 80%; margin: 15px auto; border-radius: 50%;">
         
+        <h2 class="logo">Ryan Coach</h2>
+        <img src="img/ryan_coach_atualizado.png" alt="Foto de perfil do usuário" class="foto-perfil">
+        <p class="usuario-nome">Usuário</p>
+        
+        <button data-pagina="dashboard">Dashboard</button>
         <button data-pagina="treinos">Meus Treinos</button>
         <button data-pagina="perfil">Meu Perfil</button>
         <button data-pagina="avaliacoes">Avaliações</button>

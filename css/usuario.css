@@ -1,5 +1,11 @@
-.desktop-navbar{
-    display: none;
+
+
+body {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.381)), url(../img/background-gym.png);
+  background-size: 100%;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 /* Estilos existentes da aside#main-aside... */
 aside#main-aside {
@@ -8,17 +14,17 @@ aside#main-aside {
     left: 0;
     height: 100vh; 
     width: 20%;
-    background-color: #020e20;
     border: 2px #FFBA42 solid;
     box-sizing: border-box;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: center;
     overflow-y: auto; 
     padding-top: 20px;
     padding-bottom: 3rem;
     z-index: 999; 
+    filter: blur(40%);
 }
 
 /* Regra de layout principal */
@@ -30,31 +36,47 @@ main#conteudo {
 }
 
 /* Estilos existentes de aside img e button... */
-aside img{
-        width: calc(7rem + 10vw);
-        height: calc(7rem + 10vw);
+.foto-perfil {
+        width: calc(6rem + 7.5vw);
+        height: calc(6rem + 7.5vw);
         object-fit: cover;
         display: block;
         align-self: center;
         border-radius: 50%;
+        border: 3px solid #FFBA42;
+        box-shadow: 0 0 15px #bf0808;
+}
+.usuario-nome {
+    font-size: 1.6rem;
+    margin-top: 0.5rem;
+    margin-bottom: 3rem;
+    font-family: cursive, sans-serif;
+    text-align: center;
 }
 aside button {
     position: relative;
-    color: #FFBA42;
+    color: #ffffff;
     font-size: 1.5rem;
     background: none;
     border: none;
-    font-family: 'AlteHaasGroteskBold', Times, serif;
+    font-family: 'cinema-sunday', cursive;
     text-decoration: none;
-    margin-left: 2vw;
+    margin-left: auto;
     margin-right: auto;
+    margin-bottom: 0.5rem;
+    padding: 3% 9%;
+    border-radius: 15%;
     cursor: pointer;
-    padding: 0px;
     white-space: nowrap; 
-    text-align: left; 
+    text-align: center; 
 }
 
-aside button::after {
+aside button:hover{ 
+    color: #FFD700;
+    border: 2px solid #bd3c3c;
+}
+
+/* aside button::after {
     content: "";
     position: absolute;
     bottom: -5px;
@@ -74,7 +96,7 @@ aside button.active::after {
 aside button:hover,
 aside button.active {
     color: #FFD700;
-}
+} */
 
 
 /* === NOVOS ESTILOS PARA LOADING (OPCIONAL) === */
