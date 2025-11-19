@@ -7,31 +7,73 @@
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="css/usuario.css">
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuário - Ryan Coach</title>
+    
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/usuario.css">
+
     <link rel="icon" type="image/png" href="img/icones/favicon3.png">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css2?family=Copse&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cherry+Cream+Soda&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&family=Orbitron:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     
+    <div class="background-overlay"></div>
+
     <aside id="main-aside">
         
-        <h2 class="logo">Ryan Coach</h2>
-        <img src="img/ryan_coach_atualizado.png" alt="Foto de perfil do usuário" class="foto-perfil">
-        <p class="usuario-nome">Usuário</p>
+        <div class="aside-header">
+            <h2 class="logo">Ryan Coach</h2>
+            <div class="profile-container">
+                <img src="img/ryan_coach_atualizado.png" alt="Foto de perfil" class="foto-perfil">
+                <div class="status-indicator"></div>
+            </div>
+            <p class="usuario-nome">Ryan Trainer</p>
+            <p class="usuario-level">Pro Member</p>
+        </div>
         
-        <button data-pagina="dashboard">Dashboard</button>
-        <button data-pagina="treinos">Meus Treinos</button>
-        <button data-pagina="perfil">Meu Perfil</button>
-        <button data-pagina="avaliacoes">Avaliações</button>
-        <button data-pagina="pagamentos">Pagamentos</button>
+        <nav class="nav-buttons">
+            <button data-pagina="dashboard" class="active">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </button>
+            
+            <button data-pagina="treinos">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Meus Treinos</span>
+            </button>
+            
+            <button data-pagina="nutrition"> <i class="fa-solid fa-utensils"></i>
+                <span>Dieta & Nutrição</span>
+            </button>
+            
+            <button data-pagina="avaliacoes">
+                <i class="fa-solid fa-file-medical"></i>
+                <span>Avaliações</span>
+            </button>
+            
+            <button data-pagina="perfil">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Configurações</span>
+            </button>
+        </nav>
+
+        <div class="aside-footer">
+            <button data-pagina="logout" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+
     </aside>
 
     <main id="conteudo">
@@ -39,19 +81,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const BOTAO_PADRAO = 'treinos';
+            const BOTAO_PADRAO = 'dashboard'; // Mudei o padrão para testar
             const aside = document.getElementById('main-aside');
             const areaConteudo = document.getElementById('conteudo');
-            const botoes = aside.querySelectorAll('button');
+            const botoes = aside.querySelectorAll('button[data-pagina]'); // Seleciona apenas botões de navegação
 
             // Função assíncrona para buscar o conteúdo
             async function carregarConteudo(pagina) {
+                if(pagina === 'logout') {
+                    window.location.href = 'index.html'; // Exemplo de logout
+                    return;
+                }
+
                 // 1. Mostrar feedback de "Carregando..."
                 areaConteudo.innerHTML = '<p class="loading">Carregando...</p>';
                 areaConteudo.classList.add('loading');
 
                 try {
-                    // 2. Fazer a requisição para o novo arquivo PHP
+                    // 2. Fazer a requisição
                     const response = await fetch(`get_conteudo.php?pagina=${pagina}`);
                     
                     if (!response.ok) {
@@ -60,13 +107,17 @@
                     
                     const html = await response.text();
                     
-                    // 3. Injetar o HTML recebido na área de conteúdo
+                    // 3. Injetar o HTML
                     areaConteudo.innerHTML = html;
                     areaConteudo.classList.remove('loading');
 
                     // 4. Atualizar o botão ativo
                     botoes.forEach(btn => {
-                        btn.classList.toggle('active', btn.dataset.pagina === pagina);
+                        if(btn.dataset.pagina === pagina) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
                     });
 
                 } catch (error) {
@@ -78,14 +129,16 @@
 
             // Adicionar o "ouvinte" de cliques na 'aside'
             aside.addEventListener('click', (e) => {
-                // Verificar se o clique foi em um botão com 'data-pagina'
-                if (e.target.tagName === 'BUTTON' && e.target.dataset.pagina) {
-                    const pagina = e.target.dataset.pagina;
+                // O truque aqui: e.target pode ser o ícone, então usamos .closest('button')
+                const btn = e.target.closest('button');
+                
+                if (btn && btn.dataset.pagina) {
+                    const pagina = btn.dataset.pagina;
                     carregarConteudo(pagina);
                 }
             });
 
-            // Carregar o conteúdo padrão ("treinos") ao entrar na página
+            // Carregar o conteúdo padrão ao entrar na página
             carregarConteudo(BOTAO_PADRAO);
         });
     </script>

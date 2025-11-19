@@ -2,15 +2,13 @@
 // Define qual página foi pedida na URL (ex: get_conteudo.php?pagina=perfil)
 $pagina = $_GET['pagina'] ?? 'treinos';
 
-// Simples sistema de roteamento para devolver o HTML correto
-// IMPORTANTE: Não coloque <html>, <head> ou <body> aqui.
-// Apenas o HTML que deve ir dentro da <main id="conteudo">.
+// Retorna o conteúdo HTML baseado na página pedida
 
 switch ($pagina) {
     case 'dashboard':
         echo '
             <section id="dashboard">
-                <h1>Dashboard</h1>
+                <h1 class="welcome-message">Bem-Vindo, Ryan.</h1>
                 <p>Visão geral das suas atividades, progresso e notificações.</p>
             </section>
         ';
