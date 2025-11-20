@@ -1,90 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuário</title>
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/usuario.css">
-
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuário - Ryan Coach</title>
     
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="css/usuario.css">
 
-    <link rel="icon" type="image/png" href="img/icones/favicon3.png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&family=Orbitron:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <?php include 'components/head_main.php'; ?>
 </head>
 <body>
     
     <div class="background-overlay"></div>
 
-    <header class="mobile-top-bar">
-        <div class="mobile-logo">Ryan Coach</div>
-        <div class="mobile-user-actions">
-            <img src="img/ryan_coach_atualizado.png" alt="Perfil" class="mobile-profile-pic">
-            <button onclick="window.location.href='index.html'" class="mobile-logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-        </div>
-    </header>
-
-    <aside id="main-aside">
-        
-        <div class="aside-header">
-            <h2 class="logo">Ryan Coach</h2>
-            <div class="profile-container">
-                <img src="img/ryan_coach_atualizado.png" alt="Foto de perfil" class="foto-perfil">
-                <div class="status-indicator"></div>
-            </div>
-            <p class="usuario-nome">Ryan Trainer</p>
-            <p class="usuario-level">Pro Member</p>
-        </div>
-        
-        <nav class="nav-buttons">
-            <button data-pagina="dashboard" class="active">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Dashboard</span>
-            </button>
-            
-            <button data-pagina="treinos">
-                <i class="fa-solid fa-dumbbell"></i>
-                <span>Meus Treinos</span>
-            </button>
-            
-            <button data-pagina="nutrition"> <i class="fa-solid fa-utensils"></i>
-                <span>Dieta & Nutrição</span>
-            </button>
-            
-            <button data-pagina="avaliacoes">
-                <i class="fa-solid fa-file-medical"></i>
-                <span>Avaliações</span>
-            </button>
-            
-            <button data-pagina="perfil">
-                <i class="fa-solid fa-user-gear"></i>
-                <span>Configurações</span>
-            </button>
-        </nav>
-
-        <div class="aside-footer">
-            <button data-pagina="logout" class="btn-logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Sair</span>
-            </button>
-        </div>
-
-    </aside>
+    <?php include 'components/sidebar_usuario.php'; ?>
 
     <main id="conteudo">
         </main>

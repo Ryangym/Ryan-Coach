@@ -1,105 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ryan Coach</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/menu.css">
-    <link rel="icon" type="image/png" href="img/icones/favicon3.png">
 
+    <?php include 'components/head_main.php'; ?>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css2?family=Copse&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css2?family=Story+Script&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cherry+Cream+Soda&display=swap" rel="stylesheet">
 </head>
 <body>
-     <!-- Barra de navegação mobile -->
-    <nav class="mobile-navbar">
-        <button class="menu-toggle" id="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
-        <img class="logo-mobilenav" src="img/icones/icon-nav.png" alt="">
-
-        <nav class="mobile-nav" id="mobile-nav">
-            <button class="btnLogin-popup-mobile">
-                <img src="img/login.png" alt="">
-                <p>Login</p>
-            </button>
-            <ul>
-                <li><a href="index.php">Início</a></li>
-                <li><a href="index.php#modalidades">Modalidades</a></li>
-                <li><a href="index.php#ft-footer">Contato</a></li>
-                <li><a href="planos.php">Planos</a></li>
-            </ul>
-            <div class="redes-mobilenavbar">
-                <a href="https://www.instagram.com/ct.olympo?igsh=b3NiaDBtcXF5bDlp&utm_source=qr">
-                    <img src="IMG/icones/insta.png" alt="">
-                </a>
-                <a href="https://www.facebook.com/">
-                    <img src="IMG/icones/facebook.png" alt="">
-                </a>
-                <a href="https://youtube.com/@ctolympo?si=6mtc_D-h9szc3hAP">
-                    <img src="IMG/icones/youtube.png" alt="">
-                </a>
-            </div>
-        </nav>
-        <script src="js/navbar.js"></script>
-    </nav>
-
-
-    <nav class="desktop-navbar">
-        <div class="glass-morphism">
-            <a href="index.html" class="logo">
-                <h2 class="logo">Ryan Coach</h2>
-            </a>
-            <div class="links-content">
-                <a class="navlinks" href="admin.php">Admin</a>
-                <a class="navlinks" href="usuario.php">Usuario</a>
-                <a class="navlinks" href="index.html#contato">Contato</a>
-            </div>
-
-            <img src="img/login.png" alt="Login" class="login-nav" id="userMenuToggle">
-            <div id="profileMenu" class="profile-dropdown-menu">
-                <div class="profile-card">
-                    <ul class="profile-list">
-                        <li class="profile-element">
-                            <a href="login.html" class="profile-link">
-                                <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-user-icon lucide-user">
-                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                <p class="profile-label">Entrar/Cadastro</p>
-                            </a>
-                        </li>
-                        <li class="profile-element">
-                            <a href="loginAdmin.html" class="profile-link">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-user-lock-icon lucide-user-lock">
-                                    <circle cx="10" cy="7" r="4" />
-                                    <path d="M10.3 15H7a4 4 0 0 0-4 4v2" />
-                                    <path d="M15 15.5V14a2 2 0 0 1 4 0v1.5" />
-                                    <rect width="8" height="5" x="13" y="16" rx=".899" />
-                                </svg>
-                                <p class="profile-label">Admin Login</p>
-                            </a>
-                        </li>
-                    </ul>
-
-                </div>
-            </div>
-    </nav>
+    <?php include 'components/navbar.php'; ?>
 
     <section class="landing-page">
         <div class="landing-text">
@@ -290,70 +200,7 @@
         <a href="mailto:contato@ryancoach.com" class="btn">Enviar E-mail</a>
     </section>
 
-    <footer class="site-footer-v2">
-        <div class="footer-glow-bar"></div>
-
-        <div class="footer-container-v2">
-            
-            <div class="footer-col" id="footer-brand">
-                <h2 class="logo">Ryan Coach</h2>
-                <p>Onde foco, disciplina e ciência se encontram para transformar seu físico.</p>
-                
-                <div class="social-links-v2">
-                    <a href="https{SEU_LINK_WHATSAPP}" target="_blank" title="WhatsApp" style="--social-color: #25D366;">
-                        <img src="img/icones/whatsapp-fill-svgrepo-com.svg" alt="WhatsApp">
-                    </a>
-                    <a href="https{SEU_LINK_INSTAGRAM}" target="_blank" title="Instagram" style="--social-color: #E4405F;">
-                        <img src="img/icones/instagram-fill-svgrepo-com.svg" alt="Instagram">
-                    </a>
-                    <a href="https{SEU_LINK_TIKTOK}" target="_blank" title="TikTok" style="--social-color: #8f16aa;">
-                        <img src="img/icones/tiktok-fill-svgrepo-com.svg" alt="TikTok">
-                    </a>
-                    <a href="https{SEU_LINK_TELEGRAM}" target="_blank" title="Telegram" style="--social-color: #229ED9;">
-                        <img src="img/icones/telegram-fill-svgrepo-com.svg" alt="Telegram">
-                    </a>
-                    <a href="https{SEU_LINK_YOUTUBE}" target="_blank" title="YouTube" style="--social-color: #FF0000;">
-                        <img src="img/icones/youtube-fill-svgrepo-com.svg" alt="YouTube">
-                    </a>
-                </div>
-            </div>
-
-        <div class="footer-col" id="footer-links">
-            <h4>Navegação</h4>
-            <ul>
-                <li><a href="index.html">Início</a></li>
-                <li><a href="planos.html">Nossos Planos</a></li>
-                <li><a href="usuario.php">Área do Aluno</a></li>
-                <li><a href="index.html#sobre">Sobre o Coach</a></li>
-                <li><a href="index.html#contato">Contato</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-col" id="footer-form">
-            <h4>Mande uma Mensagem</h4>
-            <form action="seu_script_de_email.php" method="POST">
-                <div class="input-group-v2">
-                    <input type="text" id="footer-name" name="name" placeholder="Nome Completo" required>
-                </div>
-                <div class="input-group-v2">
-                    <input type="email" id="footer-email" name="email" placeholder="Seu Email" required>
-                </div>
-                 <div class="input-group-v2">
-                    <input type="tel" id="footer-phone" name="phone" placeholder="Seu Telefone" required>
-                </div>
-                <div class="input-group-v2">
-                    <textarea id="footer-message" name="message" rows="4" placeholder="Sua Mensagem..." required></textarea>
-                </div>
-                <button type="submit" class="footer-submit-btn-v2">Enviar</button>
-            </form>
-        </div>
-
-    </div>
-
-    <div class="footer-bottom-v2">
-        <p>&copy; 2025 Ryan Coach. Todos os direitos reservados. Desenvolvido por Ryan Borges.</p>
-    </div>
-</footer>
+    <?php include 'components/footer.php'; ?>
 
     <script src="js/navbar.js"></script>
 
