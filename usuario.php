@@ -27,7 +27,7 @@
             // Função assíncrona para buscar o conteúdo
             async function carregarConteudo(pagina) {
                 if(pagina === 'logout') {
-                    window.location.href = 'index.html'; // Exemplo de logout
+                    window.location.href = 'index.php'; // Exemplo de logout
                     return;
                 }
 

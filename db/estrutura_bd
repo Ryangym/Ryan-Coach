@@ -1,0 +1,13 @@
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    nivel ENUM('aluno', 'admin') DEFAULT 'aluno',
+    data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- (Opcional) Cria um Admin padrão para você testar
+-- Senha do admin abaixo é: "admin123" (já criptografada)
+INSERT INTO usuarios (nome, email, senha, nivel) 
+VALUES ('Ryan Admin', 'admin@ryancoach.com', '$2y$10$7Kz.Xq.8/5V.5V.5V.5V.e/5V.5V.5V.5V.5V.5V.5V.5V.5V.5', 'admin');
