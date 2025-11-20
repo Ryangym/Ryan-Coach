@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db/db_connect.php';
+require_once '../config/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Limpa os dados recebidos
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute(['email' => $email]);
 
     if ($stmt->rowCount() > 0) {
-        echo "<script>alert('Email já cadastrado!'); window.location.href='login.html';</script>";
+        echo "<script>alert('Email já cadastrado!'); window.location.href='../login.php';</script>";
     } else {
         // Criptografa a senha (Segurança essencial)
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
@@ -23,9 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute(['nome' => $nome, 'email' => $email, 'senha' => $senhaHash])) {
-            echo "<script>alert('Cadastro realizado com sucesso! Faça login.'); window.location.href='login.html';</script>";
+            echo "<script>alert('Cadastro realizado com sucesso! Faça login.'); window.location.href='../login.php';</script>";
         } else {
-            echo "<script>alert('Erro ao cadastrar.'); window.location.href='login.html';</script>";
+            echo "<script>alert('Erro ao cadastrar.'); window.location.href='../login.php';</script>";
         }
     }
 }

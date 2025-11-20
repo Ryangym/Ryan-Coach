@@ -1,8 +1,8 @@
 <header class="mobile-top-bar">
         <div class="mobile-logo">Ryan Coach</div>
         <div class="mobile-user-actions">
-            <img src="img/ryan_coach_atualizado.png" alt="Perfil" class="mobile-profile-pic">
-            <button onclick="window.location.href='index.html'" class="mobile-logout">
+            <img src="assets/img/ryan_coach_atualizado.png" alt="Perfil" class="mobile-profile-pic">
+            <button onclick="window.location.href='index.php'" class="mobile-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
         </div>
@@ -13,7 +13,7 @@
         <div class="aside-header">
             <h2 class="logo">Ryan Coach</h2>
             <div class="profile-container">
-                <img src="img/ryan_coach_atualizado.png" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
+                <img src="assets/img/ryan_coach_atualizado.png" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
                 <div class="status-indicator" style="background-color: #ff4242;"></div>
             </div>
             <p class="usuario-nome">Ryan Admin</p>

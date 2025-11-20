@@ -9,19 +9,19 @@
                 
                 <div class="social-links-v2">
                     <a href="https{SEU_LINK_WHATSAPP}" target="_blank" title="WhatsApp" style="--social-color: #25D366;">
-                        <img src="img/icones/whatsapp-fill-svgrepo-com.svg" alt="WhatsApp">
+                        <img src="assets/img/icones/whatsapp-fill-svgrepo-com.svg" alt="WhatsApp">
                     </a>
                     <a href="https{SEU_LINK_INSTAGRAM}" target="_blank" title="Instagram" style="--social-color: #E4405F;">
-                        <img src="img/icones/instagram-fill-svgrepo-com.svg" alt="Instagram">
+                        <img src="assets/img/icones/instagram-fill-svgrepo-com.svg" alt="Instagram">
                     </a>
                     <a href="https{SEU_LINK_TIKTOK}" target="_blank" title="TikTok" style="--social-color: #8f16aa;">
-                        <img src="img/icones/tiktok-fill-svgrepo-com.svg" alt="TikTok">
+                        <img src="assets/img/icones/tiktok-fill-svgrepo-com.svg" alt="TikTok">
                     </a>
                     <a href="https{SEU_LINK_TELEGRAM}" target="_blank" title="Telegram" style="--social-color: #229ED9;">
-                        <img src="img/icones/telegram-fill-svgrepo-com.svg" alt="Telegram">
+                        <img src="assets/img/icones/telegram-fill-svgrepo-com.svg" alt="Telegram">
                     </a>
                     <a href="https{SEU_LINK_YOUTUBE}" target="_blank" title="YouTube" style="--social-color: #FF0000;">
-                        <img src="img/icones/youtube-fill-svgrepo-com.svg" alt="YouTube">
+                        <img src="assets/img/icones/youtube-fill-svgrepo-com.svg" alt="YouTube">
                     </a>
                 </div>
             </div>
@@ -32,8 +32,8 @@
                 <li><a href="index.php">Início</a></li>
                 <li><a href="planos.php">Nossos Planos</a></li>
                 <li><a href="usuario.php">Área do Aluno</a></li>
-                <li><a href="index.html#sobre">Sobre o Coach</a></li>
-                <li><a href="index.html#contato">Contato</a></li>
+                <li><a href="index.php#sobre">Sobre o Coach</a></li>
+                <li><a href="index.php#contato">Contato</a></li>
             </ul>
         </div>
 

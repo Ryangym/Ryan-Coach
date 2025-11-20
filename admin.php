@@ -3,17 +3,17 @@
 <head>
     <title>Administrador - Ryan Coach</title>
     
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/usuario.css"> 
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
+    <link rel="stylesheet" href="assets/css/usuario.css"> 
+    <link rel="stylesheet" href="assets/css/admin.css">
 
-    <?php include 'components/head_main.php'; ?>
+    <?php include 'includes/head_main.php'; ?>
 </head>
 <body>
     
     <div class="background-overlay"></div>
 
-    <?php include 'components/sidebar_admin.php'; ?>
+    <?php include 'includes/sidebar_admin.php'; ?>
 
     <main id="conteudo">
         </main>
@@ -37,7 +37,7 @@
 
                 try {
                     // Aponta para o novo arquivo PHP de admin
-                    const response = await fetch(`get_admin_conteudo.php?pagina=${pagina}`);
+                    const response = await fetch(`ajax/get_admin_conteudo.php?pagina=${pagina}`);
                     
                     if (!response.ok) throw new Error('Erro na requisição');
                     

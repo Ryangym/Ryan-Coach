@@ -6,11 +6,11 @@
             <span></span>
         </button>
 
-        <img class="logo-mobilenav" src="img/icones/icon-nav.png" alt="">
+        <img class="logo-mobilenav" src="assets/img/icones/icon-nav.png" alt="">
 
         <nav class="mobile-nav" id="mobile-nav">
             <button class="btnLogin-popup-mobile">
-                <img src="img/login.png" alt="">
+                <img src="assets/img/login.png" alt="">
                 <p>Login</p>
             </button>
             <ul>
@@ -21,13 +21,13 @@
             </ul>
             <div class="redes-mobilenavbar">
                 <a href="https://www.instagram.com/ct.olympo?igsh=b3NiaDBtcXF5bDlp&utm_source=qr">
-                    <img src="IMG/icones/insta.png" alt="">
+                    <img src="assets/IMG/icones/insta.png" alt="">
                 </a>
                 <a href="https://www.facebook.com/">
-                    <img src="IMG/icones/facebook.png" alt="">
+                    <img src="assets/IMG/icones/facebook.png" alt="">
                 </a>
                 <a href="https://youtube.com/@ctolympo?si=6mtc_D-h9szc3hAP">
-                    <img src="IMG/icones/youtube.png" alt="">
+                    <img src="assets/IMG/icones/youtube.png" alt="">
                 </a>
             </div>
         </nav>
@@ -38,21 +38,21 @@
     <!-- Barra de navegação desktop -->
     <nav class="desktop-navbar">
             <div class="glass-morphism">
-                <a href="index.html" class="logo">
+                <a href="index.php" class="logo">
                     <h2 class="logo">Ryan Coach</h2>
                 </a>
                 <div class="links-content">
                     <a class="navlinks" href="admin.php">Admin</a>
                     <a class="navlinks" href="usuario.php">Usuario</a>
-                    <a class="navlinks" href="index.html#contato">Contato</a>
+                    <a class="navlinks" href="index.php#contato">Contato</a>
                 </div>
 
-                <img src="img/login.png" alt="Login" class="login-nav" id="userMenuToggle">
+                <img src="assets/img/login.png" alt="Login" class="login-nav" id="userMenuToggle">
                 <div id="profileMenu" class="profile-dropdown-menu">
                     <div class="profile-card">
                         <ul class="profile-list">
                             <li class="profile-element">
-                                <a href="login.html" class="profile-link">
+                                <a href="login.php" class="profile-link">
                                     <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" class="lucide lucide-user-icon lucide-user">
@@ -63,7 +63,7 @@
                                 </a>
                             </li>
                             <li class="profile-element">
-                                <a href="loginAdmin.html" class="profile-link">
+                                <a href="loginAdmin.php" class="profile-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" class="lucide lucide-user-lock-icon lucide-user-lock">

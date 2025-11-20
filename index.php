@@ -2,15 +2,14 @@
 <html lang="pt-BR">
 <head>
     <title>Ryan Coach</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
 
-    <?php include 'components/head_main.php'; ?>
+    <?php include 'includes/head_main.php'; ?>
 
 </head>
 <body>
-    <?php include 'components/navbar.php'; ?>
-
+    <?php include 'includes/navbar.php'; ?>
     <section class="landing-page">
         <div class="landing-text">
             <p class="texto-maior"><b>Transforme</b> seu físico com um programa de treino <b>personalizado!</b> </p>
@@ -26,7 +25,7 @@
         <div class="card-box">
             <div class="card">
                 <div class="img-card">
-                    <img src="img/corrida.png" alt="">
+                    <img src="assets/img/corrida.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Corrida</h4>
@@ -35,7 +34,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="img/musculacao.png" alt="">
+                    <img src="assets/img/musculacao.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Musculação</h4>
@@ -44,7 +43,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="img/emagrecimento.png" alt="">
+                    <img src="assets/img/emagrecimento.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Emagrecimento</h4>
@@ -53,7 +52,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="img/força.png" alt="">
+                    <img src="assets/img/força.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Força</h4>
@@ -62,7 +61,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="img/esportes.png" alt="">
+                    <img src="assets/img/esportes.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Outros Esportes</h4>
@@ -200,9 +199,9 @@
         <a href="mailto:contato@ryancoach.com" class="btn">Enviar E-mail</a>
     </section>
 
-    <?php include 'components/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
-    <script src="js/navbar.js"></script>
+    <script src="assets/js/navbar.js"></script>
 
 </body>
 </html>

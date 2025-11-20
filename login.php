@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Ryan Coach</title>
     
-    <link rel="stylesheet" href="css/login.css">
-    <link rel="icon" type="image/png" href="img/icones/favicon3.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/login.css">
+    <?php include 'includes/head_main.php'; ?>
 </head>
 <body>
 
-    <a href="index.html" class="logo-link">
+    <a href="index.php" class="logo-link">
         <h2 class="logo">Ryan Coach</h2>
     </a>
 
     <div class="container" id="container">
 
         <div class="form-container sign-up-container">
-            <form action="auth_register.php" method="POST">
+            <form action="actions/auth_register.php" method="POST">
                 <h1>Criar Conta</h1>
                 <span>Use seu email para se cadastrar</span>
                 <div class="input-group">
@@ -50,7 +43,7 @@
         </div>
 
         <div class="form-container sign-in-container">
-            <form action="auth_login.php" method="POST">
+            <form action="actions/auth_login.php" method="POST">
                 <h1>Entrar</h1>
                 <span>Use sua conta</span>
                 <div class="input-group">
@@ -73,7 +66,7 @@
         <div class="overlay-container">
             <div class="overlay">
                 <video autoplay loop muted playsinline class="overlay-video">
-                    <source src="img/Man_Lifting_Weights_in_Gym.mp4" type="video/mp4">
+                    <source src="assets/videos/Man_Lifting_Weights_in_Gym.mp4" type="video/mp4">
                     Seu navegador não suporta vídeos.
                 </video>
                 <div class="overlay-panel overlay-left">

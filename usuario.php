@@ -3,16 +3,16 @@
 <head>
     <title>Usuário - Ryan Coach</title>
     
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/usuario.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
+    <link rel="stylesheet" href="assets/css/usuario.css">
 
-    <?php include 'components/head_main.php'; ?>
+    <?php include 'includes/head_main.php'; ?>
 </head>
 <body>
     
     <div class="background-overlay"></div>
 
-    <?php include 'components/sidebar_usuario.php'; ?>
+    <?php include 'includes/sidebar_usuario.php'; ?>
 
     <main id="conteudo">
         </main>
@@ -37,7 +37,7 @@
 
                 try {
                     // 2. Fazer a requisição
-                    const response = await fetch(`get_conteudo.php?pagina=${pagina}`);
+                    const response = await fetch(`ajax/get_conteudo.php?pagina=${pagina}`);
                     
                     if (!response.ok) {
                         throw new Error('Erro ao buscar conteúdo.');

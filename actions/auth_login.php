@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db/db_connect.php';
+require_once '../config/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -21,13 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Redirecionamento inteligente
         if ($user['nivel'] === 'admin') {
-            header("Location: admin.php");
+            header("Location: ../admin.php");
         } else {
-            header("Location: usuario.php");
+            header("Location: ../usuario.php");
         }
         exit;
     } else {
-        echo "<script>alert('Email ou senha incorretos!'); window.location.href='login.html';</script>";
+        echo "<script>alert('Email ou senha incorretos!'); window.location.href='../login.php';</script>";
     }
 }
 ?>

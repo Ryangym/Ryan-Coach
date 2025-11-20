@@ -2,14 +2,14 @@
 <html lang="pt-br">
 <head>
     <title>Planos</title>
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/planos.css">
+    <link rel="stylesheet" href="assets/css/menu.css">
+    <link rel="stylesheet" href="assets/css/planos.css">
 
-    <?php include 'components/head_main.php'; ?>
+    <?php include 'includes/head_main.php'; ?>
 
 </head>
 <body>
-    <?php include 'components/navbar.php'; ?>
+    <?php include 'includes/navbar.php'; ?>
     
     <section class="planos" id="planos">
         <h1 class="section-title">Nossos Planos</h1>
@@ -58,8 +58,8 @@
         </div>
     </section>
     
-    <?php include 'components/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
-    <script src="js/navbar.js"></script>
+    <script src="assets/js/navbar.js"></script>
 </body>
 </html>
