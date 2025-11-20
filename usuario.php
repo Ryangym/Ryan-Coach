@@ -29,6 +29,16 @@
     
     <div class="background-overlay"></div>
 
+    <header class="mobile-top-bar">
+        <div class="mobile-logo">Ryan Coach</div>
+        <div class="mobile-user-actions">
+            <img src="img/ryan_coach_atualizado.png" alt="Perfil" class="mobile-profile-pic">
+            <button onclick="window.location.href='index.html'" class="mobile-logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
     <aside id="main-aside">
         
         <div class="aside-header">

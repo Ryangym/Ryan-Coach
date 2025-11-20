@@ -1,0 +1,134 @@
+/* --- Utilitários de Texto e Cores --- */
+.text-desc { color: #888; margin-top: -0.5rem; margin-bottom: 1.5rem; }
+.text-success { color: #00ff00; }
+.text-danger { color: #ff4242; }
+.text-gold { color: var(--gold); } /* Usa a variável do root */
+
+/* --- Ícones de Status (Cards) --- */
+.icon-box.success { color: #00ff00; border-color: #00ff00; background: rgba(0, 255, 0, 0.1); }
+.icon-box.danger { color: #ff4242; border-color: #ff4242; background: rgba(255, 66, 66, 0.1); }
+.icon-box.gold { color: var(--gold); border-color: var(--gold); background: rgba(255, 186, 66, 0.1); }
+
+/* --- Inputs e Selects do Admin --- */
+.admin-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.admin-input, .admin-select {
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+.admin-input:focus, .admin-select:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+/* --- Tabela Financeira (A grande mudança) --- */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #ddd;
+    min-width: 600px; /* Garante que não quebre em telas pequenas */
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 15px;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* --- Badges de Status (As etiquetas coloridas) --- */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-badge.pago {
+    background: rgba(0, 255, 0, 0.15);
+    color: #00ff00;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.status-badge.pendente {
+    background: rgba(255, 66, 66, 0.15);
+    color: #ff4242;
+    border: 1px solid rgba(255, 66, 66, 0.2);
+}
+
+/* --- Componentes de Usuário na Tabela --- */
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar-mini {
+    width: 30px;
+    height: 30px;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ccc;
+}
+
+/* --- Paginação --- */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.page-btn:hover, .page-btn.active {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
+    font-weight: bold;
+}
+
+/* --- Header da Seção com Ação --- */
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
