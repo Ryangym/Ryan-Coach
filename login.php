@@ -34,6 +34,10 @@
                     <input type="password" id="reg-pass" name="senha" placeholder=" " required />
                     <label for="reg-pass">Senha</label>
                 </div>
+                <div class="input-group">
+                    <input type="password" id="reg-confirm-pass" name="confirmar_senha" placeholder=" " required />
+                    <label for="reg-confirm-pass">Confirmar Senha</label>
+                </div>
                 <button type="submit" class="btn-submit">Cadastrar</button>
                 
                 <p class="form-bottom-text mobile-only">
@@ -44,6 +48,7 @@
 
         <div class="form-container sign-in-container">
             <form action="actions/auth_login.php" method="POST">
+                <input type="hidden" name="tipo_login" value="aluno">
                 <h1>Entrar</h1>
                 <span>Use sua conta</span>
                 <div class="input-group">

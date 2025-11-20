@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// VERIFICAÇÃO DE SEGURANÇA
+// Se NÃO tem usuário logado OU se o nível NÃO é 'aluno'
+if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'aluno') {
+    // Expulsa para o login
+    header("Location: login.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -27,7 +38,8 @@
             // Função assíncrona para buscar o conteúdo
             async function carregarConteudo(pagina) {
                 if(pagina === 'logout') {
-                    window.location.href = 'index.php'; // Exemplo de logout
+                    // Agora redireciona para o script PHP que destrói a sessão
+                    window.location.href = 'actions/logout.php'; 
                     return;
                 }
 

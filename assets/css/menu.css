@@ -470,7 +470,39 @@ nav a:hover {
         margin: 0;
     } */
 
-    .redes-mobilenavbar {}
+    .redes-sociais-mobile {
+        display: flex;
+        gap: 20px;
+    }
+    .redes-sociais-mobile a{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        margin: 0;
+    }
+    .redes-sociais-mobile img{
+        width: 30px;
+        height: 30px;
+    }
+    .whatsapp-link {
+        background-color: #25D366;
+    }
+    .instagram-link {
+        background-color: #E1306C;
+    }
+    .tiktok-link {
+        background-color: #600a52;
+    }
+    .telegram-link {
+        background-color: #0088cc;
+    }
+    .youtube-link {
+        background-color: #FF0000;
+    }
 
     body.noscroll {
         overflow: hidden;

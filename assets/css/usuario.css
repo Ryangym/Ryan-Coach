@@ -193,7 +193,7 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 .btn-logout:hover {
-    color: var(--red-dark) !important;
+    color: var(--white) !important;
     border-color: var(--red-dark) !important;
 }
 

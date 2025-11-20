@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// VERIFICAÇÃO DE SEGURANÇA ADMIN
+// Se NÃO tem usuário logado OU se o nível NÃO é 'admin'
+if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
+    // Expulsa para o login de admin
+    header("Location: loginAdmin.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -27,7 +38,8 @@
 
             async function carregarConteudo(pagina) {
                 if(pagina === 'logout') {
-                    window.location.href = 'index.html';
+                    // Agora redireciona para o script PHP que destrói a sessão
+                    window.location.href = 'actions/logout.php'; 
                     return;
                 }
 

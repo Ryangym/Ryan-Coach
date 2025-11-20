@@ -17,7 +17,7 @@
 
             <div class="card" id="card">
                 <h2>Plano Básico</h2>
-                <img src="img/planos/img.planobasico.png">
+                <img src="assets/img/planos/img.planobasico.png">
                 <h3 class="price"><strong>De R$15</strong> Por R$9,90</h3>
                 <ul class="textbeneficios">
                     <li class="have">Ficha de treino personalizada</li>
@@ -30,7 +30,7 @@
 
             <div class="card" id="card">
                 <h2>Plano Avançado</h2>
-                <img src="img/planos/img.planoavançado.png">
+                <img src="assets/img/planos/img.planoavançado.png">
                 <h3 class="price"><strong>De R$25</strong> Por R$19,90:</h3>
                 <ul class="textbeneficios">
                     <li class="have">Ficha de treino personalizada</li>
@@ -43,7 +43,7 @@
 
             <div class="card card-premium" id="card">
                 <h2><span class="premium">Plano Premium</span></h2>
-                <img src="img/planos/img.planopremium.jpg">
+                <img src="assets/img/planos/img.planopremium.jpg">
                 <h3 class="price"><strong>De R$65</strong> Por R$49,90:</h3>
                 <ul class="textbeneficios">
                     <li class="have">Ficha de treino personalizada</li>

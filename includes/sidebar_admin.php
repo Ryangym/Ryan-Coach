@@ -48,6 +48,10 @@
         </nav>
 
         <div class="aside-footer">
+            <button class="btn-logout" onclick="window.location.href='index.php'">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Voltar ao Inicio</span>
+            </button>
             <button data-pagina="logout" class="btn-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Sair do Admin</span>

@@ -1,3 +1,23 @@
+<?php
+// Garante que a sessão esteja iniciada para verificar o login
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Lógica de Redirecionamento
+$is_logged = isset($_SESSION['user_id']);
+$painel_url = 'login.php'; // Padrão (se algo der errado)
+
+if ($is_logged) {
+    // Se for admin, manda pro admin.php, senão pro usuario.php
+    if (isset($_SESSION['user_nivel']) && $_SESSION['user_nivel'] === 'admin') {
+        $painel_url = 'admin.php';
+    } else {
+        $painel_url = 'usuario.php';
+    }
+}
+?>
+
 <!-- Barra de navegação mobile -->
     <nav class="mobile-navbar">
         <button class="menu-toggle" id="menu-toggle">
@@ -19,46 +39,55 @@
                 <li><a href="index.php#ft-footer">Contato</a></li>
                 <li><a href="planos.php">Planos</a></li>
             </ul>
-            <div class="redes-mobilenavbar">
-                <a href="https://www.instagram.com/ct.olympo?igsh=b3NiaDBtcXF5bDlp&utm_source=qr">
-                    <img src="assets/IMG/icones/insta.png" alt="">
-                </a>
-                <a href="https://www.facebook.com/">
-                    <img src="assets/IMG/icones/facebook.png" alt="">
-                </a>
-                <a href="https://youtube.com/@ctolympo?si=6mtc_D-h9szc3hAP">
-                    <img src="assets/IMG/icones/youtube.png" alt="">
-                </a>
+            <div class="redes-sociais-mobile">
+                    <a href="https{SEU_LINK_WHATSAPP}" target="_blank" title="WhatsApp" class="whatsapp-link">
+                        <img src="assets/img/icones/whatsapp-fill-svgrepo-com.svg" alt="WhatsApp">
+                    </a>
+                    <a href="https{SEU_LINK_INSTAGRAM}" target="_blank" title="Instagram" class="instagram-link">
+                        <img src="assets/img/icones/instagram-fill-svgrepo-com.svg" alt="Instagram">
+                    </a>
+                    <a href="https{SEU_LINK_TIKTOK}" target="_blank" title="TikTok" class="tiktok-link">
+                        <img src="assets/img/icones/tiktok-fill-svgrepo-com.svg" alt="TikTok">
+                    </a>
+                    <a href="https{SEU_LINK_TELEGRAM}" target="_blank" title="Telegram" class="telegram-link">
+                        <img src="assets/img/icones/telegram-fill-svgrepo-com.svg" alt="Telegram">
+                    </a>
+                    <a href="https{SEU_LINK_YOUTUBE}" target="_blank" title="YouTube" class="youtube-link">
+                        <img src="assets/img/icones/youtube-fill-svgrepo-com.svg" alt="YouTube">
+                    </a>
             </div>
         </nav>
     </nav>
 
+<!-- Barra de navegação desktop -->
+<nav class="desktop-navbar">
+    <div class="glass-morphism">
+        <a href="index.php" class="logo">
+            <h2 class="logo">Ryan Coach</h2>
+        </a>
+        <div class="links-content">
+            <a class="navlinks" href="index.php#servicos">Serviços</a>
+            <a class="navlinks" href="index.php#contato">Contato</a>
+            <a class="navlinks" href="planos.php">Planos</a>
+        </div>
 
+        <?php if ($is_logged): ?>
+            
+            <a href="<?php echo $painel_url; ?>" title="Ir para meu Painel" class="login-nav-link">
+                <img src="assets/img/login.png" alt="Meu Painel" class="login-nav" style="filter: drop-shadow(0 0 5px #00ff51ff);">
+            </a>
 
-    <!-- Barra de navegação desktop -->
-    <nav class="desktop-navbar">
-            <div class="glass-morphism">
-                <a href="index.php" class="logo">
-                    <h2 class="logo">Ryan Coach</h2>
-                </a>
-                <div class="links-content">
-                    <a class="navlinks" href="admin.php">Admin</a>
-                    <a class="navlinks" href="usuario.php">Usuario</a>
-                    <a class="navlinks" href="index.php#contato">Contato</a>
-                </div>
+        <?php else: ?>
 
-                <img src="assets/img/login.png" alt="Login" class="login-nav" id="userMenuToggle">
+            <div style="position: relative;">
+                <img src="assets/img/login.png" alt="Login" class="login-nav" id="userMenuToggle" style="cursor: pointer;">
+                
                 <div id="profileMenu" class="profile-dropdown-menu">
                     <div class="profile-card">
                         <ul class="profile-list">
                             <li class="profile-element">
                                 <a href="login.php" class="profile-link">
-                                    <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="lucide lucide-user-icon lucide-user">
-                                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                                        <circle cx="12" cy="7" r="4" />
-                                    </svg>
+                                    <i class="fa-regular fa-user" style="margin-right: 10px;"></i>
                                     <p class="profile-label">Entrar/Cadastro</p>
                                 </a>
                             </li>
@@ -76,7 +105,10 @@
                                 </a>
                             </li>
                         </ul>
-
                     </div>
                 </div>
-        </nav>
+            </div>
+
+        <?php endif; ?>
+    </div>
+</nav>

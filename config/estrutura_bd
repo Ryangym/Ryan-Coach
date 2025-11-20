@@ -3,6 +3,7 @@ CREATE TABLE usuarios (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20),
     nivel ENUM('aluno', 'admin') DEFAULT 'aluno',
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
