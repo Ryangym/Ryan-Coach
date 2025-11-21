@@ -94,6 +94,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+   
+                function openModal() {
+                    document.getElementById("modalLancamento").style.display = "flex";
+                }
+                function closeModal() {
+                    document.getElementById("modalLancamento").style.display = "none";
+                }
+                // Fecha ao clicar fora
+                window.onclick = function(event) {
+                    var modal = document.getElementById("modalLancamento");
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+           
     </script>
 
 </body>

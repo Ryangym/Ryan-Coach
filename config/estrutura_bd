@@ -9,6 +9,17 @@ CREATE TABLE usuarios (
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE pagamentos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    descricao VARCHAR(100) NOT NULL, /* Ex: Mensal, Trimestral */
+    valor DECIMAL(10, 2) NOT NULL,
+    data_vencimento DATE NOT NULL,
+    data_pagamento DATE, /* Se null, está pendente */
+    status ENUM('pago', 'pendente', 'atrasado') DEFAULT 'pago',
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 -- (Opcional) Cria um Admin padrão para você testar
 -- Senha do admin abaixo é: "admin123" (já criptografada)
 INSERT INTO usuarios (nome, email, senha, nivel) 
