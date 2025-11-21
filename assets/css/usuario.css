@@ -675,3 +675,147 @@ section {
 .mobile-top-bar {
     display: none;
 }
+
+
+
+/* =========================================================
+   MÓDULO: PERFIL DE USUÁRIO (Compartilhado Aluno/Admin)
+   ========================================================= */
+
+/* --- Container da Foto --- */
+.profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.photo-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 15px;
+}
+
+.photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--gold); /* Dourado por padrão */
+    box-shadow: 0 0 20px rgba(255, 186, 66, 0.2);
+    transition: transform 0.3s ease;
+}
+
+/* Botão de Upload (Camerazinha) */
+.upload-btn-float {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: var(--gold);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #000;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+    transition: 0.3s;
+    font-size: 1.1rem;
+}
+
+.upload-btn-float:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+.photo-hint {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* --- Variação para Admin (Vermelho) --- */
+.profile-admin .photo-wrapper img {
+    border-color: #ff4242;
+    box-shadow: 0 0 20px rgba(255, 66, 66, 0.3);
+}
+
+.profile-admin .upload-btn-float {
+    background: #ff4242;
+    color: #fff;
+}
+
+/* --- Layout do Formulário --- */
+.form-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Estilo dos Inputs (reaproveitando lógica do admin) */
+.input-label {
+    color: #ccc;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.input-field {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    transition: 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: #151515;
+}
+
+/* Divisória */
+.form-divider {
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 15px 0;
+}
+
+/* Seção de Senha */
+.password-section-title {
+    color: var(--gold);
+    font-size: 1.1rem;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 5px;
+}
+
+.password-section-desc {
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 600px) {
+    .input-grid {
+        grid-template-columns: 1fr; /* Uma coluna no celular */
+        gap: 15px;
+    }
+    
+    /* No admin que é lado a lado, vira coluna */
+    .admin-profile-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+}

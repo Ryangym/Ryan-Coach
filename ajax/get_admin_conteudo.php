@@ -1,13 +1,19 @@
 <?php
-// get_admin_conteudo.php
+if(session_status() === PHP_SESSION_NONE) session_start();
+
 $pagina = $_GET['pagina'] ?? 'dashboard';
+
+// Pega o nome do Admin
+$nome_admin = $_SESSION['user_nome'] ?? 'Admin';
+$partes_admin = explode(' ', trim($nome_admin));
+$primeiro_nome_admin = strtoupper($partes_admin[0]);
 
 switch ($pagina) {
     case 'dashboard':
         echo '
             <section id="admin-dash">
                 <header class="dash-header">
-                    <h1>PAINEL <span class="highlight-text">MASTER</span></h1>
+                    <h1>Bem vindo, <span class="highlight-text">'.$primeiro_nome_admin.'.</span></h1>
                     <p style="color: #888;">Visão geral do desempenho da academia</p>
                 </header>
 
@@ -256,6 +262,88 @@ switch ($pagina) {
 
                 </div>
             </section>
+        ';
+        break;
+
+    case 'perfil':
+        require_once '../config/db_connect.php';
+        if(session_status() === PHP_SESSION_NONE) session_start();
+        
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
+        $stmt->execute(['id' => $_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $foto = $user['foto'] ? $user['foto'] : 'assets/img/user-default.png';
+
+        echo '
+            <section id="perfil-admin">
+                <header class="dash-header">
+                    <h1>CONFIGURAÇÕES DO <span class="highlight-text">ADMIN</span></h1>
+                </header>
+
+                <div class="glass-card profile-admin">
+                    <form action="actions/update_profile.php" method="POST" enctype="multipart/form-data">
+                        
+                        <div style="display: flex; gap: 40px; flex-wrap: wrap;" class="admin-profile-layout">
+                            
+                            <div class="profile-photo-section" style="flex: 0 0 200px;">
+                                <div class="photo-wrapper" style="width: 180px; height: 180px;">
+                                    <img src="'.$foto.'" id="admin-preview">
+                                    <label for="admin-upload" class="upload-btn-float">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </label>
+                                    <input type="file" name="foto" id="admin-upload" style="display: none;" onchange="previewImageAdmin(this)">
+                                </div>
+                                <h3 style="margin-top: 15px; color: #fff; text-align: center;">'.$user['nome'].'</h3>
+                                <div style="text-align: center; margin-top: 5px;">
+                                    <span class="status-badge" style="background: rgba(255,66,66,0.2); color: #ff4242;">MASTER ADMIN</span>
+                                </div>
+                            </div>
+
+                            <div style="flex: 1; min-width: 300px;">
+                                <h3 class="section-title" style="font-size: 1.1rem;">Dados de Acesso</h3>
+                                
+                                <div class="form-profile">
+                                    <div class="input-grid">
+                                        <div>
+                                            <label class="input-label">Nome Admin</label>
+                                            <input type="text" name="nome" value="'.$user['nome'].'" class="input-field">
+                                        </div>
+                                        <div>
+                                            <label class="input-label">Telefone</label>
+                                            <input type="text" name="telefone" value="'.$user['telefone'].'" class="input-field">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="input-label">Email</label>
+                                        <input type="email" name="email" value="'.$user['email'].'" class="input-field">
+                                    </div>
+
+                                    <hr class="form-divider">
+
+                                    <h3 class="password-section-title" style="color: #ff4242;">Segurança</h3>
+                                    <div class="input-grid">
+                                        <div>
+                                            <label class="input-label">Nova Senha</label>
+                                            <input type="password" name="nova_senha" class="input-field" placeholder="********">
+                                        </div>
+                                        <div>
+                                            <label class="input-label">Confirmar</label>
+                                            <input type="password" name="confirma_senha" class="input-field" placeholder="********">
+                                        </div>
+                                    </div>
+
+                                    <div style="text-align: right; margin-top: 10px;">
+                                        <button type="submit" class="btn-gold" style="background: #ff4242; color: #fff; border: none;">ATUALIZAR PERFIL</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
         ';
         break;
 

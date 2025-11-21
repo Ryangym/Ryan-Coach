@@ -138,14 +138,16 @@ body {
 
 /* Ajuste no ícone de login */
 .login-nav{
-  width: 55px;
-  height: 60px;
+  width: 50px;
+  height: 55px;
   border-radius: 50%;
   margin-right: 12px;
+  margin-top: 5px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   padding: 2px;
   box-sizing: border-box;
+  object-fit: cover;
 }
 
 .login-nav:hover {
@@ -184,11 +186,10 @@ nav a:hover {
 /* ================================================= */
 
 .btnLogin-popup-mobile {
-    margin-right: 2rem;
+    display: flex;
     justify-content: center;
     align-items: center;
-    display: flex;
-    width: 10rem;
+    width: auto;
     height: 50px;
     background: transparent;
     border: 2px solid #FFBA42;
@@ -197,19 +198,19 @@ nav a:hover {
     cursor: pointer;
     color: #FFBA42;
     transition: 0.5s;
-    gap: 1rem;
-    font-family: 'MinhaFonte', sans-serif;
+    gap: 15px;
+    padding: 0 12px 0 12px;
 }
 
 .btnLogin-popup-mobile p {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-family: 'cinema-sunday', sans-serif;
-    padding-top: 6px;
+
 }
 
 .btnLogin-popup-mobile img {
-    width: 2rem;
-    height: 2rem;
+    width: 2.4rem;
+    height: 2.4rem;
     object-fit: cover;
     border-radius: 50%;
 }

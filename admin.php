@@ -78,6 +78,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
 
             carregarConteudo(BOTAO_PADRAO);
         });
+
+
+        // --- FUNÇÃO DE PREVIEW DO ADMIN ---
+        function previewImageAdmin(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    // O ID da imagem no admin é 'admin-preview'
+                    var imgPreview = document.getElementById('admin-preview');
+                    if(imgPreview) {
+                        imgPreview.src = e.target.result;
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
 
 </body>

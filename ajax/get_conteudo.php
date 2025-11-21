@@ -1,8 +1,14 @@
 <?php
-// Define qual página foi pedida na URL (ex: get_conteudo.php?pagina=perfil)
+// Inicia sessão se não estiver iniciada
+if(session_status() === PHP_SESSION_NONE) session_start();
+
+// Define qual página foi pedida
 $pagina = $_GET['pagina'] ?? 'treinos';
 
-// Retorna o conteúdo HTML baseado na página pedida
+// Lógica do Nome (Pega da sessão e separa o primeiro nome)
+$nome_completo = $_SESSION['user_nome'] ?? 'Atleta';
+$partes_nome = explode(' ', trim($nome_completo));
+$primeiro_nome = strtoupper($partes_nome[0]); // Ex: "JOÃO"
 
 switch ($pagina) {
     case 'dashboard':
@@ -11,7 +17,7 @@ switch ($pagina) {
                 <div class="dashboard-container-view">
                     
                     <header class="dash-header">
-                        <h1>BEM-VINDO, <span class="highlight-text">RYAN.</span></h1>
+                        <h1>BEM-VINDO, <span class="highlight-text">'.$primeiro_nome.'.</span></h1>
                     </header>
 
                     <div class="stats-row">
@@ -153,12 +159,76 @@ switch ($pagina) {
         break;
 
     case 'perfil':
+        require_once '../config/db_connect.php';
+        if(session_status() === PHP_SESSION_NONE) session_start();
+        
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
+        $stmt->execute(['id' => $_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $foto = $user['foto'] ? $user['foto'] : 'assets/img/user-default.png';
+
         echo '
-            <section id="perfil">
-                <h1>Meu Perfil</h1>
-                <p>Informações pessoais, foto, objetivos, etc.</p>
-                <input type="text" placeholder="Seu nome">
+            <section id="perfil-section">
+                <header class="dash-header">
+                    <h1>MEU <span class="highlight-text">PERFIL</span></h1>
+                </header>
+
+                <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+                    <form action="actions/update_profile.php" method="POST" enctype="multipart/form-data" class="form-profile">
+                        
+                        <div class="profile-photo-section">
+                            <div class="photo-wrapper">
+                                <img src="'.$foto.'" alt="Foto Perfil" id="preview-img">
+                                <label for="foto-upload" class="upload-btn-float">
+                                    <i class="fa-solid fa-camera"></i>
+                                </label>
+                                <input type="file" name="foto" id="foto-upload" style="display: none;" accept="image/*" onchange="previewImage(this)">
+                            </div>
+                            <p class="photo-hint">Toque na câmera para alterar</p>
+                        </div>
+
+                        <div class="input-grid">
+                            <div>
+                                <label class="input-label">Nome Completo</label>
+                                <input type="text" name="nome" value="'.$user['nome'].'" class="input-field" required>
+                            </div>
+                            <div>
+                                <label class="input-label">Telefone (WhatsApp)</label>
+                                <input type="text" name="telefone" value="'.$user['telefone'].'" class="input-field">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="input-label">E-mail de Acesso</label>
+                            <input type="email" name="email" value="'.$user['email'].'" class="input-field" required>
+                        </div>
+
+                        <hr class="form-divider">
+
+                        <div>
+                            <h3 class="password-section-title">Segurança</h3>
+                            <p class="password-section-desc">Preencha apenas se quiser alterar sua senha.</p>
+                        </div>
+
+                        <div class="input-grid">
+                            <div>
+                                <label class="input-label">Nova Senha</label>
+                                <input type="password" name="nova_senha" class="input-field" placeholder="********">
+                            </div>
+                            <div>
+                                <label class="input-label">Confirmar Nova Senha</label>
+                                <input type="password" name="confirma_senha" class="input-field" placeholder="********">
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button type="submit" class="btn-gold">SALVAR ALTERAÇÕES</button>
+                        </div>
+                    </form>
+                </div>
             </section>
+
         ';
         break;
 

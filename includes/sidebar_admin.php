@@ -1,7 +1,13 @@
+<?php
+$foto_admin = $_SESSION['user_foto'] ?? 'assets/img/user-default.png';
+$nome_admin = $_SESSION['user_nome'] ?? 'Admin';
+$partes_admin = explode(' ', trim($nome_admin));
+$primeiro_nome_admin = strtoupper($partes_admin[0]);
+?>
 <header class="mobile-top-bar">
         <div class="mobile-logo">Ryan Coach</div>
         <div class="mobile-user-actions">
-            <img src="assets/img/ryan_coach_atualizado.png" alt="Perfil" class="mobile-profile-pic">
+            <img src="<?php echo $foto_admin; ?>" alt="Perfil" class="mobile-profile-pic">
             <button onclick="window.location.href='index.php'" class="mobile-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
@@ -13,10 +19,10 @@
         <div class="aside-header">
             <h2 class="logo">Ryan Coach</h2>
             <div class="profile-container">
-                <img src="assets/img/ryan_coach_atualizado.png" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
+                <img src="<?php echo $foto_admin; ?>" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
                 <div class="status-indicator" style="background-color: #ff4242;"></div>
             </div>
-            <p class="usuario-nome">Ryan Admin</p>
+            <p class="usuario-nome"><?php echo $primeiro_nome_admin; ?></p>
             <p class="usuario-level" style="color: #ff4242; background: rgba(255, 66, 66, 0.1);">Master Coach</p>
         </div>
         
@@ -41,6 +47,10 @@
                 <span>Financeiro</span>
             </button>
             
+            <button data-pagina="perfil">
+                <i class="fa-solid fa-gear"></i>
+                <span>Meu perfil</span>
+            </button>
             <button data-pagina="config">
                 <i class="fa-solid fa-gear"></i>
                 <span>Sistema</span>

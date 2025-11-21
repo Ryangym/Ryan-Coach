@@ -5,6 +5,7 @@ CREATE TABLE usuarios (
     senha VARCHAR(255) NOT NULL,
     telefone VARCHAR(20),
     nivel ENUM('aluno', 'admin') DEFAULT 'aluno',
+    foto VARCHAR(255) DEFAULT 'assets/img/user-default.png',
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
