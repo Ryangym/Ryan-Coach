@@ -358,6 +358,220 @@ li{
 }
 /* --------------- Fim Diferenciais --------------- */
 
+/* ==========================================================================
+   SEÇÃO: COMO FUNCIONA (Sua Jornada em 4 Passos)
+   ========================================================================== */
+.como-funciona {
+    padding: 80px 20px;
+    text-align: center;
+    background: linear-gradient(to bottom, #0a0a0a, #111);
+    /* Garante uma transição suave se estiver acima do footer ou faq */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+}
+
+.subtitulo-section {
+    color: #888;
+    margin-bottom: 50px;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.steps-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.step-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 30px 20px;
+    border-radius: 15px;
+    width: 250px;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.step-card:hover {
+    transform: translateY(-10px);
+    border-color: #FFBA42; /* Cor Dourada */
+}
+
+.step-number {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #FFBA42;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid #FFBA42;
+    z-index: 2;
+}
+
+.step-icon {
+    font-size: 2.5rem;
+    color: #fff;
+    margin: 20px 0;
+}
+
+.step-card h4 {
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.step-card p {
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Setas entre os cards */
+.step-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 80px; /* Alinha visualmente com o meio do card */
+}
+
+
+/* ==========================================================================
+   SEÇÃO: FAQ (Novo Design Premium)
+   ========================================================================== */
+.faq-section {
+    padding: 80px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.faq-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.faq-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.faq-header p {
+    color: #888;
+}
+
+.faq-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.faq-item {
+    background: rgba(20, 20, 20, 0.6); /* Fundo escuro translúcido */
+    backdrop-filter: blur(10px);       /* Efeito vidro */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: rgba(255, 186, 66, 0.5); /* Borda Dourada sutil no hover */
+    transform: translateX(5px); /* Leve movimento para direita */
+}
+
+/* Configuração do elemento Details/Summary */
+details {
+    padding: 0;
+}
+
+summary {
+    padding: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #fff;
+    list-style: none; /* Remove marcador padrão */
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    transition: color 0.3s;
+}
+
+summary:hover {
+    color: #FFBA42; /* Dourado no hover do texto */
+}
+
+/* Ícone personalizado (+ / -) do FAQ novo */
+summary::after {
+    content: '+';
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    color: #FFBA42;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+/* Estado Aberto */
+details[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 186, 66, 0.05); /* Fundo dourado muito sutil */
+}
+
+details[open] summary::after {
+    content: '-';
+    transform: rotate(180deg); /* Animação de girar */
+}
+
+details p {
+    padding: 25px;
+    color: #ccc;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0; /* Remove margem padrão */
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Remove a seta padrão feia do navegador (Webkit) */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+
+/* ==========================================================================
+   RESPONSIVIDADE (Aplicada a ambos)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Ajustes dos Passos */
+    .step-arrow { display: none; } /* Esconde setas entre cards */
+    .steps-container { flex-direction: column; align-items: center; }
+    .step-card { width: 100%; max-width: 350px; }
+    
+    /* Ajustes do FAQ */
+    .faq-header h3 { font-size: 1.8rem; }
+    summary { font-size: 1rem; padding: 20px; }
+    summary::after { font-size: 1.2rem; }
+}
 
 
 

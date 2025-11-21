@@ -170,34 +170,108 @@
         </div>
     </section>
 
-    <!-- <section id="servicos">
-        <h3>Serviços Oferecidos</h3>
-        <div class="services">
-            <div class="card">
-                <h4>Treinamento Personalizado</h4>
-                <p>Planos de treino exclusivos para o seu objetivo, seja hipertrofia, emagrecimento ou condicionamento físico.</p>
+        <section class="como-funciona">
+        <h3>Sua Jornada em 4 Passos</h3>
+        <p class="subtitulo-section">Entenda como vamos sair do zero até o seu objetivo.</p>
+        
+        <div class="steps-container">
+            
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <h4>Anamnese</h4>
+                <p>Você preenche um formulário detalhado sobre sua rotina, alimentação atual, lesões e objetivos.</p>
             </div>
-            <div class="card">
-                <h4>Consultoria Online</h4>
-                <p>Acompanhamento remoto com ajustes semanais e suporte contínuo para otimizar seus resultados.</p>
+
+            <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon">
+                    <i class="fa-solid fa-laptop-file"></i>
+                </div>
+                <h4>Planejamento</h4>
+                <p>Com base nos seus dados, eu monto seu treino e estratégia nutricional 100% personalizados.</p>
             </div>
-            <div class="card">
-                <h4>Orientação Nutricional</h4>
-                <p>Estratégias nutricionais alinhadas ao seu objetivo, sem dietas restritivas impossíveis de seguir.</p>
+
+            <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <h4>Execução</h4>
+                <p>Você acessa o app, vê os vídeos dos exercícios e começa a treinar com a técnica correta.</p>
             </div>
+
+            <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="step-card">
+                <div class="step-number">04</div>
+                <div class="step-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h4>Evolução</h4>
+                <p>A cada 30 dias analisamos seu progresso e ajustamos o plano para você não estagnar.</p>
+            </div>
+
         </div>
-    </section> -->
-
-    <section id="sobre">
-        <h3>Sobre o Ryan Coach</h3>
-        <p>Com anos de experiência em musculação e preparação física, Ryan Coach é especialista em criar estratégias eficientes para transformar o corpo e a saúde dos seus alunos. Foco, disciplina e ciência aplicada ao treino para resultados reais.</p>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="planos.php" class="CTA-rounded"><span>Começar Minha Jornada</span></a>
+        </div>
     </section>
 
-    <section id="contato">
-        <h3>Entre em Contato</h3>
-        <p>Pronto para começar sua transformação? Envie uma mensagem e dê o primeiro passo.</p>
-        <a href="mailto:contato@ryancoach.com" class="btn">Enviar E-mail</a>
+    <section class="faq-section" id="faq">
+        <div class="faq-header">
+            <h3>Dúvidas Frequentes</h3>
+            <p>Tudo o que você precisa saber antes de começar sua transformação.</p>
+        </div>
+        
+        <div class="faq-container">
+            
+            <div class="faq-item">
+                <details>
+                    <summary>Sou iniciante, consigo acompanhar?</summary>
+                    <p>Com certeza! O plano é montado 100% baseado no seu nível atual. Se você nunca treinou, começaremos com uma fase de adaptação para você aprender os movimentos com segurança.</p>
+                </details>
+            </div>
+
+            <div class="faq-item">
+                <details>
+                    <summary>Preciso de academia ou posso treinar em casa?</summary>
+                    <p>Onde você preferir. Se tiver acesso a academia, usaremos os equipamentos de lá. Se treinar em casa, monto seu treino com peso do corpo, elásticos ou halteres, garantindo intensidade.</p>
+                </details>
+            </div>
+
+            <div class="faq-item">
+                <details>
+                    <summary>Como vou saber se estou fazendo o exercício certo?</summary>
+                    <p>Na sua ficha, cada exercício tem um vídeo demonstrativo gravado por mim. Além disso, você pode me enviar vídeos da sua execução pelo WhatsApp para eu corrigir sua postura.</p>
+                </details>
+            </div>
+
+            <div class="faq-item">
+                <details>
+                    <summary>Quais são as formas de pagamento?</summary>
+                    <p>Aceito apenas PIX como forma de pagamento, o valor de todos os planos corresponde ao período de três meses.</p>
+                </details>
+            </div>
+
+            <div class="faq-item">
+            <details>
+                <summary>O suporte é feito por robô?</summary>
+                <p>Não! O suporte é feito diretamente comigo (Ryan). Você terá acesso ao meu WhatsApp pessoal para tirar dúvidas, mandar vídeos da execução e receber feedbacks.</p>
+            </details>
+            </div>
+
+
+        </div>
     </section>
+
 
     <?php include 'includes/footer.php'; ?>
 

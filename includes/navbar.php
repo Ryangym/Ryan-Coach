@@ -66,7 +66,7 @@ if ($is_logged) {
             <h2 class="logo">Ryan Coach</h2>
         </a>
         <div class="links-content">
-            <a class="navlinks" href="index.php#servicos">Serviços</a>
+            <a class="navlinks" href="ferramentas.php">Ferramentas</a>
             <a class="navlinks" href="index.php#contato">Contato</a>
             <a class="navlinks" href="planos.php">Planos</a>
         </div>
