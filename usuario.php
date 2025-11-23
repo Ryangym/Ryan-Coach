@@ -1,11 +1,24 @@
 <?php
 session_start();
+require_once 'config/db_connect.php'; // Necessário para checar o banco atualizado
 
-// VERIFICAÇÃO DE SEGURANÇA
-// Se NÃO tem usuário logado OU se o nível NÃO é 'aluno'
+// 1. Verifica Login
 if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'aluno') {
-    // Expulsa para o login
     header("Location: login.php");
+    exit;
+}
+
+// 2. Verifica Status do Plano (TRAVA DE SEGURANÇA)
+$stmt = $pdo->prepare("SELECT data_expiracao FROM usuarios WHERE id = :id");
+$stmt->execute(['id' => $_SESSION['user_id']]);
+$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Se data_expiracao for NULL ou menor que hoje, bloqueia
+$hoje = date('Y-m-d');
+if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje) {
+    // Exceção: Se for admin testando, não bloqueia (opcional, mas bom pra teste)
+    // Mas aqui é arquivo de usuário, então bloqueia.
+    header("Location: bloqueado.php");
     exit;
 }
 ?>

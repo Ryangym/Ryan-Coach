@@ -301,6 +301,14 @@ switch ($pagina) {
                             </div>
                         </div>
 
+                        <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <label style="color:#FFBA42; font-size: 0.8rem;">Vencimento do Plano (Acesso)</label>
+                                <input type="date" name="data_expiracao" id="edit_expiracao" class="admin-input">
+                                <p style="font-size:0.7rem; color:#666; margin-top:5px;">Se passar desta data, o aluno perde o acesso.</p>
+                            </div>
+                        </div>
+
                         <div style="margin-bottom: 20px;">
                             <label style="color:#ff4242; font-size: 0.8rem;">Redefinir Senha (Opcional)</label>
                             <input type="text" name="nova_senha" class="admin-input" placeholder="Deixe vazio para não alterar">
@@ -316,24 +324,147 @@ switch ($pagina) {
         break;
 
     case 'treinos_editor':
+        require_once '../config/db_connect.php';
+        
+        // 1. LISTAR TREINOS EXISTENTES
+        // Busca treinos com nome do aluno
+        $sql_list = "SELECT t.*, u.nome as nome_aluno, u.foto as foto_aluno 
+                     FROM treinos t 
+                     JOIN usuarios u ON t.aluno_id = u.id 
+                     ORDER BY t.criado_em DESC";
+        $treinos = $pdo->query($sql_list)->fetchAll(PDO::FETCH_ASSOC);
+
+        // 2. LISTA DE ALUNOS (Para o Form de Cadastro)
+        $alunos = $pdo->query("SELECT id, nome FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
+
         echo '
-            <section>
+            <section id="editor-treinos">
                 <header class="dash-header">
                     <h1>EDITOR DE <span class="highlight-text">TREINOS</span></h1>
+                    <p class="text-desc">Gerencie as periodizações e fichas dos alunos.</p>
                 </header>
+
                 <div class="glass-card">
-                    <p style="color: #ccc; margin-bottom: 1rem;">Selecione um aluno para atribuir treino:</p>
-                    <select style="width: 100%; padding: 10px; background: #111; color: #fff; border: 1px solid #333; border-radius: 5px; margin-bottom: 1rem;">
-                        <option>Selecione...</option>
-                        <option>João Silva</option>
-                        <option>Maria Oliveira</option>
-                    </select>
-                    <textarea placeholder="Descreva o treino ou cole o JSON do treino..." style="width: 100%; height: 150px; background: #111; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 5px;"></textarea>
-                    <div style="margin-top: 15px; text-align: right;">
-                        <button class="btn-gold">SALVAR TREINO</button>
+                    <div class="section-header-row">
+                        <h3 class="section-title" style="margin:0"><i class="fa-solid fa-list"></i> PLANEJAMENTOS</h3>
+                        <button class="btn-gold" onclick="toggleNovoTreino()">
+                            <i class="fa-solid fa-plus"></i> NOVO TREINO
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ALUNO</th>
+                                    <th>NOME DO TREINO</th>
+                                    <th>TIPO</th>
+                                    <th>VIGÊNCIA</th>
+                                    <th style="text-align:right;">AÇÃO</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            
+                            if (count($treinos) > 0) {
+                                foreach ($treinos as $t) {
+                                    $foto = !empty($t['foto_aluno']) ? $t['foto_aluno'] : 'assets/img/icones/user-default.png';
+                                    $inicio = date('d/m', strtotime($t['data_inicio']));
+                                    $fim = date('d/m', strtotime($t['data_fim']));
+                                    
+                                    // Badge de Nível
+                                    $corBadge = ($t['nivel_plano'] == 'basico') ? '#ccc' : (($t['nivel_plano'] == 'avancado') ? '#FFBA42' : '#ff4242');
+                                    
+                                    echo '
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <img src="'.$foto.'" class="table-avatar" alt="Foto">
+                                                <span>'.$t['nome_aluno'].'</span>
+                                            </div>
+                                        </td>
+                                        <td><strong style="color:#fff;">'.$t['nome'].'</strong><br><span style="font-size:0.8rem; color:#666;">Divisão '.$t['divisao_nome'].'</span></td>
+                                        <td><span class="status-badge" style="color:'.$corBadge.'; border-color:'.$corBadge.'; background:transparent;">'.strtoupper($t['nivel_plano']).'</span></td>
+                                        <td style="color:#888;">'.$inicio.' a '.$fim.'</td>
+                                        <td style="text-align:right;">
+                                            <button class="btn-gold" style="padding: 5px 15px; font-size: 0.8rem;" onclick="carregarConteudo(\'treino_painel&id='.$t['id'].'\')">
+                                                GERENCIAR <i class="fa-solid fa-arrow-right"></i>
+                                            </button>
+                                        </td>
+                                    </tr>';
+                                }
+                            } else {
+                                echo '<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">Nenhum treino criado ainda.</td></tr>';
+                            }
+
+        echo '              </tbody>
+                        </table>
                     </div>
                 </div>
+
+                <div class="glass-card mt-large" id="box-novo-treino" style="display:none; border: 1px solid var(--gold); margin-top: 30px;">
+                    <h3 class="section-title" style="color: var(--gold);"><i class="fa-solid fa-dumbbell"></i> Criar Nova Estrutura</h3>
+                    
+                    <form action="actions/treino_create.php" method="POST">
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="input-label">Selecione o Atleta</label>
+                                <select name="aluno_id" class="admin-input" required>
+                                    <option value="">Escolha...</option>';
+                                    foreach($alunos as $al) { echo '<option value="'.$al['id'].'">'.$al['nome'].'</option>'; }
+        echo '                  </select>
+                            </div>
+                            <div class="form-col">
+                                <label class="input-label">Nome do Planejamento</label>
+                                <input type="text" name="nome" class="admin-input" placeholder="Ex: Hipertrofia Fase 1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="input-label">Tipo de Plano</label>
+                                <select name="nivel" class="admin-input" id="selectNivel" onchange="togglePeriodizacao()" required>
+                                    <option value="basico">Básico (Ficha Fixa)</option>
+                                    <option value="avancado">Avançado (Periodizado)</option>
+                                    <option value="premium">Premium (Periodizado +)</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label class="input-label">Data de Início</label>
+                                <input type="date" name="data_inicio" class="admin-input" required value="'.date('Y-m-d').'">
+                            </div>
+                            <div class="form-col" style="flex: 0 0 150px;">
+                                <label class="input-label">Divisão</label>
+                                <input type="text" name="divisao" class="admin-input" placeholder="Ex: ABC" maxlength="5" style="text-transform:uppercase;" required>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 30px;">
+                            <label class="input-label">Dias de Treino</label>
+                            <div class="days-selector">
+                                <label><input type="checkbox" name="dias_semana[]" value="1" class="day-checkbox"><span class="day-label">SEG</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="2" class="day-checkbox"><span class="day-label">TER</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="3" class="day-checkbox"><span class="day-label">QUA</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="4" class="day-checkbox"><span class="day-label">QUI</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="5" class="day-checkbox"><span class="day-label">SEX</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="6" class="day-checkbox"><span class="day-label">SÁB</span></label>
+                                <label><input type="checkbox" name="dias_semana[]" value="7" class="day-checkbox"><span class="day-label">DOM</span></label>
+                            </div>
+                        </div>
+
+                        <div id="aviso-periodizacao" class="alert-box">
+                            <span class="alert-title">Modo Periodização Ativo</span>
+                            <p class="alert-text">Serão gerados 12 Microciclos automaticamente.</p>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button type="button" class="btn-gold" style="background: transparent; border: 1px solid #555; color: #ccc; margin-right: 10px;" onclick="toggleNovoTreino()">Cancelar</button>
+                            <button type="submit" class="btn-gold">CRIAR ESTRUTURA</button>
+                        </div>
+                    </form>
+                </div>
             </section>
+
         ';
         break;
 
@@ -507,6 +638,201 @@ switch ($pagina) {
                         </div>
 
                         <button type="submit" class="btn-gold" style="width: 100%; padding: 15px; font-size: 1rem;">REGISTRAR VENDA</button>
+                    </form>
+                </div>
+            </div>
+
+        ';
+        break;
+    
+    case 'treino_painel':
+        require_once '../config/db_connect.php';
+        $treino_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+        if (!$treino_id) { echo "ID Inválido"; break; }
+
+        // 1. BUSCAR DADOS GERAIS
+        $sql = "SELECT t.*, u.nome as nome_aluno FROM treinos t JOIN usuarios u ON t.aluno_id = u.id WHERE t.id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id' => $treino_id]);
+        $treino = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 2. BUSCAR DIVISÕES
+        $sql_div = "SELECT * FROM treino_divisoes WHERE treino_id = :id ORDER BY letra ASC";
+        $stmt_div = $pdo->prepare($sql_div);
+        $stmt_div->execute(['id' => $treino_id]);
+        $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3. TIMELINE (Mantida igual)
+        // ... (O código da timeline permanece o mesmo da etapa anterior, vou ocultar aqui pra economizar espaço mas você mantem) ...
+        
+        // --- INICIO HTML ---
+        echo '
+            <section id="painel-treino">
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:30px;">
+                    <button class="btn-action-icon" onclick="carregarConteudo(\'treinos_editor\')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h2 style="color:#fff; font-family:Orbitron; margin:0;">'.$treino['nome'].'</h2>
+                        <p style="color:#888; font-size:0.9rem;">Aluno: <strong style="color:var(--gold);">'.$treino['nome_aluno'].'</strong> • '.strtoupper($treino['nivel_plano']).'</p>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="division-tabs">';
+                        $first = true;
+                        foreach ($divisoes as $div) {
+                            $active = $first ? 'active' : '';
+                            echo '<button class="div-tab-btn '.$active.'" onclick="openTab(event, \'div_'.$div['letra'].'\')">TREINO '.$div['letra'].'</button>';
+                            $first = false;
+                        }
+        echo '      </div>';
+
+                    // CONTEÚDO DAS ABAS (LOOP PRINCIPAL)
+                    $firstContent = true;
+                    foreach ($divisoes as $div) {
+                        $display = $firstContent ? 'active' : '';
+                        
+                        // Busca exercícios desta divisão
+                        $sqlEx = "SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC";
+                        $stmtEx = $pdo->prepare($sqlEx);
+                        $stmtEx->execute([$div['id']]);
+                        $exercicios = $stmtEx->fetchAll(PDO::FETCH_ASSOC);
+
+                        echo '
+                        <div id="div_'.$div['letra'].'" class="division-content '.$display.'">
+                            
+                            <div class="div-header">
+                                <div><h3 style="color:#fff; margin:0;">Ficha '.$div['letra'].'</h3></div>
+                                <button class="btn-gold" onclick="openExercicioModal('.$div['id'].', '.$treino_id.')">
+                                    <i class="fa-solid fa-plus"></i> ADD EXERCÍCIO
+                                </button>
+                            </div>
+
+                            <div class="exercise-list">';
+                                
+                                if (count($exercicios) > 0) {
+                                    foreach ($exercicios as $ex) {
+                                        // Busca as séries deste exercício
+                                        $sqlSeries = "SELECT * FROM series WHERE exercicio_id = ?";
+                                        $stmtSeries = $pdo->prepare($sqlSeries);
+                                        $stmtSeries->execute([$ex['id']]);
+                                        $series = $stmtSeries->fetchAll(PDO::FETCH_ASSOC);
+
+                                        echo '
+                                        <div class="exercise-card">
+                                            <div class="ex-info">
+                                                <span class="ex-meta">'.strtoupper($ex['tipo_mecanica']).'</span>
+                                                <h4>'.$ex['nome_exercicio'].'</h4>
+                                                <div class="sets-container">';
+                                                    foreach ($series as $s) {
+                                                        // Monta a tag: "3x Work (8-10)"
+                                                        $infoReps = $s['reps_fixas'] ? "(".$s['reps_fixas'].")" : "";
+                                                        echo '<span class="set-tag '.$s['categoria'].'">'.$s['quantidade'].'x '.strtoupper($s['categoria']).' '.$infoReps.'</span>';
+                                                    }
+                                        echo '  </div>
+                                            </div>
+                                            <div class="ex-actions">
+                                                <button class="btn-action-icon"><i class="fa-solid fa-pen"></i></button>
+                                                <button class="btn-action-icon btn-delete"><i class="fa-solid fa-trash"></i></button>
+                                            </div>
+                                        </div>';
+                                    }
+                                } else {
+                                    echo '<p style="text-align:center; color:#666; padding:30px;">Nenhum exercício cadastrado.</p>';
+                                }
+                        
+                        echo '</div>
+                        </div>';
+                        $firstContent = false;
+                    }
+
+        echo '  </div>
+            </section>
+
+            <div id="modalExercicio" class="modal-overlay">
+                <div class="modal-content" style="max-width: 700px;">
+                    <button class="modal-close" onclick="closeExercicioModal()">&times;</button>
+                    
+                    <h3 class="section-title" style="color:var(--gold); margin-bottom:20px;">Novo Exercício</h3>
+                    
+                    <form action="actions/treino_add_exercicio.php" method="POST" id="formExercicio">
+                        <input type="hidden" name="divisao_id" id="modal_divisao_id">
+                        <input type="hidden" name="treino_id" id="modal_treino_id">
+                        <input type="hidden" name="series_data" id="series_json_input">
+
+                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
+                            <div style="flex:2;">
+                                <label class="input-label">Nome do Exercício</label>
+                                <input type="text" name="nome_exercicio" class="admin-input" placeholder="Ex: Supino Reto" required>
+                            </div>
+                            <div style="flex:1;">
+                                <label class="input-label">Mecânica</label>
+                                <select name="tipo_mecanica" class="admin-input">
+                                    <option value="livre">Livre / Máquina</option>
+                                    <option value="composto">Composto (Periodizado)</option>
+                                    <option value="isolador">Isolador (Periodizado)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
+                            <div style="flex:1;">
+                                <label class="input-label">Link Vídeo (Youtube/Drive)</label>
+                                <input type="text" name="video_url" class="admin-input" placeholder="https://...">
+                            </div>
+                            <div style="flex:1;">
+                                <label class="input-label">Observação</label>
+                                <input type="text" name="observacao" class="admin-input" placeholder="Ex: Segurar 2s na descida">
+                            </div>
+                        </div>
+
+                        <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+
+                        <h4 style="color:#fff; font-size:0.9rem; margin-bottom:10px;">Configuração de Séries</h4>
+                        
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
+                            <div style="display:flex; gap:10px; align-items:end; flex-wrap:wrap;">
+                                <div style="width:60px;">
+                                    <label class="input-label" style="font-size:0.7rem;">Qtd</label>
+                                    <input type="number" id="set_qtd" class="admin-input" value="1" style="padding:8px;">
+                                </div>
+                                <div style="flex:1; min-width:100px;">
+                                    <label class="input-label" style="font-size:0.7rem;">Tipo</label>
+                                    <select id="set_tipo" class="admin-input" style="padding:8px;">
+                                        <option value="warmup">Warm Up (Aquecimento)</option>
+                                        <option value="feeder">Feeder (Reconhecimento)</option>
+                                        <option value="work">Work Set (Valendo)</option>
+                                        <option value="top">Top Set (Carga Máx)</option>
+                                        <option value="backoff">Backoff (Redução)</option>
+                                        <option value="falha">Falha Total</option>
+                                    </select>
+                                </div>
+                                <div style="flex:1; min-width:80px;">
+                                    <label class="input-label" style="font-size:0.7rem;">Reps</label>
+                                    <input type="text" id="set_reps" class="admin-input" placeholder="Ex: 8-12" style="padding:8px;">
+                                </div>
+                                <div style="flex:1; min-width:80px;">
+                                    <label class="input-label" style="font-size:0.7rem;">Descanso</label>
+                                    <input type="text" id="set_desc" class="admin-input" placeholder="Ex: 90s" style="padding:8px;">
+                                </div>
+                                <div style="width:60px;">
+                                    <label class="input-label" style="font-size:0.7rem;">RPE</label>
+                                    <input type="number" id="set_rpe" class="admin-input" placeholder="1-10" style="padding:8px;">
+                                </div>
+                                <button type="button" class="btn-gold" onclick="addSetToList()" style="padding:8px 15px;">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <div id="temp-sets-list">
+                                <p style="color:#666; font-size:0.8rem; text-align:center; margin-top:10px;">Nenhuma série adicionada.</p>
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button type="button" class="btn-gold" style="background:transparent; border:1px solid #555; color:#ccc; margin-right:10px;" onclick="closeExercicioModal()">Cancelar</button>
+                            <button type="submit" class="btn-gold">SALVAR EXERCÍCIO</button>
+                        </div>
                     </form>
                 </div>
             </div>

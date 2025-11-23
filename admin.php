@@ -30,45 +30,71 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const BOTAO_PADRAO = 'dashboard';
-            const aside = document.getElementById('main-aside');
+        async function carregarConteudo(pagina) {
             const areaConteudo = document.getElementById('conteudo');
-            const botoes = aside.querySelectorAll('button[data-pagina]');
 
-            async function carregarConteudo(pagina) {
-                if(pagina === 'logout') {
-                    // Agora redireciona para o script PHP que destrói a sessão
-                    window.location.href = 'actions/logout.php'; 
-                    return;
-                }
-
-                // Feedback visual mantendo o estilo
-                areaConteudo.innerHTML = '<div class="loading"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
-                areaConteudo.classList.add('loading');
-
-                try {
-                    // Aponta para o novo arquivo PHP de admin
-                    const response = await fetch(`ajax/get_admin_conteudo.php?pagina=${pagina}`);
-                    
-                    if (!response.ok) throw new Error('Erro na requisição');
-                    
-                    const html = await response.text();
-                    
-                    areaConteudo.innerHTML = html;
-                    areaConteudo.classList.remove('loading');
-
-                    // Atualiza classe active
-                    botoes.forEach(btn => {
-                        btn.classList.toggle('active', btn.dataset.pagina === pagina);
-                    });
-
-                } catch (error) {
-                    console.error(error);
-                    areaConteudo.innerHTML = '<p class="error">Erro ao carregar painel administrativo.</p>';
-                }
+            // Lógica de Logout
+            if (pagina === 'logout') {
+                window.location.href = 'actions/logout.php';
+                return;
             }
 
+            // Feedback visual de carregamento
+            areaConteudo.innerHTML = '<div class="loading"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
+            areaConteudo.classList.add('loading');
+
+            try {
+                const response = await fetch(`ajax/get_admin_conteudo.php?pagina=${pagina}`);
+
+                if (!response.ok) throw new Error('Erro na requisição');
+
+                const html = await response.text();
+
+                areaConteudo.innerHTML = html;
+                areaConteudo.classList.remove('loading');
+
+                // Atualiza classe active na Sidebar
+                // Truque: Se a página for "treino_painel&id=1", pegamos só "treino_painel"
+                const paginaBase = pagina.split('&')[0]; 
+                const botoes = document.querySelectorAll('#main-aside button[data-pagina]');
+
+                botoes.forEach(btn => {
+                    if (btn.dataset.pagina === paginaBase) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+            } catch (error) {
+                console.error(error);
+                areaConteudo.innerHTML = '<p class="error">Erro ao carregar painel administrativo.</p>';
+            }
+        }
+
+        // 2. INICIALIZAÇÃO INTELIGENTE
+        document.addEventListener('DOMContentLoaded', () => {
+            const aside = document.getElementById('main-aside');
+
+            // Verifica se tem parâmetros na URL (ex: voltou do salvamento)
+            const params = new URLSearchParams(window.location.search);
+            const pageParam = params.get('page'); // ex: 'treino_painel'
+            const idParam = params.get('id');     // ex: '15'
+
+            let paginaInicial = 'dashboard'; // Padrão
+
+            // Se tiver parametro, usa ele
+            if (pageParam) {
+                paginaInicial = pageParam;
+                if (idParam) {
+                    paginaInicial += '&id=' + idParam;
+                }
+                
+                // (Opcional) Limpa a URL para não ficar "suja" visualmente
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Adiciona o clique nos botões da barra lateral
             aside.addEventListener('click', (e) => {
                 const btn = e.target.closest('button');
                 if (btn && btn.dataset.pagina) {
@@ -76,26 +102,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                 }
             });
 
-            carregarConteudo(BOTAO_PADRAO);
+            // Carrega a página decidida (Dashboard ou Treino Específico)
+            carregarConteudo(paginaInicial);
         });
 
-
-        // --- FUNÇÃO DE PREVIEW DO ADMIN ---
+        // 3. FUNÇÃO DE PREVIEW DE FOTO (Global)
         function previewImageAdmin(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    // O ID da imagem no admin é 'admin-preview'
                     var imgPreview = document.getElementById('admin-preview');
-                    if(imgPreview) {
+                    if (imgPreview) {
                         imgPreview.src = e.target.result;
                     }
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
+    </script>
+    <script>
 
-   
                 function openModal() {
                     document.getElementById("modalLancamento").style.display = "flex";
                 }
@@ -140,6 +166,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                     document.getElementById("edit_nome").value = aluno.nome;
                     document.getElementById("edit_email").value = aluno.email;
                     document.getElementById("edit_telefone").value = aluno.telefone;
+                    // Carrega a data de expiração
+                    document.getElementById("edit_expiracao").value = aluno.data_expiracao;
                     
                     document.getElementById("modalEditarAluno").style.display = "flex";
                 }
@@ -154,6 +182,97 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                     if (event.target == modal) {
                         modal.style.display = "none";
                     }
+                }
+            </script>
+
+            <script>
+                function toggleNovoTreino() {
+                    var box = document.getElementById("box-novo-treino");
+                    if(box.style.display === "none") {
+                        box.style.display = "block";
+                        box.scrollIntoView({behavior: "smooth"});
+                    } else {
+                        box.style.display = "none";
+                    }
+                }
+                
+                function togglePeriodizacao() {
+                    var nivel = document.getElementById("selectNivel").value;
+                    var aviso = document.getElementById("aviso-periodizacao");
+                    if (nivel === "basico") { aviso.style.display = "none"; } 
+                    else { aviso.style.display = "block"; }
+                }
+            </script>
+    
+
+    <script>
+                // Gerenciamento de Abas
+                function openTab(evt, divName) {
+                    var i, content, tablinks;
+                    content = document.getElementsByClassName("division-content");
+                    for (i = 0; i < content.length; i++) { content[i].className = content[i].className.replace(" active", ""); }
+                    tablinks = document.getElementsByClassName("div-tab-btn");
+                    for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
+                    document.getElementById(divName).className += " active";
+                    evt.currentTarget.className += " active";
+                }
+
+                // Modal Logic
+                let seriesArray = [];
+
+                function openExercicioModal(divId, treinoId) {
+                    document.getElementById("modal_divisao_id").value = divId;
+                    document.getElementById("modal_treino_id").value = treinoId;
+                    document.getElementById("modalExercicio").style.display = "flex";
+                    seriesArray = []; // Reseta lista
+                    renderSetsList();
+                }
+
+                function closeExercicioModal() {
+                    document.getElementById("modalExercicio").style.display = "none";
+                }
+
+                // Adicionar Série ao Array Temporário
+                function addSetToList() {
+                    const qtd = document.getElementById("set_qtd").value;
+                    const tipo = document.getElementById("set_tipo").value;
+                    const reps = document.getElementById("set_reps").value;
+                    const desc = document.getElementById("set_desc").value;
+                    const rpe = document.getElementById("set_rpe").value;
+
+                    if(qtd > 0) {
+                        seriesArray.push({ qtd, tipo, reps, desc, rpe });
+                        renderSetsList();
+                    }
+                }
+
+                // Renderizar lista visual e atualizar input hidden
+                function renderSetsList() {
+                    const listDiv = document.getElementById("temp-sets-list");
+                    const jsonInput = document.getElementById("series_json_input");
+                    
+                    listDiv.innerHTML = "";
+                    
+                    if(seriesArray.length === 0) {
+                        listDiv.innerHTML = "<p style=\'color:#666; font-size:0.8rem; text-align:center; margin-top:10px;\'>Nenhuma série adicionada.</p>";
+                    } else {
+                        seriesArray.forEach((s, index) => {
+                            listDiv.innerHTML += `
+                                <div class="temp-set-item">
+                                    <span><strong>${s.qtd}x</strong> ${s.tipo.toUpperCase()} (${s.reps} reps)</span>
+                                    <span style="color:#ff4242; cursor:pointer;" onclick="removeSet(${index})"><i class="fa-solid fa-times"></i></span>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    // Salva no input hidden para enviar pro PHP
+                    jsonInput.value = JSON.stringify(seriesArray);
+                }
+
+                function removeSet(index) {
+                    seriesArray.splice(index, 1);
+                    renderSetsList();
                 }
             </script>
 

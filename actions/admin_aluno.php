@@ -40,10 +40,17 @@ try {
         $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $telefone = filter_input(INPUT_POST, 'telefone', FILTER_SANITIZE_STRING);
+        $data_expiracao = $_POST['data_expiracao']; // <--- NOVO CAMPO
         $nova_senha = $_POST['nova_senha'];
 
         $sql_senha = "";
-        $params = ['nome' => $nome, 'email' => $email, 'telefone' => $telefone, 'id' => $id];
+        $params = [
+            'nome' => $nome, 
+            'email' => $email, 
+            'telefone' => $telefone, 
+            'expiracao' => $data_expiracao, // <--- NOVO PARAM
+            'id' => $id
+        ];
 
         if (!empty($nova_senha)) {
             $senhaHash = password_hash($nova_senha, PASSWORD_DEFAULT);
@@ -51,7 +58,9 @@ try {
             $params['senha'] = $senhaHash;
         }
 
-        $sql = "UPDATE usuarios SET nome = :nome, email = :email, telefone = :telefone $sql_senha WHERE id = :id";
+        // Atualiza a query incluindo data_expiracao
+        $sql = "UPDATE usuarios SET nome = :nome, email = :email, telefone = :telefone, data_expiracao = :expiracao $sql_senha WHERE id = :id";
+        
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
 
