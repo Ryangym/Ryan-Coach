@@ -177,35 +177,141 @@ switch ($pagina) {
         break;
 
     case 'alunos':
+        require_once '../config/db_connect.php';
+        
+        // Busca todos os alunos
+        $sql = "SELECT * FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC";
+        $alunos = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $total_alunos = count($alunos);
+
         echo '
-            <section>
+            <section id="gerenciar-alunos">
                 <header class="dash-header">
                     <h1>GERENCIAR <span class="highlight-text">ALUNOS</span></h1>
+                    <p class="text-desc">Controle total da base de atletas ('.$total_alunos.')</p>
                 </header>
                 
-                <div class="glass-card" style="padding: 20px;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <input type="text" placeholder="Buscar aluno..." style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: #fff;">
-                        <button class="btn-gold">BUSCAR</button>
+                <div class="glass-card mt-large">
+                    
+                    <div class="section-header-row">
+                        <div style="flex: 1; position: relative; max-width: 400px;">
+                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
+                            <input type="text" id="searchAluno" onkeyup="filtrarAlunos()" placeholder="Buscar por nome ou email..." class="admin-input" style="padding-left: 40px;">
+                        </div>
                     </div>
 
-                    <div class="workout-list">
-                        <div class="glass-card workout-item" style="background: rgba(255,255,255,0.05);">
-                            <div class="wk-left">
-                                <div class="wk-icon"><i class="fa-solid fa-user"></i></div>
-                                <div class="wk-details">
-                                    <h4>Carlos Eduardo</h4>
-                                    <span style="color: #FFBA42;">Plano Premium</span>
-                                </div>
-                            </div>
-                            <div class="wk-right" style="display: flex; gap: 10px;">
-                                <i class="fa-solid fa-pen-to-square" style="cursor: pointer; color: #fff;"></i>
-                                <i class="fa-solid fa-trash" style="cursor: pointer; color: #ff4242;"></i>
-                            </div>
-                        </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="admin-table" id="tabelaAlunos">
+                            <thead>
+                                <tr>
+                                    <th>ALUNO</th>
+                                    <th>CONTATO</th>
+                                    <th>CADASTRO</th>
+                                    <th style="text-align: right;">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            
+                            if ($total_alunos > 0) {
+                                foreach ($alunos as $a) {
+                                    $foto = !empty($a['foto']) ? $a['foto'] : 'assets/img/icones/user-default.png';
+                                    $data_cadastro = date('d/m/y', strtotime($a['data_cadastro']));
+                                    
+                                    // Link do Zap limpo (remove caracteres não numéricos)
+                                    $zap_clean = preg_replace('/[^0-9]/', '', $a['telefone']);
+                                    $link_zap = "https://wa.me/55".$zap_clean;
+
+                                    // Dados para o Modal (Json no atributo data)
+                                    $dados_json = htmlspecialchars(json_encode($a), ENT_QUOTES, 'UTF-8');
+
+                                    echo '
+                                    <tr class="aluno-row">
+                                        <td>
+                                            <div class="user-cell">
+                                                <img src="'.$foto.'" class="table-avatar" alt="Foto">
+                                                <div>
+                                                    <span style="display:block; font-weight:bold; color:#fff;">'.$a['nome'].'</span>
+                                                    <span style="font-size:0.8rem; color:#666;">'.$a['email'].'</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <span style="color:#ccc; font-size:0.9rem;">'.$a['telefone'].'</span>
+                                                <a href="'.$link_zap.'" target="_blank" class="btn-action-icon btn-confirm" title="Chamar no WhatsApp" style="width: 25px; height: 25px; font-size: 0.8rem;">
+                                                    <i class="fa-brands fa-whatsapp"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td style="color:#888;">'.$data_cadastro.'</td>
+                                        <td style="text-align: right;">
+                                            <div style="display:flex; gap:5px; justify-content:flex-end;">
+                                                <button class="btn-action-icon" onclick=\'openEditModal('.$dados_json.')\' title="Editar Dados">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+                                                
+                                                <a href="actions/admin_aluno.php?id='.$a['id'].'&acao=promover" class="btn-action-icon" style="border-color: var(--gold); color: var(--gold);" onclick="return confirm(\'ATENÇÃO: Tem certeza que deseja transformar este aluno em ADMINISTRADOR?\n\nEle terá acesso total ao sistema, incluindo financeiro.\')" title="Promover a Admin">
+                                                    <i class="fa-solid fa-user-shield"></i>
+                                                </a>
+
+                                                <a href="actions/admin_aluno.php?id='.$a['id'].'&acao=excluir" class="btn-action-icon btn-delete" onclick="return confirm(\'Tem certeza que deseja remover este aluno?\')" title="Remover Aluno">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>';
+                                }
+                            } else {
+                                echo '<tr><td colspan="4" style="text-align:center; padding:30px;">Nenhum aluno encontrado.</td></tr>';
+                            }
+
+        echo '              </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
+
+            <div id="modalEditarAluno" class="modal-overlay">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                    
+                    <h3 class="section-title" style="color: var(--gold); margin-bottom: 20px; text-align: center;">
+                        <i class="fa-solid fa-user-pen"></i> Editar Aluno
+                    </h3>
+                    
+                    <form action="actions/admin_aluno.php" method="POST">
+                        <input type="hidden" name="acao" value="editar">
+                        <input type="hidden" name="id" id="edit_id">
+
+                        <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <label style="color:#ccc; font-size: 0.8rem;">Nome Completo</label>
+                                <input type="text" name="nome" id="edit_nome" class="admin-input" required>
+                            </div>
+                        </div>
+
+                        <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <label style="color:#ccc; font-size: 0.8rem;">Email</label>
+                                <input type="email" name="email" id="edit_email" class="admin-input" required>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="color:#ccc; font-size: 0.8rem;">Telefone</label>
+                                <input type="text" name="telefone" id="edit_telefone" class="admin-input">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="color:#ff4242; font-size: 0.8rem;">Redefinir Senha (Opcional)</label>
+                            <input type="text" name="nova_senha" class="admin-input" placeholder="Deixe vazio para não alterar">
+                            <p style="font-size:0.7rem; color:#666; margin-top:5px;">Se preencher, a senha do aluno será trocada.</p>
+                        </div>
+
+                        <button type="submit" class="btn-gold" style="width: 100%; padding: 15px;">SALVAR ALTERAÇÕES</button>
+                    </form>
+                </div>
+            </div>
+
         ';
         break;
 

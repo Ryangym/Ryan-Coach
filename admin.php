@@ -111,6 +111,51 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                 }
            
     </script>
+    <script>
+                // Filtro de Busca na Tabela
+                function filtrarAlunos() {
+                    var input, filter, table, tr, td, i, txtValue;
+                    input = document.getElementById("searchAluno");
+                    filter = input.value.toUpperCase();
+                    table = document.getElementById("tabelaAlunos");
+                    tr = table.getElementsByTagName("tr");
+
+                    for (i = 1; i < tr.length; i++) { // Começa do 1 para pular o cabeçalho
+                        // Verifica Nome (index 0) e Email (dentro da div)
+                        var tdNome = tr[i].getElementsByTagName("td")[0];
+                        if (tdNome) {
+                            txtValue = tdNome.textContent || tdNome.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }       
+                    }
+                }
+
+                // Modal de Edição
+                function openEditModal(aluno) {
+                    document.getElementById("edit_id").value = aluno.id;
+                    document.getElementById("edit_nome").value = aluno.nome;
+                    document.getElementById("edit_email").value = aluno.email;
+                    document.getElementById("edit_telefone").value = aluno.telefone;
+                    
+                    document.getElementById("modalEditarAluno").style.display = "flex";
+                }
+
+                function closeEditModal() {
+                    document.getElementById("modalEditarAluno").style.display = "none";
+                }
+                
+                // Fecha ao clicar fora
+                window.onclick = function(event) {
+                    var modal = document.getElementById("modalEditarAluno");
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            </script>
 
 </body>
 </html>
