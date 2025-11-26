@@ -150,11 +150,185 @@ switch ($pagina) {
         ';
         break;
     case 'treinos':
+        require_once '../config/db_connect.php';
+        if(session_status() === PHP_SESSION_NONE) session_start();
+        $aluno_id = $_SESSION['user_id'];
+        $hoje = date('Y-m-d');
+
+        // 1. BUSCA O TREINO ATIVO (Vigente)
+        $sql = "SELECT * FROM treinos WHERE aluno_id = :uid AND data_inicio <= :hj AND data_fim >= :hj LIMIT 1";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['uid' => $aluno_id, 'hj' => $hoje]);
+        $treino = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$treino) {
+            echo '
+            <section id="treinos-vazio" style="text-align:center; padding-top:50px;">
+                <i class="fa-solid fa-dumbbell" style="font-size:4rem; color:#333; margin-bottom:20px;"></i>
+                <h2 style="color:#fff; margin-bottom:10px;">Nenhum treino ativo</h2>
+                <p style="color:#888;">Você não possui um planejamento vigente para hoje.<br>Entre em contato com o treinador.</p>
+            </section>';
+            break;
+        }
+
+        // 2. SE AVANÇADO: BUSCA MICROCICLO ATUAL
+        $micro_atual = null;
+        $todos_micros = [];
+        
+        if ($treino['nivel_plano'] !== 'basico') {
+            $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
+            $stmt_per->execute([$treino['id']]);
+            $periodizacao_id = $stmt_per->fetchColumn();
+
+            if ($periodizacao_id) {
+                // Busca todos para a timeline
+                $stmt_micros = $pdo->prepare("SELECT * FROM microciclos WHERE periodizacao_id = ? ORDER BY semana_numero ASC");
+                $stmt_micros->execute([$periodizacao_id]);
+                $todos_micros = $stmt_micros->fetchAll(PDO::FETCH_ASSOC);
+
+                // Descobre qual é o de hoje
+                foreach ($todos_micros as $m) {
+                    if ($hoje >= $m['data_inicio_semana'] && $hoje <= $m['data_fim_semana']) {
+                        $micro_atual = $m;
+                        break;
+                    }
+                }
+                // Fallback: Se hoje não caiu em nenhum (ex: dia off entre treinos), pega o mais próximo ou o último
+                if (!$micro_atual && !empty($todos_micros)) $micro_atual = $todos_micros[0]; 
+            }
+        }
+
+        // 3. BUSCA DIVISÕES
+        $stmt_div = $pdo->prepare("SELECT * FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
+        $stmt_div->execute([$treino['id']]);
+        $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
+
+        echo '<section id="meu-treino">';
+        
+        // --- HEADER DO TREINO ---
         echo '
-            <section id="treinos">
-                <h1>Meus Treinos</h1>
-                <p>Aqui você verá sua planilha de treinos, vídeos, etc.</p>
-                </section>
+        <div class="dash-header" style="margin-bottom:20px;">
+            <h2 style="font-family:Orbitron; color:#fff;">'.$treino['nome'].'</h2>
+            <p style="color:#888;">Foco: '.($micro_atual ? $micro_atual['nome_fase'] : 'Geral').'</p>
+        </div>';
+
+        // --- TIMELINE (Só Avançado) ---
+        if (!empty($todos_micros)) {
+            echo '<div class="timeline-wrapper">';
+            foreach ($todos_micros as $m) {
+                $active = ($micro_atual && $m['id'] == $micro_atual['id']) ? 'active' : '';
+                $inicio = date('d/m', strtotime($m['data_inicio_semana']));
+                echo '
+                <div class="micro-card '.$active.'">
+                    <span class="micro-title">SEM '.$m['semana_numero'].'</span>
+                    <span class="micro-dates">'.$inicio.'</span>
+                </div>';
+            }
+            echo '</div>';
+
+            // Aviso da Semana
+            if ($micro_atual) {
+                echo '
+                <div class="week-focus-box">
+                    <h4 style="color:var(--gold); margin-bottom:5px;"><i class="fa-solid fa-crosshairs"></i> Estratégia da Semana</h4>
+                    <p style="color:#ccc; font-size:0.9rem; margin-bottom:5px;">
+                        <strong>Compostos:</strong> '.$micro_atual['reps_compostos'].' reps | 
+                        <strong>Isoladores:</strong> '.$micro_atual['reps_isoladores'].' reps
+                    </p>
+                    '.($micro_atual['foco_comentario'] ? '<p style="color:#888; font-size:0.8rem; margin-top:5px;">"'.$micro_atual['foco_comentario'].'"</p>' : '').'
+                </div>';
+            }
+        }
+
+        // --- ABAS DE DIVISÃO ---
+        echo '<div class="division-tabs">';
+        $first = true;
+        foreach ($divisoes as $div) {
+            $active = $first ? 'active' : '';
+            echo '<button class="tab-btn '.$active.'" onclick="abrirTreino(event, \'tdiv_'.$div['id'].'\')">TREINO '.$div['letra'].'</button>';
+            $first = false;
+        }
+        echo '</div>';
+
+        // --- CONTEÚDO DAS ABAS (Exercícios) ---
+        $firstContent = true;
+        foreach ($divisoes as $div) {
+            $display = $firstContent ? 'block' : 'none';
+            
+            // Busca exercícios
+            $stmt_ex = $pdo->prepare("SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC");
+            $stmt_ex->execute([$div['id']]);
+            $exercicios = $stmt_ex->fetchAll(PDO::FETCH_ASSOC);
+
+            echo '<div id="tdiv_'.$div['id'].'" class="treino-content" style="display:'.$display.';">';
+            
+            if (count($exercicios) > 0) {
+                foreach ($exercicios as $ex) {
+                    
+                    // Busca séries
+                    $stmt_ser = $pdo->prepare("SELECT * FROM series WHERE exercicio_id = ?");
+                    $stmt_ser->execute([$ex['id']]);
+                    $series = $stmt_ser->fetchAll(PDO::FETCH_ASSOC);
+
+                    echo '
+                    <div class="workout-card">
+                        <div class="workout-header">
+                            <div>
+                                <span class="workout-name">'.$ex['nome_exercicio'].'</span>
+                                <span class="workout-meta">'.strtoupper($ex['tipo_mecanica']).'</span>
+                            </div>
+                            '.($ex['video_url'] ? '<a href="'.$ex['video_url'].'" target="_blank" class="video-btn"><i class="fa-solid fa-play"></i></a>' : '').'
+                        </div>
+                        '.($ex['observacao_exercicio'] ? '<p style="color:#888; font-size:0.85rem; margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i> '.$ex['observacao_exercicio'].'</p>' : '').'
+                        
+                        <div class="sets-grid">';
+                            
+                            foreach ($series as $s) {
+                                // LÓGICA DE REPRA E DESCANSO INTELIGENTE
+                                $reps_display = $s['reps_fixas'];
+                                $desc_display = $s['descanso_fixo'];
+
+                                // Se for Avançado, tenta pegar da periodização
+                                if ($treino['nivel_plano'] !== 'basico' && $micro_atual) {
+                                    if ($ex['tipo_mecanica'] == 'composto' && !empty($micro_atual['reps_compostos'])) {
+                                        $reps_display = $micro_atual['reps_compostos'];
+                                    } elseif ($ex['tipo_mecanica'] == 'isolador' && !empty($micro_atual['reps_isoladores'])) {
+                                        $reps_display = $micro_atual['reps_isoladores'];
+                                    }
+                                    // Se tiver descanso global na semana
+                                    if (!empty($micro_atual['descanso_segundos'])) {
+                                        $desc_display = $micro_atual['descanso_segundos']."s";
+                                    }
+                                }
+
+                                // Fallback final se ainda estiver vazio
+                                if (empty($reps_display)) $reps_display = "Falha";
+                                if (empty($desc_display)) $desc_display = "-";
+
+                                echo '
+                                <div class="set-box '.$s['categoria'].'">
+                                    <div class="set-info">
+                                        <span class="set-type">'.$s['quantidade'].'x '.strtoupper($s['categoria']).'</span>
+                                        <i class="fa-solid fa-check-circle" style="color:#333;"></i>
+                                    </div>
+                                    <div class="set-reps">'.$reps_display.'</div>
+                                    <div class="set-rest"><i class="fa-solid fa-stopwatch"></i> '.$desc_display.'</div>
+                                </div>';
+                            }
+
+                    echo '</div>
+                    </div>';
+                }
+            } else {
+                echo '<p style="color:#666; text-align:center; padding:30px;">Descanso ou sem exercícios cadastrados.</p>';
+            }
+            echo '</div>'; // Fim da aba
+            $firstContent = false;
+        }
+
+        echo '
+        </section>
+        
         ';
         break;
 

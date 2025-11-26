@@ -114,6 +114,21 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
             }
         }
     </script>
+    <script>
+            function abrirTreino(evt, divName) {
+                var i, content, tablinks;
+                content = document.getElementsByClassName("treino-content");
+                for (i = 0; i < content.length; i++) {
+                    content[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tab-btn");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(divName).style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+        </script>
 
 </body>
 </html>
