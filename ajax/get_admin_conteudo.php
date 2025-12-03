@@ -386,9 +386,18 @@ switch ($pagina) {
                                         <td><span class="status-badge" style="color:'.$corBadge.'; border-color:'.$corBadge.'; background:transparent;">'.strtoupper($t['nivel_plano']).'</span></td>
                                         <td style="color:#888;">'.$inicio.' a '.$fim.'</td>
                                         <td style="text-align:right;">
-                                            <button class="btn-gold" style="padding: 5px 15px; font-size: 0.8rem;" onclick="carregarConteudo(\'treino_painel&id='.$t['id'].'\')">
-                                                GERENCIAR <i class="fa-solid fa-arrow-right"></i>
-                                            </button>
+                                            <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
+                                                <a href="actions/treino_delete.php?id='.$t['id'].'" 
+                                                class="btn-action-icon btn-delete" 
+                                                onclick="return confirm(\'Tem certeza que deseja EXCLUIR este planejamento?\n\nIsso apagará permanentemente:\n- Todas as divisões\n- Exercícios e Séries\n- Histórico de periodização vinculados a ele.\')" 
+                                                title="Excluir Treino">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
+
+                                                <button class="btn-gold" style="padding: 5px 15px; font-size: 0.8rem;" onclick="carregarConteudo(\'treino_painel&id='.$t['id'].'\')">
+                                                    GERENCIAR <i class="fa-solid fa-arrow-right"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>';
                                 }
@@ -663,8 +672,19 @@ switch ($pagina) {
         $stmt_div->execute(['id' => $treino_id]);
         $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. TIMELINE (Mantida igual)
-        // ... (O código da timeline permanece o mesmo da etapa anterior, vou ocultar aqui pra economizar espaço mas você mantem) ...
+        // 3. BUSCAR PERIODIZAÇÃO E MICROCICLOS (Lógica Adicionada)
+        $microciclos = [];
+        if ($treino['nivel_plano'] !== 'basico') {
+            $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
+            $stmt_per->execute([$treino_id]);
+            $periodizacao_id = $stmt_per->fetchColumn();
+
+            if ($periodizacao_id) {
+                $stmt_micro = $pdo->prepare("SELECT * FROM microciclos WHERE periodizacao_id = ? ORDER BY semana_numero ASC");
+                $stmt_micro->execute([$periodizacao_id]);
+                $microciclos = $stmt_micro->fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
         
         // --- INICIO HTML ---
         echo '
@@ -677,6 +697,33 @@ switch ($pagina) {
                     </div>
                 </div>
 
+                ';
+                if (!empty($microciclos)) {
+                    echo '<h3 class="section-title" style="font-size:1rem; margin-bottom:10px;">PERIODIZAÇÃO (12 SEMANAS)</h3>
+                          <div class="timeline-wrapper">';
+                    
+                    foreach ($microciclos as $m) {
+                        $inicio = date('d/m', strtotime($m['data_inicio_semana']));
+                        $fim = date('d/m', strtotime($m['data_fim_semana']));
+                        
+                        // Marca a semana atual
+                        $hoje = date('Y-m-d');
+                        $activeClass = ($hoje >= $m['data_inicio_semana'] && $hoje <= $m['data_fim_semana']) ? 'active' : '';
+                        
+                        // JSON para o modal
+                        $m_json = htmlspecialchars(json_encode($m), ENT_QUOTES, 'UTF-8');
+
+                        echo '
+                        <div class="micro-card '.$activeClass.'" onclick=\'openMicroModal('.$m_json.', '.$treino_id.')\'>
+                            <span class="micro-week">SEMANA '.$m['semana_numero'].' <i class="fa-solid fa-pen" style="font-size:0.6rem; margin-left:5px;"></i></span>
+                            <span class="micro-date">'.$inicio.' - '.$fim.'</span>
+                            <div style="margin-top:5px; font-size:0.7rem; color: inherit; opacity:0.7;">'.$m['nome_fase'].'</div>
+                        </div>';
+                    }
+                    echo '</div>';
+                }
+        
+        echo '
                 <div class="glass-card">
                     <div class="division-tabs">';
                         $first = true;
@@ -687,7 +734,7 @@ switch ($pagina) {
                         }
         echo '      </div>';
 
-                    // CONTEÚDO DAS ABAS (LOOP PRINCIPAL)
+                    // CONTEÚDO DAS ABAS (Lista de Exercícios)
                     $firstContent = true;
                     foreach ($divisoes as $div) {
                         $display = $firstContent ? 'active' : '';
@@ -712,7 +759,7 @@ switch ($pagina) {
                                 
                                 if (count($exercicios) > 0) {
                                     foreach ($exercicios as $ex) {
-                                        // Busca as séries deste exercício
+                                        // Busca as séries
                                         $sqlSeries = "SELECT * FROM series WHERE exercicio_id = ?";
                                         $stmtSeries = $pdo->prepare($sqlSeries);
                                         $stmtSeries->execute([$ex['id']]);
@@ -725,7 +772,6 @@ switch ($pagina) {
                                                 <h4>'.$ex['nome_exercicio'].'</h4>
                                                 <div class="sets-container">';
                                                     foreach ($series as $s) {
-                                                        // Monta a tag: "3x Work (8-10)"
                                                         $infoReps = $s['reps_fixas'] ? "(".$s['reps_fixas'].")" : "";
                                                         echo '<span class="set-tag '.$s['categoria'].'">'.$s['quantidade'].'x '.strtoupper($s['categoria']).' '.$infoReps.'</span>';
                                                     }
@@ -833,6 +879,50 @@ switch ($pagina) {
                             <button type="button" class="btn-gold" style="background:transparent; border:1px solid #555; color:#ccc; margin-right:10px;" onclick="closeExercicioModal()">Cancelar</button>
                             <button type="submit" class="btn-gold">SALVAR EXERCÍCIO</button>
                         </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="modalMicro" class="modal-overlay">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeMicroModal()">&times;</button>
+                    
+                    <h3 class="section-title" style="color:var(--gold); margin-bottom:20px;">
+                        <i class="fa-solid fa-calendar-week"></i> Configurar Semana <span id="span_semana_num"></span>
+                    </h3>
+                    
+                    <form action="actions/treino_edit_micro.php" method="POST">
+                        <input type="hidden" name="micro_id" id="micro_id">
+                        <input type="hidden" name="treino_id" id="micro_treino_id">
+
+                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
+                            <div style="flex:1;">
+                                <label class="input-label">Fase / Nome</label>
+                                <input type="text" name="nome_fase" id="micro_fase" class="admin-input" placeholder="Ex: Choque" required>
+                            </div>
+                            <div style="flex:1;">
+                                <label class="input-label">Descanso Global (s)</label>
+                                <input type="number" name="descanso_segundos" id="micro_desc" class="admin-input" placeholder="Opcional">
+                            </div>
+                        </div>
+
+                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
+                            <div style="flex:1;">
+                                <label class="input-label">Reps Compostos</label>
+                                <input type="text" name="reps_compostos" id="micro_reps_comp" class="admin-input" placeholder="Ex: 6 a 8">
+                            </div>
+                            <div style="flex:1;">
+                                <label class="input-label">Reps Isoladores</label>
+                                <input type="text" name="reps_isoladores" id="micro_reps_iso" class="admin-input" placeholder="Ex: 10 a 12">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label class="input-label">Foco / Comentário para o Aluno</label>
+                            <textarea name="foco_comentario" id="micro_foco" class="admin-input" rows="3" placeholder="Ex: Aumentar carga nos básicos..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-gold" style="width:100%;">SALVAR SEMANA</button>
                     </form>
                 </div>
             </div>
