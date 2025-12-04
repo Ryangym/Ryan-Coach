@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fase = ($i <= 4) ? 'Base' : (($i <= 8) ? 'Intensificação' : 'Polimento');
 
                 // Salva Microciclo
-                $stmt = $pdo->prepare("INSERT INTO microciclos (periodizacao_id, semana_numero, nome_fase, data_inicio_semana, data_fim_semana) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO microciclos (periodizacao_id, semana_numero, nome_fase, data_inicio_semana, data_fim_semana, descanso_compostos, descanso_isoladores) VALUES (?, ?, ?, ?, ?, 120, 90)");
                 $stmt->execute([$periodizacao_id, $i, $fase, $inicio_micro, $fim_micro]);
 
                 // Prepara data para a próxima semana (+1 semana a partir do início desta)

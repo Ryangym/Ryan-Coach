@@ -246,6 +246,11 @@ switch ($pagina) {
                                         <td style="color:#888;">'.$data_cadastro.'</td>
                                         <td style="text-align: right;">
                                             <div style="display:flex; gap:5px; justify-content:flex-end;">
+                                                
+                                                <button class="btn-action-icon" onclick="carregarConteudo(\'aluno_historico&id='.$a['id'].'\')" title="Ver Histórico de Treinos" style="border-color: #888; color: #ccc;">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                                </button>
+
                                                 <button class="btn-action-icon" onclick=\'openEditModal('.$dados_json.')\' title="Editar Dados">
                                                     <i class="fa-solid fa-pen"></i>
                                                 </button>
@@ -321,6 +326,145 @@ switch ($pagina) {
             </div>
 
         ';
+        break;
+
+    case 'aluno_historico':
+        require_once '../config/db_connect.php';
+        
+        $aluno_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        $data_ref = $_GET['data_ref'] ?? null;
+
+        if (!$aluno_id) { echo "Aluno não identificado."; break; }
+
+        // Busca dados do aluno para o cabeçalho
+        $stmt_aluno = $pdo->prepare("SELECT nome, foto FROM usuarios WHERE id = ?");
+        $stmt_aluno->execute([$aluno_id]);
+        $dados_aluno = $stmt_aluno->fetch(PDO::FETCH_ASSOC);
+        $foto_aluno = $dados_aluno['foto'] ?? 'assets/img/user-default.png';
+
+        // --- MODO 1: DETALHES DO TREINO (TABELA) ---
+        if ($data_ref) {
+            // Infos Gerais do Treino
+            $sql_info = "SELECT DISTINCT t.nome as nome_treino, td.letra 
+                         FROM treino_historico th
+                         JOIN treinos t ON th.treino_id = t.id
+                         JOIN treino_divisoes td ON th.divisao_id = td.id
+                         WHERE th.aluno_id = :uid AND th.data_treino = :dt";
+            $stmt = $pdo->prepare($sql_info);
+            $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
+            $info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Exercícios e Cargas
+            $sql_detalhes = "SELECT th.*, e.nome_exercicio 
+                             FROM treino_historico th
+                             JOIN exercicios e ON th.exercicio_id = e.id
+                             WHERE th.aluno_id = :uid AND th.data_treino = :dt
+                             ORDER BY th.id ASC";
+            $stmt = $pdo->prepare($sql_detalhes);
+            $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo '
+            <section id="admin-historico-detalhe">
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:30px;">
+                    <button class="btn-action-icon" onclick="carregarConteudo(\'aluno_historico&id='.$aluno_id.'\')">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 style="color:#fff; font-family:Orbitron; margin:0;">DETALHES DO TREINO</h2>
+                        <p style="color:#888; font-size:0.9rem;">Atleta: <strong style="color:var(--gold);">'.$dados_aluno['nome'].'</strong></p>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid var(--gold);">
+                        <h3 style="color:#fff; margin:0; font-size:1.1rem;">Treino '.$info['letra'].' - '.$info['nome_treino'].'</h3>
+                        <span style="color:#888; font-size:0.85rem;">Realizado em: '.date('d/m/Y \à\s H:i', strtotime($data_ref)).'</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>EXERCÍCIO</th>
+                                    <th style="text-align:center;">SÉRIE</th>
+                                    <th style="text-align:center;">CARGA (KG)</th>
+                                    <th style="text-align:center;">REPS</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            
+                            foreach ($registros as $reg) {
+                                echo '<tr>
+                                        <td style="color:#fff; font-weight:bold;">'.$reg['nome_exercicio'].'</td>
+                                        <td style="text-align:center; color:#888;">#'.$reg['serie_numero'].'</td>
+                                        <td style="text-align:center;"><span class="status-badge" style="background:#222; color:#fff; border:1px solid #444;">'.($reg['carga_kg']*1).'kg</span></td>
+                                        <td style="text-align:center;"><span class="status-badge" style="background:#222; color:#ccc; border:1px solid #444;">'.$reg['reps_realizadas'].'</span></td>
+                                      </tr>';
+                            }
+
+            echo '          </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>';
+            break;
+        }
+
+        // --- MODO 2: TIMELINE (LISTA DE DATAS) ---
+        $sql_lista = "SELECT th.data_treino, t.nome as nome_treino, td.letra
+                      FROM treino_historico th
+                      JOIN treinos t ON th.treino_id = t.id
+                      JOIN treino_divisoes td ON th.divisao_id = td.id
+                      WHERE th.aluno_id = :uid
+                      GROUP BY th.data_treino
+                      ORDER BY th.data_treino DESC";
+        $stmt = $pdo->prepare($sql_lista);
+        $stmt->execute(['uid' => $aluno_id]);
+        $historico = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo '
+        <section id="admin-historico-lista">
+            <header class="dash-header">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <img src="'.$foto_aluno.'" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--gold);">
+                    <div>
+                        <h1>HISTÓRICO DE <span class="highlight-text">TREINOS</span></h1>
+                        <p class="text-desc">Visualizando: '.$dados_aluno['nome'].'</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="glass-card mt-large">';
+            
+            if (empty($historico)) {
+                echo '<p style="text-align:center; color:#666; padding:40px;">Este aluno ainda não registrou nenhum treino.</p>';
+            } else {
+                echo '<div class="admin-timeline">';
+                
+                foreach ($historico as $h) {
+                    $data = date('d/m/Y', strtotime($h['data_treino']));
+                    $hora = date('H:i', strtotime($h['data_treino']));
+                    $link = 'aluno_historico&id='.$aluno_id.'&data_ref='.$h['data_treino'];
+
+                    echo '
+                    <div class="timeline-item" onclick="carregarConteudo(\''.$link.'\')">
+                        <div class="tl-date">
+                            <span class="tl-day">'.$data.'</span>
+                            <span class="tl-time">'.$hora.'</span>
+                        </div>
+                        <div class="tl-content">
+                            <span class="tl-badge">TREINO '.$h['letra'].'</span>
+                            <strong class="tl-title">'.$h['nome_treino'].'</strong>
+                        </div>
+                        <div class="tl-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    </div>';
+                }
+                echo '</div>';
+            }
+
+        echo '</div>
+        </section>';
         break;
 
     case 'treinos_editor':
@@ -895,31 +1039,38 @@ switch ($pagina) {
                         <input type="hidden" name="micro_id" id="micro_id">
                         <input type="hidden" name="treino_id" id="micro_treino_id">
 
-                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
-                            <div style="flex:1;">
-                                <label class="input-label">Fase / Nome</label>
-                                <input type="text" name="nome_fase" id="micro_fase" class="admin-input" placeholder="Ex: Choque" required>
-                            </div>
-                            <div style="flex:1;">
-                                <label class="input-label">Descanso Global (s)</label>
-                                <input type="number" name="descanso_segundos" id="micro_desc" class="admin-input" placeholder="Opcional">
-                            </div>
+                        <div style="margin-bottom:15px;">
+                            <label class="input-label">Fase / Nome da Semana</label>
+                            <input type="text" name="nome_fase" id="micro_fase" class="admin-input" placeholder="Ex: Força ou Choque" required>
                         </div>
 
+                        <h4 style="color:#fff; font-size:0.8rem; margin-bottom:5px; border-bottom:1px solid #333; padding-bottom:5px;">Multiarticulares / Compostos</h4>
                         <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
-                            <div style="flex:1;">
-                                <label class="input-label">Reps Compostos</label>
+                            <div style="flex:2;">
+                                <label class="input-label">Faixa de Repetições</label>
                                 <input type="text" name="reps_compostos" id="micro_reps_comp" class="admin-input" placeholder="Ex: 6 a 8">
                             </div>
                             <div style="flex:1;">
-                                <label class="input-label">Reps Isoladores</label>
+                                <label class="input-label">Descanso (seg)</label>
+                                <input type="number" name="descanso_compostos" id="micro_desc_comp" class="admin-input" placeholder="Ex: 120">
+                            </div>
+                        </div>
+
+                        <h4 style="color:#fff; font-size:0.8rem; margin-bottom:5px; border-bottom:1px solid #333; padding-bottom:5px;">Isoladores / Monoarticulares</h4>
+                        <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
+                            <div style="flex:2;">
+                                <label class="input-label">Faixa de Repetições</label>
                                 <input type="text" name="reps_isoladores" id="micro_reps_iso" class="admin-input" placeholder="Ex: 10 a 12">
+                            </div>
+                            <div style="flex:1;">
+                                <label class="input-label">Descanso (seg)</label>
+                                <input type="number" name="descanso_isoladores" id="micro_desc_iso" class="admin-input" placeholder="Ex: 60">
                             </div>
                         </div>
 
                         <div style="margin-bottom:20px;">
                             <label class="input-label">Foco / Comentário para o Aluno</label>
-                            <textarea name="foco_comentario" id="micro_foco" class="admin-input" rows="3" placeholder="Ex: Aumentar carga nos básicos..."></textarea>
+                            <textarea name="foco_comentario" id="micro_foco" class="admin-input" rows="3" placeholder="Ex: Focar na progressão de carga..."></textarea>
                         </div>
 
                         <button type="submit" class="btn-gold" style="width:100%;">SALVAR SEMANA</button>

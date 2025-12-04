@@ -220,22 +220,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         }
 
         // --- MODAL PERIODIZAÇÃO (Semana) ---
-        function openMicroModal(data, treinoId) {
-            document.getElementById("micro_id").value = data.id;
-            document.getElementById("micro_treino_id").value = treinoId;
-            
-            document.getElementById("span_semana_num").innerText = data.semana_numero;
-            document.getElementById("micro_fase").value = data.nome_fase;
-            document.getElementById("micro_reps_comp").value = data.reps_compostos || "";
-            document.getElementById("micro_reps_iso").value = data.reps_isoladores || "";
-            document.getElementById("micro_foco").value = data.foco_comentario || "";
-            document.getElementById("micro_desc").value = data.descanso_segundos || "";
-
-            document.getElementById("modalMicro").style.display = "flex";
+        function openMicroModal(micro, treinoId) {
+        document.getElementById('micro_id').value = micro.id;
+        document.getElementById('micro_treino_id').value = treinoId;
+        
+        document.getElementById('micro_fase').value = micro.nome_fase;
+        document.getElementById('micro_foco').value = micro.foco_comentario;
+        
+        // Novos campos
+        document.getElementById('micro_reps_comp').value = micro.reps_compostos;
+        document.getElementById('micro_desc_comp').value = micro.descanso_compostos; 
+        
+        document.getElementById('micro_reps_iso').value = micro.reps_isoladores;
+        document.getElementById('micro_desc_iso').value = micro.descanso_isoladores; 
+        
+        document.getElementById('span_semana_num').innerText = micro.semana_numero;
+        document.getElementById('modalMicro').style.display = 'flex';
         }
-
+        
         function closeMicroModal() {
-            document.getElementById("modalMicro").style.display = "none";
+            document.getElementById('modalMicro').style.display = 'none';
         }
 
         // Fechar qualquer modal ao clicar fora

@@ -63,9 +63,9 @@ CREATE TABLE microciclos (
     
     reps_compostos VARCHAR(50), 
     reps_isoladores VARCHAR(50), 
-    descanso_segundos INT, 
+    descanso_compostos INT DEFAULT 90,
+    descanso_isoladores INT DEFAULT 60,
     
-
     data_inicio_semana DATE, 
     data_fim_semana DATE,
     
@@ -102,5 +102,19 @@ CREATE TABLE series (
     carga_prevista VARCHAR(50), 
     rpe_previsto INT, 
     
+    FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE treino_historico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aluno_id INT NOT NULL,
+    treino_id INT NOT NULL,
+    divisao_id INT NOT NULL,
+    exercicio_id INT NOT NULL,
+    serie_numero INT NOT NULL,
+    reps_realizadas INT,
+    carga_kg DECIMAL(5,2),
+    data_treino DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
 );

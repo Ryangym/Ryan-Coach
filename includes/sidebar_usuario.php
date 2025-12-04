@@ -32,7 +32,7 @@ $primeiro_nome = strtoupper($partes_nome[0]); // Ex: "JOÃO"
                 <span>Dashboard</span>
             </button>
             
-            <button data-pagina="treinos">
+            <button onclick="abrirModalTreinos()">
                 <i class="fa-solid fa-dumbbell"></i>
                 <span>Meus Treinos</span>
             </button>
