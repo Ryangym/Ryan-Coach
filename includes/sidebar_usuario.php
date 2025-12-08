@@ -41,8 +41,8 @@ $primeiro_nome = strtoupper($partes_nome[0]); // Ex: "JOÃO"
                 <span>Dieta & Nutrição</span>
             </button>
             
-            <button data-pagina="avaliacoes">
-                <i class="fa-solid fa-file-medical"></i>
+            <button onclick="abrirModalAvaliacoes()">
+                <i class="fa-solid fa-scale-balanced"></i>
                 <span>Avaliações</span>
             </button>
             

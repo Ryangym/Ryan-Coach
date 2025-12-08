@@ -118,3 +118,71 @@ CREATE TABLE treino_historico (
     FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE CASCADE
 );
+
+-- 1. TABELA PRINCIPAL DE AVALIAÇÕES (Completa)
+CREATE TABLE avaliacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aluno_id INT NOT NULL,
+    registrado_por ENUM('aluno', 'admin') NOT NULL,
+    data_avaliacao DATE NOT NULL,
+    
+    /* Dados Vitais */
+    idade INT,
+    genero ENUM('M', 'F') DEFAULT 'M', /* Necessário para cálculo de BF */
+    peso_kg DECIMAL(5,2),
+    altura_cm INT,
+    
+    /* Medidas Superiores */
+    pescoco DECIMAL(5,2),
+    ombro DECIMAL(5,2),
+    torax_inspirado DECIMAL(5,2),
+    torax_relaxado DECIMAL(5,2),
+    
+    braco_dir_relaxado DECIMAL(5,2),
+    braco_esq_relaxado DECIMAL(5,2),
+    braco_dir_contraido DECIMAL(5,2),
+    braco_esq_contraido DECIMAL(5,2),
+    
+    antebraco_dir DECIMAL(5,2),
+    antebraco_esq DECIMAL(5,2),
+    
+    /* Medidas Tronco & Inferiores */
+    cintura DECIMAL(5,2),
+    abdomen DECIMAL(5,2),
+    quadril DECIMAL(5,2),
+    
+    coxa_dir DECIMAL(5,2),
+    coxa_esq DECIMAL(5,2),
+    panturrilha_dir DECIMAL(5,2),
+    panturrilha_esq DECIMAL(5,2),
+    
+    /* Resultados Calculados (Preenchidos pelo sistema) */
+    imc DECIMAL(5,2),
+    percentual_gordura DECIMAL(5,2),
+    massa_magra_kg DECIMAL(5,2),
+    massa_gorda_kg DECIMAL(5,2),
+    
+    observacoes TEXT,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- 2. TABELA DE MÍDIA (Fotos e Vídeos vinculados à avaliação)
+CREATE TABLE avaliacoes_arquivos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    avaliacao_id INT NOT NULL,
+    tipo ENUM('foto', 'video') NOT NULL,
+    caminho_ou_url VARCHAR(255) NOT NULL, /* Caminho do arquivo ou Link */
+    angulo VARCHAR(50), /* Ex: Frente, Costas, Perfil */
+    FOREIGN KEY (avaliacao_id) REFERENCES avaliacoes(id) ON DELETE CASCADE
+);
+
+-- 2. Tabela de Mídia (Fotos e Vídeos vinculados)
+CREATE TABLE avaliacoes_arquivos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    avaliacao_id INT NOT NULL,
+    tipo ENUM('foto', 'video') NOT NULL,
+    caminho_ou_url VARCHAR(255) NOT NULL, /* Caminho da pasta ou Link do YouTube */
+    angulo VARCHAR(50), /* Ex: Frente, Costas, Perfil */
+    FOREIGN KEY (avaliacao_id) REFERENCES avaliacoes(id) ON DELETE CASCADE
+);

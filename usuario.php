@@ -236,5 +236,495 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
     }
     </script>
 
+    <div id="modalNovaAvaliacao" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        
+        <div class="modal-header-av">
+            <button class="modal-close" onclick="fecharModalAvaliacao()">&times;</button>
+            <h3><i class="fa-solid fa-ruler-combined"></i> NOVA AVALIAÇÃO</h3>
+        </div>
+        
+        <form action="actions/avaliacao_add.php" method="POST" enctype="multipart/form-data" id="formAvaliacao">
+            <input type="hidden" name="aluno_id" id="av_aluno_id" value="<?php echo $_SESSION['user_id'] ?? ''; ?>">
+
+            <div class="modal-body-scroll">
+                
+                <div class="form-section-box">
+                    <span class="section-label-gold">DADOS GERAIS</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label class="label-mini">Data</label>
+                            <input type="date" name="data_avaliacao" class="input-dark" value="<?php echo date('Y-m-d'); ?>">
+                        </div>
+                        <div>
+                            <label class="label-mini">Gênero (p/ Cálculo BF)</label>
+                            <select name="genero" class="input-dark">
+                                <option value="M">Masculino</option>
+                                <option value="F">Feminino</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label class="label-mini">Idade</label>
+                            <input type="number" name="idade" class="input-dark" placeholder="Anos">
+                        </div>
+                        <div>
+                            <label class="label-mini">Altura (cm)</label>
+                            <input type="number" name="altura" class="input-dark" placeholder="Ex: 175" required>
+                        </div>
+                        <div>
+                            <label class="label-mini">Peso (kg)</label>
+                            <input type="number" step="0.1" name="peso" class="input-dark" placeholder="00.0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-box">
+                    <span class="section-label-gold">TRONCO & PERÍMETROS</span>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                        <div>
+                            <label class="label-mini">Pescoço</label>
+                            <input type="number" step="0.1" name="pescoco" class="input-dark" placeholder="0.0">
+                        </div>
+                        <div>
+                            <label class="label-mini">Ombros</label>
+                            <input type="number" step="0.1" name="ombro" class="input-dark" placeholder="0.0">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                        <div>
+                            <label class="label-mini">Tórax Inspirado</label>
+                            <input type="number" step="0.1" name="torax_inspirado" class="input-dark" placeholder="0.0">
+                        </div>
+                        <div>
+                            <label class="label-mini">Tórax Relaxado</label>
+                            <input type="number" step="0.1" name="torax_relaxado" class="input-dark" placeholder="0.0">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label class="label-mini">Cintura</label>
+                            <input type="number" step="0.1" name="cintura" class="input-dark" placeholder="0.0">
+                        </div>
+                        <div>
+                            <label class="label-mini">Abdômen</label>
+                            <input type="number" step="0.1" name="abdomen" class="input-dark" placeholder="0.0">
+                        </div>
+                        <div>
+                            <label class="label-mini">Quadril</label>
+                            <input type="number" step="0.1" name="quadril" class="input-dark" placeholder="0.0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-box">
+                    <span class="section-label-gold">MEMBROS SUPERIORES (DIR / ESQ)</span>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <label class="label-mini" style="color:#fff;">Braço Relaxado</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" step="0.1" name="braco_dir_relaxado" class="input-dark" placeholder="Direito">
+                            <input type="number" step="0.1" name="braco_esq_relaxado" class="input-dark" placeholder="Esquerdo">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <label class="label-mini" style="color:#fff;">Braço Contraído</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" step="0.1" name="braco_dir_contraido" class="input-dark" placeholder="Direito">
+                            <input type="number" step="0.1" name="braco_esq_contraido" class="input-dark" placeholder="Esquerdo">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="label-mini" style="color:#fff;">Antebraço</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" step="0.1" name="antebraco_dir" class="input-dark" placeholder="Direito">
+                            <input type="number" step="0.1" name="antebraco_esq" class="input-dark" placeholder="Esquerdo">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-box">
+                    <span class="section-label-gold">MEMBROS INFERIORES (DIR / ESQ)</span>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <label class="label-mini" style="color:#fff;">Coxa</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" step="0.1" name="coxa_dir" class="input-dark" placeholder="Direita">
+                            <input type="number" step="0.1" name="coxa_esq" class="input-dark" placeholder="Esquerda">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="label-mini" style="color:#fff;">Panturrilha</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" step="0.1" name="panturrilha_dir" class="input-dark" placeholder="Direita">
+                            <input type="number" step="0.1" name="panturrilha_esq" class="input-dark" placeholder="Esquerda">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-box">
+                    <span class="section-label-gold">FOTOS</span>
+                    <input type="file" name="fotos[]" id="foto_input" multiple accept="image/*" style="display: none;" onchange="previewFiles()">
+                    <label for="foto_input" class="upload-zone">
+                        <i class="fa-solid fa-camera upload-icon"></i>
+                        <div class="upload-text">Adicionar Fotos</div>
+                    </label>
+                    <div id="preview-area" class="preview-container"></div>
+                </div>
+
+                <div class="form-section-box" style="margin-bottom:0;">
+                    <span class="section-label-gold">VÍDEO (OPCIONAL)</span>
+                    <label class="label-mini">Link (Youtube / Drive)</label>
+                    <input type="text" name="videos_links" class="input-dark" placeholder="Cole o link aqui...">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn-save-modal">SALVAR E CALCULAR</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <script>
+    // Abre o modal. 
+    // Se passar 'idAluno', é o admin abrindo para um aluno específico.
+    function abrirModalAvaliacao(idAluno = null) {
+        if (idAluno) {
+            document.getElementById('av_aluno_id').value = idAluno;
+        }
+        document.getElementById('modalNovaAvaliacao').style.display = 'flex';
+    }
+
+    function fecharModalAvaliacao() {
+        document.getElementById('modalNovaAvaliacao').style.display = 'none';
+    }
+
+    
+   // --- LÓGICA DE UPLOAD BLINDADA ---
+    
+    // Configurações
+    const TARGET_SIZE = 2 * 1024 * 1024; // Tenta comprimir se maior que 2MB
+    const HARD_LIMIT = 15 * 1024 * 1024; // 15MB (Bloqueia envio se for maior que isso)
+    const MAX_WIDTH = 1600; 
+    const QUALITY = 0.7;
+
+    // Monitora seleção de arquivos
+    const fotoInput = document.getElementById('foto_input');
+    if(fotoInput) {
+        fotoInput.addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            // Feedback visual
+            const label = document.querySelector('.upload-zone .upload-text');
+            const originalText = "Adicionar Fotos"; // Texto padrão
+            label.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Preparando fotos...';
+            
+            const dataTransfer = new DataTransfer();
+            const previewArea = document.getElementById('preview-area');
+            previewArea.innerHTML = ""; 
+
+            // Processa cada arquivo individualmente
+            for (let file of files) {
+                
+                // 1. Validação de Tipo
+                if (!/\.(jpe?g|png|webp)$/i.test(file.name)) {
+                    continue; // Ignora arquivos que não são imagem
+                }
+
+                // 2. Validação de Limite Extremo (Server Crash)
+                if (file.size > HARD_LIMIT) {
+                    alert(`A imagem "${file.name}" é GIGANTE (${(file.size/1024/1024).toFixed(1)}MB). O limite é 15MB. Ela será ignorada.`);
+                    continue;
+                }
+
+                let finalFile = file;
+
+                // 3. Tenta Comprimir se for grande
+                if (file.size > TARGET_SIZE) {
+                    try {
+                        console.log(`Tentando comprimir ${file.name}...`);
+                        finalFile = await compressImage(file);
+                        console.log(`Sucesso: ${(finalFile.size/1024/1024).toFixed(2)}MB`);
+                    } catch (err) {
+                        console.warn("Falha na compressão, usando original:", err);
+                        finalFile = file; // Fallback: usa a original se der erro
+                    }
+                }
+
+                // Adiciona à lista final
+                dataTransfer.items.add(finalFile);
+
+                // Gera Preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'thumb-preview';
+                    previewArea.appendChild(img);
+                }
+                reader.readAsDataURL(finalFile);
+            }
+
+            // Atualiza o input com a nova lista (processada ou original)
+            document.getElementById('foto_input').files = dataTransfer.files;
+            
+            // Atualiza texto do botão
+            const total = dataTransfer.files.length;
+            if (total > 0) {
+                label.innerText = total + (total === 1 ? ' foto pronta' : ' fotos prontas');
+                document.querySelector('.upload-zone').style.borderColor = 'var(--gold)';
+            } else {
+                label.innerText = originalText;
+            }
+        });
+    }
+
+    // Função de Compressão
+    function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            reject(new Error('Erro no Canvas Blob'));
+                            return;
+                        }
+                        const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(newFile);
+                    }, 'image/jpeg', QUALITY);
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    }
+
+    // Validação no Envio (Submit)
+    const formAvaliacao = document.querySelector('form[action*="avaliacao_add"]');
+    if (formAvaliacao) {
+        formAvaliacao.onsubmit = function(e) {
+            const btn = document.querySelector('.btn-save-modal');
+            
+            // Feedback visual
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+            
+            return true;
+        };
+    }
+    </script>
+
+    <div id="modalAvaliacaoOpcoes" class="modal-overlay" style="display: none;">
+        <div class="modal-content selection-modal">
+            <button class="modal-close" onclick="fecharModalAvaliacoes()">&times;</button>
+            
+            <div id="step-type-av">
+                <h3 class="modal-title">O QUE DESEJA VER?</h3>
+                <div class="modal-grid-options">
+                    
+                    <div class="option-card" onclick="irParaAvaliacoes()">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Minhas Avaliações</span>
+                    </div>
+                    
+                    <div class="option-card outline" onclick="irParaProgresso()">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Meu Progresso</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalAvaliacoes() {
+            document.getElementById('modalAvaliacaoOpcoes').style.display = 'flex';
+        }
+
+        function fecharModalAvaliacoes() {
+            document.getElementById('modalAvaliacaoOpcoes').style.display = 'none';
+        }
+
+        function irParaAvaliacoes() {
+            fecharModalAvaliacoes();
+            carregarConteudo('avaliacoes');
+        }
+
+        function irParaProgresso() {
+            fecharModalAvaliacoes();
+            carregarConteudo('progresso');
+        }
+
+        // Fecha ao clicar fora
+        window.onclick = function(event) {
+            const m1 = document.getElementById('modalTreinoOpcoes');
+            const m2 = document.getElementById('modalAvaliacaoOpcoes');
+            if (event.target == m1) fecharModalTreinos();
+            if (event.target == m2) fecharModalAvaliacoes();
+        }
+    </script>
+    <script>
+        window.toggleAccordion = function(id) {
+        const card = document.getElementById(id);
+        if (!card) return;
+
+        // SELETOR CORRIGIDO: Agora busca pela classe certa
+        const body = card.querySelector(".accordion-body");
+        const arrow = card.querySelector(".accordion-arrow");
+        
+        if (body.style.display === "none" || body.style.display === "") {
+            body.style.display = "block";
+            card.classList.add("active");
+            if(arrow) arrow.style.transform = "rotate(90deg)"; // Gira a setinha
+        } else {
+            body.style.display = "none";
+            card.classList.remove("active");
+            if(arrow) arrow.style.transform = "rotate(0deg)"; // Volta a setinha
+        }
+    };
+    </script>
+    <script>
+    // --- LÓGICA DO DASHBOARD PROGRESSO (FIXED) ---
+
+    // 1. Trocar Tabelas
+    window.switchTable = function(tabName, btn) {
+        document.querySelectorAll('.table-container').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.tab-pill').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabName).style.display = 'block';
+        btn.classList.add('active');
+    };
+
+    // 2. Gráfico Master
+    let masterChartInstance = null;
+    let chartDataStore = null;
+
+    window.initMasterChart = function() {
+        const input = document.getElementById('chart-master-data');
+        if (!input) return;
+        
+        try {
+            chartDataStore = JSON.parse(input.value);
+            // Inicia com Peso por padrão
+            renderChart('peso');
+        } catch (e) {
+            console.error("Erro ao ler dados do gráfico", e);
+        }
+    };
+
+    window.switchChart = function(metric, btn) {
+        document.querySelectorAll('.chart-btn').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        renderChart(metric);
+    };
+
+    function renderChart(metric) {
+        const ctx = document.getElementById('masterChart');
+        if (!ctx || !chartDataStore) return;
+
+        // Se já existe um gráfico, DESTRUA ele antes de criar outro
+        if (masterChartInstance) {
+            masterChartInstance.destroy();
+        }
+
+        // Configurações Visuais
+        let label = 'Peso (kg)';
+        let color = '#FFBA42'; // Gold
+        let data = chartDataStore[metric];
+
+        if (metric === 'bf') { label = '% Gordura'; color = '#ff4d4d'; } // Vermelho
+        if (metric === 'magra') { label = 'Massa Magra (kg)'; color = '#00e676'; } // Verde
+
+        // Monta o Gradiente
+        const context = ctx.getContext('2d');
+        const gradient = context.createLinearGradient(0, 0, 0, 300);
+        
+        // Conversão Hex para RGB simples para o gradiente
+        let r=255, g=186, b=66; // Gold default
+        if(metric === 'bf') { r=255; g=77; b=77; }
+        if(metric === 'magra') { r=0; g=230; b=118; }
+
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+
+        masterChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartDataStore.labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: color,
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#161616',
+                    pointBorderColor: color,
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                layout: { padding: { top: 10, bottom: 10, left: 0, right: 10 } },
+                scales: {
+                    y: { 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        ticks: { color: '#888', font: { size: 11 } } 
+                    },
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { color: '#888', font: { size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 } 
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+    }
+    </script>
+        
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

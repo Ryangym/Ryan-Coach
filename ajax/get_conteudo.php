@@ -6,7 +6,7 @@ $aluno_id = $_SESSION['user_id'];
 $pagina_raw = $_GET['pagina'] ?? 'dashboard';
 $partes = explode('&', $pagina_raw);
 $pagina = $partes[0];
--
+$hoje = date('Y-m-d');
 $divisao_req = $_GET['divisao_id'] ?? null; // Usado no Realizar Treino
 $treino_req  = $_GET['treino_id'] ?? null;  // Usado no Visualizar Treino
 $micro_req   = $_GET['micro_id'] ?? null;   // Usado no Visualizar Treino
@@ -33,25 +33,165 @@ switch ($pagina) {
     break;
 
     case 'dashboard':
-        // Botão de Start no topo do Dashboard
-        echo '<section id="dashboard" class="fade-in">
-                <div class="dashboard-container-view">
-                    <header class="dash-header">
-                        <h1>OLÁ, <span class="highlight-text">'.$primeiro_nome.'</span></h1>
-                    </header>
-                    
-                    <!-- BOTÃO DE AÇÃO PRINCIPAL -->
-                    <button class="btn-start-workout" onclick="carregarConteudo(\'realizar_treino\')">
-                        <i class="fa-solid fa-play"></i> COMEÇAR TREINO
-                    </button>
+        require_once '../config/db_connect.php';
+        
+        // --- LÓGICA DE DADOS ---
+        $start_week = date('Y-m-d 00:00:00', strtotime('monday this week'));
+        $end_week   = date('Y-m-d 23:59:59', strtotime('sunday this week'));
+        
+        // 1. Frequência
+        $stmt_w = $pdo->prepare("SELECT COUNT(DISTINCT data_treino) FROM treino_historico WHERE aluno_id = ? AND data_treino BETWEEN ? AND ?");
+        $stmt_w->execute([$aluno_id, $start_week, $end_week]);
+        $treinos_semana = $stmt_w->fetchColumn();
 
-                    <!-- Resto do Dashboard (Resumo, gráficos...) -->
-                    <div class="stats-row">
-                        <div class="glass-card">
-                           <div class="card-label">FOCO DA SEMANA</div>
-                           <p style="color:#ccc">Acesse "Meus Treinos" para ver o planejamento completo.</p>
+        // 2. Volume (Tonelagem)
+        $stmt_vol = $pdo->prepare("SELECT SUM(carga_kg * reps_realizadas) FROM treino_historico WHERE aluno_id = ? AND data_treino BETWEEN ? AND ?");
+        $stmt_vol->execute([$aluno_id, $start_week, $end_week]);
+        $volume = $stmt_vol->fetchColumn() ?: 0;
+        $vol_fmt = ($volume > 1000) ? number_format($volume/1000, 1).'k' : $volume;
+
+        // 3. Streak (Ofensiva)
+        $streak = 0;
+        for ($i = 0; $i < 30; $i++) {
+            $check = date('Y-m-d', strtotime("-$i days"));
+            $stmt_chk = $pdo->prepare("SELECT id FROM treino_historico WHERE aluno_id = ? AND DATE(data_treino) = ? LIMIT 1");
+            $stmt_chk->execute([$aluno_id, $check]);
+            if ($stmt_chk->fetch()) $streak++;
+            else if ($i > 0) break; 
+        }
+
+        // 4. Próximo Treino
+        $stmt_ativo = $pdo->prepare("SELECT id, nivel_plano FROM treinos WHERE aluno_id = ? ORDER BY criado_em DESC LIMIT 1");
+        $stmt_ativo->execute([$aluno_id]);
+        $plano = $stmt_ativo->fetch(PDO::FETCH_ASSOC);
+
+        $prox_letra = "A";
+        $fase = "Geral";
+        
+        if ($plano) {
+            $stmt_last = $pdo->prepare("SELECT td.letra FROM treino_historico th JOIN treino_divisoes td ON th.divisao_id = td.id WHERE th.aluno_id = ? ORDER BY th.data_treino DESC LIMIT 1");
+            $stmt_last->execute([$aluno_id]);
+            $last = $stmt_last->fetchColumn();
+
+            $stmt_divs = $pdo->prepare("SELECT letra FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
+            $stmt_divs->execute([$plano['id']]);
+            $divs = $stmt_divs->fetchAll(PDO::FETCH_COLUMN);
+
+            if ($divs) {
+                if ($last) {
+                    $key = array_search($last, $divs);
+                    $prox_letra = ($key !== false && isset($divs[$key+1])) ? $divs[$key+1] : $divs[0];
+                } else {
+                    $prox_letra = $divs[0];
+                }
+            }
+            
+            if ($plano['nivel_plano'] !== 'basico') {
+                $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
+                $stmt_per->execute([$plano['id']]);
+                $pid = $stmt_per->fetchColumn();
+                if($pid) {
+                    $stmt_m = $pdo->prepare("SELECT nome_fase FROM microciclos WHERE periodizacao_id = ? AND data_inicio_semana <= ? AND data_fim_semana >= ? LIMIT 1");
+                    $stmt_m->execute([$pid, $hoje, $hoje]);
+                    $m = $stmt_m->fetch(PDO::FETCH_ASSOC);
+                    if($m) $fase = $m['nome_fase'];
+                }
+            }
+        }
+
+        // --- RENDERIZAÇÃO LIMPA ---
+        echo '<section id="dashboard" class="fade-in">
+                
+                <div class="clean-header-bg">
+                    <div class="header-content-clean">
+                        <div class="header-texts">
+                            <span class="greeting-sub">Painel do Atleta</span>
+                            <h1 class="greeting-main">Olá, <span style="color:var(--gold)">'.$primeiro_nome.'</span></h1>
+                        </div>
+                        <div class="header-avatar">
+                            <img src="'.$_SESSION['user_foto'].'" onerror="this.src=\'assets/img/user-default.png\'">
                         </div>
                     </div>
+                    
+                    <div class="status-bar-float">
+                        <div class="sb-item">
+                            <i class="fa-solid fa-fire sb-icon fire"></i>
+                            <div class="sb-info">
+                                <strong>'.$streak.'</strong>
+                                <span>Dias seguidos</span>
+                            </div>
+                        </div>
+                        <div class="sb-divider"></div>
+                        <div class="sb-item">
+                            <i class="fa-solid fa-weight-hanging sb-icon"></i>
+                            <div class="sb-info">
+                                <strong>'.$vol_fmt.' kg</strong>
+                                <span>Volume Semanal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-content-padded">
+                    
+                    <h3 class="section-label">TREINO DE HOJE</h3>
+                    <div class="today-card" onclick="carregarConteudo(\'realizar_treino\')">
+                        <div class="today-left">
+                            <span class="today-letter">'.$prox_letra.'</span>
+                            <div class="today-info">
+                                <span class="badge-phase">'.$fase.'</span>
+                                <h2>Treino '.$prox_letra.'</h2>
+                                <p>Toque para iniciar a sessão</p>
+                            </div>
+                        </div>
+                        <div class="today-action">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="section-label">ACESSO RÁPIDO</h3>
+                    <div class="quick-grid">
+                        <div class="quick-card" onclick="carregarConteudo(\'historico\')">
+                            <div class="qc-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <span>Histórico</span>
+                        </div>
+                        <div class="quick-card" onclick="carregarConteudo(\'treinos\')">
+                            <div class="qc-icon"><i class="fa-solid fa-dumbbell"></i></div>
+                            <span>Minha Ficha</span>
+                        </div>
+                        <div class="quick-card" onclick="carregarConteudo(\'avaliacoes\')">
+                            <div class="qc-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                            <span>Avaliação</span>
+                        </div>
+                        <div class="quick-card" onclick="carregarConteudo(\'perfil\')">
+                            <div class="qc-icon"><i class="fa-solid fa-user-gear"></i></div>
+                            <span>Perfil</span>
+                        </div>
+                    </div>
+
+                    <h3 class="section-label">CONSTÂNCIA</h3>
+                    <div class="frequency-strip">
+                        <div class="freq-header">
+                            <span>Esta Semana</span>
+                            <strong>'.$treinos_semana.'/5</strong>
+                        </div>
+                        <div class="week-pills">';
+                            $dias = ['S','T','Q','Q','S','S','D'];
+                            $hoje_n = date('N');
+                            
+                            $stmt_d = $pdo->prepare("SELECT DATE(data_treino) FROM treino_historico WHERE aluno_id = ? AND data_treino BETWEEN ? AND ?");
+                            $stmt_d->execute([$aluno_id, $start_week, $end_week]);
+                            $dias_feitos = $stmt_d->fetchAll(PDO::FETCH_COLUMN);
+
+                            for($i=1; $i<=7; $i++){
+                                $dt = date('Y-m-d', strtotime('monday this week +'.($i-1).' days'));
+                                $done = in_array($dt, $dias_feitos) ? 'done' : '';
+                                $curr = ($i == $hoje_n) ? 'current' : '';
+                                echo '<div class="day-pill '.$done.' '.$curr.'">'.$dias[$i-1].'</div>';
+                            }
+        echo '          </div>
+                    </div>
+
                 </div>
               </section>';
         break;
@@ -754,12 +894,356 @@ switch ($pagina) {
         break;
 
     case 'avaliacoes':
-        echo '
-            <section id="avaliacoes">
-                <h1>Avaliações Físicas</h1>
-                <p>Histórico de avaliações, medidas, progresso, etc.</p>
-            </section>
-        ';
+        require_once '../config/db_connect.php';
+        $aluno_id = $_SESSION['user_id'];
+
+        // --- DEFINIÇÃO DAS FUNÇÕES AUXILIARES (Closures) ---
+        // Definimos como variáveis para garantir que funcionem dentro do switch
+        $renderMeasure = function($label, $val) {
+            if(!$val) return '';
+            return '<div class="m-box"><span>'.$label.'</span><strong>'.$val.'</strong></div>';
+        };
+
+        $renderMeasureDouble = function($label, $val1, $val2) {
+            if(!$val1 && !$val2) return '';
+            return '<div class="m-box-double">
+                        <span>'.$label.'</span>
+                        <div class="vals">
+                            <strong>'.($val1?:'-').'</strong>
+                            <small>/</small>
+                            <strong>'.($val2?:'-').'</strong>
+                        </div>
+                    </div>';
+        };
+        // -------------------------------------------------------
+
+        // 1. BUSCA DADOS
+        $sql = "SELECT * FROM avaliacoes WHERE aluno_id = ? ORDER BY data_avaliacao DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$aluno_id]);
+        $avaliacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo '<section id="avaliacoes-section" class="fade-in">
+                
+                <header class="dash-header-clean">
+                    <div>
+                        <h1 class="greeting-clean">Avaliação <span class="text-gold">Física</span></h1>
+                        <p class="date-clean">Histórico de composição e medidas</p>
+                    </div>
+                    <button class="btn-gold-icon" onclick="abrirModalAvaliacao('.$aluno_id.')">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </header>';
+
+        if (empty($avaliacoes)) {
+            echo '<div class="empty-state-modern">
+                    <div class="icon-pulse"><i class="fa-solid fa-weight-scale"></i></div>
+                    <h2>Comece sua Jornada</h2>
+                    <p>Registre sua primeira avaliação para acompanhar sua evolução.</p>
+                  </div>';
+        } else {
+
+            // --- LISTA ACCORDION ---
+            echo '<div class="eval-timeline-wrapper">';
+
+            foreach ($avaliacoes as $av) {
+                // Busca Arquivos (Fotos/Vídeos)
+                $stmt_arq = $pdo->prepare("SELECT * FROM avaliacoes_arquivos WHERE avaliacao_id = ?");
+                $stmt_arq->execute([$av['id']]);
+                $arquivos = $stmt_arq->fetchAll(PDO::FETCH_ASSOC);
+
+                $dia = date('d', strtotime($av['data_avaliacao']));
+                $mes = date('M', strtotime($av['data_avaliacao']));
+                $card_id = 'eval_card_' . $av['id'];
+
+                echo '<div class="accordion-card" id="'.$card_id.'">
+                        
+                        <div class="accordion-header" onclick="toggleAccordion(\''.$card_id.'\')">
+                            <div class="date-badge">
+                                <span class="d-day">'.$dia.'</span>
+                                <span class="d-month">'.$mes.'</span>
+                            </div>
+                            <div class="header-info">
+                                <div class="info-main">
+                                    <span class="weight-display">'.($av['peso_kg'] * 1).' <small>kg</small></span>
+                                    '.($av['percentual_gordura'] ? '<span class="bf-tag">BF '.($av['percentual_gordura']*1).'%</span>' : '').'
+                                </div>
+                                <span class="info-sub">'.count($arquivos).' mídias anexadas</span>
+                            </div>
+
+                            <a href="actions/avaliacao_delete.php?id='.$av['id'].'" 
+                               class="btn-delete-eval" 
+                               onclick="event.stopPropagation(); return confirm(\'Tem certeza que deseja EXCLUIR esta avaliação permanentemente?\');"
+                               title="Excluir Avaliação">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+
+                            <div class="accordion-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                        </div>
+
+                        <div class="accordion-body" style="display: none;">
+                            <div class="body-padding">
+                                
+                                <div class="stats-tiles">
+                                    <div class="tile">
+                                        <small>IMC</small>
+                                        <strong>'.($av['imc'] ?: '-').'</strong>
+                                    </div>
+                                    <div class="tile">
+                                        <small>M. MAGRA</small>
+                                        <strong>'.($av['massa_magra_kg'] ? $av['massa_magra_kg'].'kg' : '-').'</strong>
+                                    </div>
+                                    <div class="tile">
+                                        <small>M. GORDA</small>
+                                        <strong>'.($av['massa_gorda_kg'] ? $av['massa_gorda_kg'].'kg' : '-').'</strong>
+                                    </div>
+                                </div>
+
+                                ';
+                                if (!empty($arquivos)) {
+                                    echo '<div class="gallery-strip">
+                                            <span class="strip-title"><i class="fa-solid fa-camera"></i> Fotos do Dia</span>
+                                            <div class="strip-scroll">';
+                                    
+                                    foreach ($arquivos as $arq) {
+                                        if ($arq['tipo'] == 'foto') {
+                                            echo '<div class="strip-item"><img src="assets/uploads/'.$arq['caminho_ou_url'].'" onclick="window.open(this.src)"></div>';
+                                        } else {
+                                            echo '<a href="'.$arq['caminho_ou_url'].'" target="_blank" class="strip-item video-item"><i class="fa-solid fa-play"></i></a>';
+                                        }
+                                    }
+                                    echo '  </div>
+                                          </div>';
+                                }
+
+                                // 3. MEDIDAS DETALHADAS (Usando as variáveis $renderMeasure)
+                                echo '<div class="measures-container">
+                                        
+                                        <div class="m-group">
+                                            <span class="mg-label">TRONCO</span>
+                                            <div class="mg-grid">
+                                                '.$renderMeasure('Ombros', $av['ombro']).'
+                                                '.$renderMeasure('Tórax', $av['torax_relaxado']).'
+                                                '.$renderMeasure('Cintura', $av['cintura']).'
+                                                '.$renderMeasure('Abdômen', $av['abdomen']).'
+                                                '.$renderMeasure('Quadril', $av['quadril']).'
+                                            </div>
+                                        </div>
+
+                                        <div class="m-group">
+                                            <span class="mg-label">MEMBROS (D / E)</span>
+                                            <div class="mg-grid-wide">
+                                                '.$renderMeasureDouble('Braço (Rel)', $av['braco_dir_relaxado'], $av['braco_esq_relaxado']).'
+                                                '.$renderMeasureDouble('Braço (Con)', $av['braco_dir_contraido'], $av['braco_esq_contraido']).'
+                                                '.$renderMeasureDouble('Coxa', $av['coxa_dir'], $av['coxa_esq']).'
+                                                '.$renderMeasureDouble('Panturrilha', $av['panturrilha_dir'], $av['panturrilha_esq']).'
+                                            </div>
+                                        </div>
+
+                                      </div>';
+                                
+                                if($av['observacoes']) {
+                                    echo '<div class="obs-box"><i class="fa-solid fa-quote-left"></i> '.$av['observacoes'].'</div>';
+                                }
+
+                echo '      </div> </div> </div> ';
+            }
+            echo '</div>'; 
+        }
+        echo '</section>';
+        break;
+
+
+    // --- TELA 2: MEU PROGRESSO (COM DELTAS E GRÁFICO FIX) ---
+    case 'progresso':
+        require_once '../config/db_connect.php';
+        $aluno_id = $_SESSION['user_id'];
+
+        // 1. BUSCA DADOS CRONOLÓGICOS (Antigo -> Novo) para o Gráfico
+        $sql = "SELECT * FROM avaliacoes WHERE aluno_id = ? ORDER BY data_avaliacao ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$aluno_id]);
+        $historico = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 2. PREPARA ARRAYS PARA O GRÁFICO
+        $json_data = [
+            'labels' => [],
+            'peso' => [],
+            'bf' => [],
+            'magra' => [],
+            'gorda' => []
+        ];
+
+        foreach ($historico as $h) {
+            $dt = date('d/m/y', strtotime($h['data_avaliacao']));
+            // Adiciona apenas se tiver peso, para evitar pontos vazios
+            if ($h['peso_kg'] > 0) {
+                $json_data['labels'][] = $dt;
+                $json_data['peso'][] = (float)$h['peso_kg'];
+                $json_data['bf'][] = (float)$h['percentual_gordura'];
+                $json_data['magra'][] = (float)$h['massa_magra_kg'];
+            }
+        }
+        $chart_config = htmlspecialchars(json_encode($json_data), ENT_QUOTES, 'UTF-8');
+
+        // 3. PREPARA LISTA INVERTIDA PARA A TABELA (Novo -> Antigo)
+        // Usamos array_reverse para mostrar o mais recente em cima
+        $historico_reverso = array_reverse($historico);
+
+        // 4. FUNÇÃO HELPER PARA RENDERIZAR VALOR + DELTA
+        // $val: Valor atual, $idx: Índice atual no loop reverso, $key: Nome da coluna (ex: 'braco_dir')
+        // $inverse: Se true, diminuir é bom (ex: cintura). Se false, aumentar é bom (ex: braço).
+        $renderVal = function($historico_reverso, $idx, $key, $inverse = false) {
+            $val = $historico_reverso[$idx][$key] ?? null;
+            if (!$val) return '-';
+
+            // Pega o valor da avaliação ANTERIOR (que no array reverso é o índice + 1)
+            $prev = $historico_reverso[$idx + 1][$key] ?? null;
+            
+            $html = '<strong>'.$val.'</strong>';
+
+            if ($prev) {
+                $diff = $val - $prev;
+                if ($diff != 0) {
+                    $sinal = $diff > 0 ? '+' : '';
+                    // Define cor: 
+                    // Se inverse (Cintura): Diminuir (diff < 0) é Green. Aumentar é Red.
+                    // Se normal (Braço): Aumentar (diff > 0) é Green. Diminuir é Red.
+                    $isGood = $inverse ? ($diff < 0) : ($diff > 0);
+                    $color = $isGood ? '#00e676' : '#ff1744'; // Verde Neon / Vermelho Neon
+                    
+                    $html .= ' <small style="color:'.$color.'; font-size:0.7em; font-weight:bold;">'.$sinal.number_format($diff, 1).'</small>';
+                } else {
+                    $html .= ' <small style="color:#666; font-size:0.7em;">=</small>';
+                }
+            }
+            return $html;
+        };
+
+        // Renderização
+        echo '<section id="progresso-view" class="fade-in">
+                <input type="hidden" id="chart-master-data" value="'.$chart_config.'">
+
+                <header class="dash-header-clean">
+                    <div>
+                        <h1 class="greeting-clean">Performance <span class="text-gold">Analytics</span></h1>
+                        <p class="date-clean">Análise detalhada da sua evolução</p>
+                    </div>
+                </header>';
+
+        if (count($historico) < 2) {
+            echo '<div class="empty-state-modern">
+                    <div class="icon-pulse"><i class="fa-solid fa-chart-line"></i></div>
+                    <h2>Dados Insuficientes</h2>
+                    <p>Registre pelo menos 2 avaliações para desbloquear a análise comparativa.</p>
+                    <button class="btn-gold" style="margin-top:20px;" onclick="carregarConteudo(\'avaliacoes\')">REGISTRAR AGORA</button>
+                  </div>';
+        } else {
+            
+            // --- GRÁFICO MASTER ---
+            // Adicionei height explícito no canvas-wrapper-master para garantir renderização
+            echo '<div class="chart-master-container mb-large">
+                    <div class="chart-controls">
+                        <button class="chart-btn active" onclick="switchChart(\'peso\', this)">Peso</button>
+                        <button class="chart-btn" onclick="switchChart(\'bf\', this)">% Gordura</button>
+                        <button class="chart-btn" onclick="switchChart(\'magra\', this)">M. Magra</button>
+                    </div>
+                    <div class="canvas-wrapper-master" style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="masterChart"></canvas>
+                    </div>
+                    <img src="" onerror="setTimeout(initMasterChart, 300)" style="display:none;">
+                  </div>';
+
+            // --- TABELAS COMPARATIVAS ---
+            echo '<div class="comparison-section">
+                    <h3 class="section-title"><i class="fa-solid fa-ruler-horizontal"></i> Comparativo de Medidas</h3>
+                    
+                    <div class="comp-tabs">
+                        <button class="tab-pill active" onclick="switchTable(\'tronco\', this)">Tronco</button>
+                        <button class="tab-pill" onclick="switchTable(\'bracos\', this)">Braços</button>
+                        <button class="tab-pill" onclick="switchTable(\'pernas\', this)">Pernas</button>
+                    </div>
+
+                    <div id="tab-tronco" class="table-container active">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>DATA</th>
+                                    <th>Ombro</th>
+                                    <th>Tórax</th>
+                                    <th>Cintura</th>
+                                    <th>Abdômen</th>
+                                    <th>Quadril</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'ombro').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'torax_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'cintura', true).'</td> <td>'.$renderVal($historico_reverso, $i, 'abdomen', true).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'quadril').'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tab-bracos" class="table-container" style="display:none;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>DATA</th>
+                                    <th>B. Dir (R)</th>
+                                    <th>B. Esq (R)</th>
+                                    <th>B. Dir (C)</th>
+                                    <th>B. Esq (C)</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_dir_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_esq_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_dir_contraido').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_esq_contraido').'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tab-pernas" class="table-container" style="display:none;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>DATA</th>
+                                    <th>Coxa Dir</th>
+                                    <th>Coxa Esq</th>
+                                    <th>Pant. Dir</th>
+                                    <th>Pant. Esq</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'coxa_dir').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'coxa_esq').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'panturrilha_dir').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'panturrilha_esq').'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody>
+                        </table>
+                    </div>
+
+                  </div>';
+        }
+        
+        echo '</section>';
         break;
 
     case 'pagamentos':
