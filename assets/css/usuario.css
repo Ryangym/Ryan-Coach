@@ -1396,95 +1396,166 @@ section {
 .set-row-input.work .set-type-label   { color: #FF4242; }
 
 /* =========================================
-   MÓDULO: HISTÓRICO DE TREINOS
+   HISTÓRICO DETALHADO (DESIGN PREMIUM)
    ========================================= */
 
 /* --- LISTA (TIMELINE) --- */
 .history-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding-bottom: 80px;
+    gap: 12px;
+    padding-bottom: 90px; /* Espaço extra pro final */
 }
 
 .history-card {
-    background: #161616;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 15px;
+    background: linear-gradient(145deg, #1a1a1a 0%, #111111 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.history-card:active { transform: scale(0.98); background: #202020; }
+.history-card:active { 
+    transform: scale(0.97); 
+    background: #0f0f0f;
+    border-color: var(--gold);
+}
 
-/* Barra lateral colorida para indicar treino */
+/* Barra lateral moderna (com gradiente) */
 .history-card::before {
     content: '';
     position: absolute;
     left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--gold);
+    width: 5px;
+    background: linear-gradient(to bottom, var(--gold), #b8860b);
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
 }
 
+/* Infos internas do card da lista */
 .hist-date-box {
-    text-align: center;
-    margin-right: 15px;
     padding-right: 15px;
-    border-right: 1px solid #333;
-    min-width: 60px;
+    margin-right: 15px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+    min-width: 65px;
 }
-
-.hist-day { display: block; font-size: 1.4rem; font-weight: bold; color: #fff; line-height: 1; }
-.hist-month { display: block; font-size: 0.7rem; text-transform: uppercase; color: #888; margin-top: 3px; }
+.hist-day { display: block; font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1; }
+.hist-month { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--gold); font-weight: bold; margin-top: 2px; }
 
 .hist-info { flex: 1; }
-.hist-title { display: block; font-size: 1rem; color: #fff; font-weight: bold; margin-bottom: 4px; }
-.hist-sub   { display: block; font-size: 0.8rem; color: #666; }
+.hist-title { display: block; font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.hist-sub { font-size: 0.8rem; color: #777; display: flex; align-items: center; gap: 5px; }
 
-.hist-arrow { color: var(--gold); font-size: 0.9rem; }
+.hist-arrow { 
+    color: #444; 
+    font-size: 1rem; 
+    transition: 0.3s;
+}
+.history-card:hover .hist-arrow { color: var(--gold); transform: translateX(3px); }
 
-/* --- DETALHES (TABELA) --- */
-.hist-detail-header {
-    background: #1a1a1a;
-    padding: 20px;
+
+/* --- DETALHES DO TREINO (TABELA INTERNA) --- */
+
+.hist-exercise-group {
+    background: #141414;
+    border: 1px solid #252525;
     border-radius: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #333;
-    text-align: center;
+    margin-bottom: 12px;
+    overflow: hidden; /* Para o cabeçalho não vazar */
 }
 
-.hist-table {
+/* Cabeçalho do Exercício */
+.hist-ex-header {
+    background: rgba(255,255,255,0.03);
+    padding: 12px 15px;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hist-ex-header i { 
+    color: var(--gold); 
+    font-size: 1rem; 
+    background: rgba(255, 186, 66, 0.1);
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+}
+
+.hist-ex-header span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+/* Tabela Interna das Séries */
+.hist-sets-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
-.hist-table th {
-    text-align: left;
-    color: #666;
-    font-size: 0.7rem;
+.hist-sets-table th {
+    text-align: center;
+    color: #555;
+    font-size: 0.65rem;
+    font-weight: 800;
     text-transform: uppercase;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #333;
+    letter-spacing: 1px;
+    padding: 10px 0;
+    background: rgba(0,0,0,0.2);
 }
 
-.hist-table td {
-    padding: 12px 0;
-    border-bottom: 1px solid #222;
-    color: #ccc;
+.hist-sets-table td {
+    padding: 10px 0;
+    text-align: center;
+    color: #ddd;
+    border-bottom: 1px solid #1f1f1f;
+    font-variant-numeric: tabular-nums; /* Alinha números */
 }
 
-.hist-ex-name { color: #fff; font-weight: bold; display: block; margin-bottom: 2px; }
-.hist-val-box { 
-    background: #222; 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-    font-size: 0.8rem; 
-    white-space: nowrap;
+.hist-sets-table tr:last-child td { border-bottom: none; }
+
+/* Badges de Tipo (Estilo "Pílula" Brilhante) */
+.badge-set-type {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.badge-set-type.warmup { 
+    color: #FFD700; 
+    background: rgba(255, 215, 0, 0.1); 
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+.badge-set-type.feeder { 
+    color: #87CEEB; 
+    background: rgba(135, 206, 235, 0.1); 
+    border: 1px solid rgba(135, 206, 235, 0.2);
+}
+.badge-set-type.work { 
+    color: #ff5e5e; 
+    background: rgba(255, 66, 66, 0.1); 
+    border: 1px solid rgba(255, 66, 66, 0.2);
+}
+.badge-set-type.top { 
+    color: #fff; 
+    background: linear-gradient(135deg, #ff0000 0%, #aa0000 100%);
+    border: none;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.4);
 }

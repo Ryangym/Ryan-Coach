@@ -509,9 +509,9 @@ switch ($pagina) {
         $data_ref = $_GET['data_ref'] ?? null;
 
         // --- MODO 1: DETALHES DO TREINO (QUANDO CLICA) ---
+        // --- MODO 1: DETALHES DO TREINO (AGRUPADO) ---
         if ($data_ref) {
-            // 1. Busca informações gerais daquele registro
-            // Usamos DISTINCT para pegar o nome do treino e divisão daquele dia
+            // 1. Infos Gerais
             $sql_info = "SELECT DISTINCT t.nome as nome_treino, td.letra 
                          FROM treino_historico th
                          JOIN treinos t ON th.treino_id = t.id
@@ -521,60 +521,95 @@ switch ($pagina) {
             $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
             $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // 2. Busca os exercícios e cargas realizados
-            $sql_detalhes = "SELECT th.*, e.nome_exercicio 
+            // 2. Busca Detalhes (JOIN com SERIES para pegar a categoria)
+            // Ordenamos por exercício (ordem) e depois pela série
+            $sql_detalhes = "SELECT th.*, e.nome_exercicio, s.categoria 
                              FROM treino_historico th
                              JOIN exercicios e ON th.exercicio_id = e.id
+                             LEFT JOIN series s ON th.serie_numero = s.id 
                              WHERE th.aluno_id = :uid AND th.data_treino = :dt
-                             ORDER BY th.id ASC"; // Ordem de execução
+                             ORDER BY e.ordem ASC, th.id ASC";
             $stmt = $pdo->prepare($sql_detalhes);
             $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Header com botão de voltar
+            // 3. AGRUPAMENTO POR EXERCÍCIO
+            $treino_agrupado = [];
+            foreach ($registros as $reg) {
+                $id_ex = $reg['exercicio_id'];
+                if (!isset($treino_agrupado[$id_ex])) {
+                    $treino_agrupado[$id_ex] = [
+                        'nome' => $reg['nome_exercicio'],
+                        'series' => []
+                    ];
+                }
+                $treino_agrupado[$id_ex]['series'][] = $reg;
+            }
+
+            // --- RENDERIZAÇÃO ---
             echo '<section class="fade-in">
                     <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                        <button onclick="carregarConteudo(\'historico\')" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">
+                        <button onclick="carregarConteudo(\'historico\')" style="background:none; border:none; color:#fff; font-size:1.2rem;">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
-                        <h2 style="margin:0; color:#fff; font-size:1.4rem;">Detalhes</h2>
+                        <div>
+                            <span style="color:#888; font-size:0.8rem; text-transform:uppercase;">Visualizando</span>
+                            <h2 style="margin:0; color:#fff; font-size:1.2rem;">TREINO '.$info['letra'].'</h2>
+                        </div>
                     </div>
 
-                    <div class="hist-detail-header">
-                        <h3 style="color:var(--gold); margin:0; font-size:1.5rem;">Treino '.$info['letra'].'</h3>
-                        <p style="color:#888; margin:5px 0 0 0;">'.$info['nome_treino'].'</p>
-                        <p style="color:#666; font-size:0.8rem; margin-top:5px;">'.date('d/m/Y \à\s H:i', strtotime($data_ref)).'</p>
+                    <div style="margin-bottom:20px; padding:15px; background:rgba(255,186,66,0.1); border-radius:8px; border:1px solid var(--gold); display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong style="color:var(--gold); display:block;">'.$info['nome_treino'].'</strong>
+                            <span style="color:#ccc; font-size:0.8rem;">'.date('d/m/Y \à\s H:i', strtotime($data_ref)).'</span>
+                        </div>
+                        <i class="fa-solid fa-calendar-check" style="color:var(--gold); font-size:1.5rem;"></i>
                     </div>
 
-                    <div class="glass-card">
-                        <table class="hist-table">
-                            <thead>
-                                <tr>
-                                    <th width="50%">EXERCÍCIO</th>
-                                    <th width="25%" style="text-align:center;">CARGA</th>
-                                    <th width="25%" style="text-align:center;">REPS</th>
-                                </tr>
-                            </thead>
-                            <tbody>';
-                            
-                            foreach ($registros as $reg) {
-                                echo '<tr>
-                                        <td>
-                                            <span class="hist-ex-name">'.$reg['nome_exercicio'].'</span>
-                                            <span style="font-size:0.7rem; color:#666;">Série '.$reg['serie_numero'].'</span>
-                                        </td>
-                                        <td style="text-align:center;">
-                                            <span class="hist-val-box">'.($reg['carga_kg']*1).'kg</span>
-                                        </td>
-                                        <td style="text-align:center;">
-                                            <span class="hist-val-box">'.$reg['reps_realizadas'].'</span>
-                                        </td>
-                                      </tr>';
-                            }
+                    <div class="history-details-list">';
+                    
+                    if (empty($treino_agrupado)) {
+                        echo '<p style="text-align:center; color:#666;">Nenhum dado encontrado para este registro.</p>';
+                    }
 
-            echo '          </tbody>
-                        </table>
-                    </div>
+                    foreach ($treino_agrupado as $ex_id => $dados) {
+                        echo '<div class="hist-exercise-group">
+                                <div class="hist-ex-header">
+                                    <i class="fa-solid fa-dumbbell"></i>
+                                    <span>'.$dados['nome'].'</span>
+                                </div>
+                                
+                                <table class="hist-sets-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="15%">#</th>
+                                            <th width="35%">TIPO</th>
+                                            <th width="25%">KG</th>
+                                            <th width="25%">REPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
+                                    
+                                    $contador_serie = 1;
+                                    foreach ($dados['series'] as $serie) {
+                                        // Fallback se categoria vier vazia
+                                        $cat = $serie['categoria'] ? $serie['categoria'] : 'work';
+                                        
+                                        echo '<tr>
+                                                <td style="color:#666; font-weight:bold;">'.$contador_serie.'</td>
+                                                <td><span class="badge-set-type '.$cat.'">'.strtoupper($cat).'</span></td>
+                                                <td style="color:#fff; font-weight:bold;">'.($serie['carga_kg']*1).'</td>
+                                                <td style="color:#fff;">'.$serie['reps_realizadas'].'</td>
+                                              </tr>';
+                                        $contador_serie++;
+                                    }
+
+                        echo '      </tbody>
+                                </table>
+                              </div>';
+                    }
+
+            echo '  </div>
                   </section>';
             
             break;
