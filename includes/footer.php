@@ -32,7 +32,7 @@
                 <li><a href="index.php">Início</a></li>
                 <li><a href="planos.php">Nossos Planos</a></li>
                 <li><a href="usuario.php">Área do Aluno</a></li>
-                <li><a href="index.php#sobre">Sobre o Coach</a></li>
+                <li><a href="sobre.php">Sobre o Coach</a></li>
                 <li><a href="index.php#contato">Contato</a></li>
             </ul>
         </div>

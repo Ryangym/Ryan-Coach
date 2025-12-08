@@ -14,7 +14,7 @@
         <div class="landing-text">
             <p class="texto-maior"><b>Transforme</b> seu físico com um programa de treino <b>personalizado!</b> </p>
             <p class="texto-menor">Planos feitos sob medida para suas metas, necessidades e condições físicas. Resultados incríveis ao seu alcance por um preço acessível que cabe no seu bolso. </p>
-            <a href="planos.html" class="CTA-rounded">
+            <a href="planos.php" class="CTA-rounded">
             <span>Comece Agora</span>
             </a>
         </div>

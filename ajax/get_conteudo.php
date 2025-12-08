@@ -534,7 +534,7 @@ switch ($pagina) {
             // Header com botão de voltar
             echo '<section class="fade-in">
                     <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                        <button onclick="carregarConteudo(\'historico\')" style="background:none; border:none; color:#fff; font-size:1.2rem;">
+                        <button onclick="carregarConteudo(\'historico\')" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
                         <h2 style="margin:0; color:#fff; font-size:1.4rem;">Detalhes</h2>
