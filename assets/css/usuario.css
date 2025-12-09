@@ -200,11 +200,15 @@ body {
 /* --- CONTEÚDO PRINCIPAL --- */
 #conteudo {
     flex: 1;
-    padding: 3rem;
     overflow-y: auto;
-    /* Scrollbar customizada para o conteúdo */
     scrollbar-width: thin;
     scrollbar-color: var(--red-dark) #111;
+    width: 100%;
+    min-height: 100dvh;
+    padding: 20px;
+    padding-bottom: 100px; 
+    box-sizing: border-box;
+    overflow-x: hidden; 
 }
 
 /* Feedback de Carregamento */
@@ -1605,6 +1609,7 @@ section {
 .header-avatar img {
     width: 60px;
     height: 60px;
+    object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--gold); /* Borda dourada para destaque no fundo escuro */
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
@@ -1968,7 +1973,8 @@ section {
    ========================================= */
 
 .greeting-clean{
-    font-size: 1.8rem;
+    font-size: clamp(1.5rem, 5vw, 2.2rem); /* Mínimo 1.5rem, Ideal 5% da tela, Máximo 2.2rem */
+    margin-bottom: 5px;
     color: #fff;
     margin: 0;
     line-height: 1;
