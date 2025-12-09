@@ -883,7 +883,7 @@ switch ($pagina) {
                             </div>
                         </div>
 
-                        <div style="text-align: right; margin-top: 10px;">
+                        <div style="text-align: center; margin-top: 10px; margin-bottom: 50px;">
                             <button type="submit" class="btn-gold">SALVAR ALTERAÇÕES</button>
                         </div>
                     </form>
