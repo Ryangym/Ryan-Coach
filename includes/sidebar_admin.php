@@ -51,10 +51,6 @@ $primeiro_nome_admin = strtoupper($partes_admin[0]);
                 <i class="fa-solid fa-gear"></i>
                 <span>Meu perfil</span>
             </button>
-            <button data-pagina="config">
-                <i class="fa-solid fa-gear"></i>
-                <span>Sistema</span>
-            </button>
         </nav>
 
         <div class="aside-footer">

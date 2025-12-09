@@ -768,3 +768,123 @@
     
     .modal-body-scroll { padding: 15px; }
 }
+/* =========================================
+   PERFIL ADMIN RESPONSIVO
+   ========================================= */
+
+/* Layout Principal (Desktop) */
+.admin-profile-layout {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* Coluna da Foto */
+.profile-photo-section {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.photo-wrapper {
+    width: 180px; 
+    height: 180px; 
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--gold);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+/* Botão Flutuante de Upload */
+.upload-btn-float {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    background: var(--gold);
+    color: #000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid #1a1a1a;
+    transition: 0.2s;
+}
+.upload-btn-float:hover { transform: scale(1.1); }
+
+/* Coluna do Formulário */
+.profile-form-section {
+    flex: 1;
+    min-width: 300px; /* Garante tamanho mínimo */
+}
+
+/* Grid de Inputs (Lado a Lado) */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Estilos de Input (Padronização) */
+.input-field {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.95rem;
+}
+.input-field:focus { border-color: var(--gold); }
+
+.form-divider {
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 25px 0;
+}
+
+/* --- RESPONSIVIDADE (MOBILE) --- */
+@media (max-width: 768px) {
+    /* Muda para coluna única */
+    .admin-profile-layout {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    /* Centraliza a foto e remove largura fixa */
+    .profile-photo-section {
+        flex: auto;
+        width: 100%;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-bottom: 20px;
+    }
+
+    .profile-form-section {
+        min-width: 100%; /* Ocupa tudo */
+        width: 100%;
+    }
+
+    /* Inputs ficam um embaixo do outro */
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Ajuste de Botão */
+    .btn-gold {
+        width: 100%; /* Botão full width no mobile */
+        padding: 15px !important;
+    }
+}

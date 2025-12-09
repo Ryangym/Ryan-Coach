@@ -1100,24 +1100,22 @@ switch ($pagina) {
                 <div class="glass-card profile-admin">
                     <form action="actions/update_profile.php" method="POST" enctype="multipart/form-data">
                         
-                        <div style="display: flex; gap: 40px; flex-wrap: wrap;" class="admin-profile-layout">
+                        <div class="admin-profile-layout">
                             
-                            <div class="profile-photo-section" style="flex: 0 0 200px;">
-                                <div class="photo-wrapper" style="width: 180px; height: 180px;">
+                            <div class="profile-photo-section">
+                                <div class="photo-wrapper">
                                     <img src="'.$foto.'" id="admin-preview">
                                     <label for="admin-upload" class="upload-btn-float">
                                         <i class="fa-solid fa-pen"></i>
                                     </label>
                                     <input type="file" name="foto" id="admin-upload" style="display: none;" onchange="previewImageAdmin(this)">
                                 </div>
-                                <h3 style="margin-top: 15px; color: #fff; text-align: center;">'.$user['nome'].'</h3>
-                                <div style="text-align: center; margin-top: 5px;">
-                                    <span class="status-badge" style="background: rgba(255,66,66,0.2); color: #ff4242;">MASTER ADMIN</span>
-                                </div>
+                                <h3 style="margin-top: 15px; color: #fff; text-align: center; margin-bottom: 5px;">'.$user['nome'].'</h3>
+                                <span class="status-badge" style="background: rgba(255,66,66,0.2); color: #ff4242;">MASTER ADMIN</span>
                             </div>
 
-                            <div style="flex: 1; min-width: 300px;">
-                                <h3 class="section-title" style="font-size: 1.1rem;">Dados de Acesso</h3>
+                            <div class="profile-form-section">
+                                <h3 class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Dados de Acesso</h3>
                                 
                                 <div class="form-profile">
                                     <div class="input-grid">
@@ -1131,14 +1129,14 @@ switch ($pagina) {
                                         </div>
                                     </div>
                                     
-                                    <div>
+                                    <div style="margin-bottom: 15px;">
                                         <label class="input-label">Email</label>
                                         <input type="email" name="email" value="'.$user['email'].'" class="input-field">
                                     </div>
 
                                     <hr class="form-divider">
 
-                                    <h3 class="password-section-title" style="color: #ff4242;">Segurança</h3>
+                                    <h3 class="password-section-title" style="color: #ff4242; margin-bottom: 15px;">Segurança</h3>
                                     <div class="input-grid">
                                         <div>
                                             <label class="input-label">Nova Senha</label>
@@ -1150,8 +1148,8 @@ switch ($pagina) {
                                         </div>
                                     </div>
 
-                                    <div style="text-align: right; margin-top: 10px;">
-                                        <button type="submit" class="btn-gold" style="background: #ff4242; color: #fff; border: none;">ATUALIZAR PERFIL</button>
+                                    <div style="text-align: right; margin-top: 20px;">
+                                        <button type="submit" class="btn-gold" style="background: #ff4242; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;">ATUALIZAR PERFIL</button>
                                     </div>
                                 </div>
                             </div>
@@ -1159,7 +1157,6 @@ switch ($pagina) {
                     </form>
                 </div>
             </section>
-            
         ';
         break;
 
