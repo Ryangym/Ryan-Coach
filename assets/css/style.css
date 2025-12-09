@@ -8,14 +8,14 @@
   background-size: 70%;
   background-repeat: repeat no-repeat;
   background-position: center center;
-  height: 80vh;
+  height: 80dvh;
   width: 100%;
   padding: 0;
   text-align: center;
 }
 @media (max-width: 1300px) {
     .landing-page {
-        height: 70vh; /* Reduz a altura da seção */
+        height: 70dvh; /* Reduz a altura da seção */
         background-size: cover; /* Cobre o fundo inteiro */
         background-position: center center;
     }
@@ -632,7 +632,7 @@ details > summary::-webkit-details-marker {
     background-position: center center;
     background-size: cover;
     background-attachment: fixed;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;

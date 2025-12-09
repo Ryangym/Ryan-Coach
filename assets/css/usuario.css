@@ -21,7 +21,7 @@ body {
     background-attachment: fixed;
     background-position: center;
     color: var(--text-main);
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     overflow: hidden; /* Evita rolagem dupla */
 }
@@ -823,7 +823,7 @@ section {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.85); /* Bem escuro */
     z-index: 9999; /* Garante que fique em cima de TUDO */
     display: flex;
@@ -1824,7 +1824,7 @@ section {
     max-width: 600px;
     
     /* ALTURA E FLEXBOX: O Segredo do Scroll */
-    height: 90vh; /* Força altura máxima de 90% da tela */
+    height: 90dvh; /* Força altura máxima de 90% da tela */
     max-height: 800px; 
     display: flex;
     flex-direction: column;

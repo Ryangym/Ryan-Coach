@@ -84,12 +84,22 @@ body {
   background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
   color: #fff;
   overflow-x: hidden;
+
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 :root {
  --vinho: #360a03;
  --black: #000000;
 }
 
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important; /* Impede zoom no iOS */
+    }
+}
 /* ----------------- Navbar ----------------- */
 
 .desktop-navbar {
@@ -404,7 +414,7 @@ nav a:hover {
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
+        height: 100dvh;
         background-color: #000033;
         display: none;
         flex-direction: column;

@@ -633,7 +633,7 @@
     max-width: 600px;
     
     /* ALTURA E FLEXBOX: O Segredo do Scroll */
-    height: 90vh; /* Força altura máxima de 90% da tela */
+    height: 90dvh; /* Força altura máxima de 90% da tela */
     max-height: 800px; 
     display: flex;
     flex-direction: column;

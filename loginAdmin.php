@@ -18,7 +18,7 @@
         body {
             background: url('assets/img/background-gym.png') no-repeat center center fixed;
             background-size: cover;
-            height: 100vh;
+            height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
