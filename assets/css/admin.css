@@ -191,11 +191,15 @@
 }
 
 /* --- Botões de Ação da Tabela --- */
+.ex-actions{
+    display: flex;
+    gap: 10px;
+}
 .btn-action-icon {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.2);
     color: #ccc;
-    width: 30px;
+    min-width: 30px;
     height: 30px;
     border-radius: 50%;
     cursor: pointer;

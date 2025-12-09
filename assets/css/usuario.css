@@ -619,6 +619,7 @@ section {
 
     /* Texto do botão menor */
     #main-aside button span {
+        text-align: center;
         font-size: 0.65rem;
         letter-spacing: 0.5px;
     }
@@ -644,7 +645,7 @@ section {
     #conteudo {
         width: 100%;
         padding: 15px;
-        margin-top: 60px; /* Espaço para o header fixo */
+        margin-top: 10px; /* Espaço para o header fixo */
         padding-bottom: 90px; /* Espaço para a barra inferior não cobrir conteúdo */
     }
 
