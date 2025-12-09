@@ -345,7 +345,7 @@ nav a:hover {
         display: none; /* Esconde o menu de desktop */
     }
     .logo-mobilenav{
-        height: 55px; width: 55px;
+        width: 55px;
         filter: drop-shadow(0 0 6px #ff0000);
     }
 
@@ -353,7 +353,7 @@ nav a:hover {
         top: 0;
         position: fixed;
         width: 100%;
-        padding: 16px;
+        padding: 10px 14px 10px 14px;
         background-color: #360a03; /* Você pode mudar isso para 'var(--vinho)' */
         display: flex;
         justify-content: space-between;
@@ -489,8 +489,12 @@ nav a:hover {
         width: 30px;
         height: 30px;
     }
+    .redes-sociais-mobile a{
+        background: #FFBA42 !important;
+        margin-bottom: 4rem;
+    }
     .whatsapp-link {
-        background-color: #25D366;
+        background-color: #641010;
     }
     .instagram-link {
         background-color: #E1306C;
@@ -504,6 +508,9 @@ nav a:hover {
     .youtube-link {
         background-color: #FF0000;
     }
+    .hidden{
+        transform: translateY(-100%);
+    }
 
     body.noscroll {
         overflow: hidden;
@@ -511,9 +518,7 @@ nav a:hover {
 }
 /*------------- FIM NAVBAR--------------
 
-/* ==================== Footer ================= */
 /* ==================== FOOTER ================= */
-/* ==================== FOOTER v2 (Design Caprichado) ==================== */
 .site-footer-v2 {
     background-color: #000;
     color: #ccc;
