@@ -894,7 +894,7 @@ switch ($pagina) {
                             
                             <div class="div-header">
                                 <div><h3 style="color:#fff; margin:0;">Ficha '.$div['letra'].'</h3></div>
-                                <button class="btn-gold" onclick="openExercicioModal('.$div['id'].', '.$treino_id.')">
+                                <button class="btn-gerenciar" onclick="openExercicioModal('.$div['id'].', '.$treino_id.')">
                                     <i class="fa-solid fa-plus"></i> ADD EXERCÍCIO
                                 </button>
                             </div>

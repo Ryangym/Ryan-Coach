@@ -446,6 +446,24 @@
     font-weight: bold;
 }
 
+.btn-gerenciar {
+    background: var(--gold);
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.btn-gerenciar:hover {
+    background: #fff;
+    box-shadow: 0 0 15px var(--gold);
+}
+
 /* --- Conteúdo da Divisão --- */
 .division-content {
     display: none; /* Escondido por padrão */
@@ -543,6 +561,24 @@
     border-bottom: 1px solid #222;
     font-size: 0.85rem;
     color: #ddd;
+}
+@media (max-width: 500px) {
+    .exercise-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .ex-actions{
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .set-tag{
+        flex: 1 1 40%;
+    }
+    .div-tab-btn{
+        flex: 1 1 45%;
+        text-align: center;
+    }
 }
 
 /* =========================================
