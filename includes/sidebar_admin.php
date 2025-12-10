@@ -15,53 +15,68 @@ $primeiro_nome_admin = strtoupper($partes_admin[0]);
     </header>
 
     <aside id="main-aside">
+    
+    <div class="aside-header">
+        <h1 class="logo">Ryan Coach</h1>
         
-        <div class="aside-header">
-            <h2 class="logo">Ryan Coach</h2>
-            <div class="profile-container">
-                <img src="<?php echo $foto_admin; ?>" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
-                <div class="status-indicator" style="background-color: #ff4242;"></div>
-            </div>
-            <p class="usuario-nome"><?php echo $primeiro_nome_admin; ?></p>
-            <p class="usuario-level" style="color: #ff4242; background: rgba(255, 66, 66, 0.1);">Master Coach</p>
+        <div class="profile-container">
+            <img src="<?php echo !empty($_SESSION['user_foto']) ? $_SESSION['user_foto'] : 'assets/img/user-default.png'; ?>" class="foto-perfil">
+            <div class="status-indicator"></div>
         </div>
         
-        <nav class="nav-buttons">
-            <button data-pagina="dashboard" class="active">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Visão Geral</span>
-            </button>
-            
-            <button data-pagina="alunos">
-                <i class="fa-solid fa-users"></i>
-                <span>Gerenciar Alunos</span>
-            </button>
-            
-            <button data-pagina="treinos_editor">
-                <i class="fa-solid fa-dumbbell"></i>
-                <span>Editor de Treinos</span>
-            </button>
-            
-            <button data-pagina="financeiro">
-                <i class="fa-solid fa-sack-dollar"></i>
-                <span>Financeiro</span>
-            </button>
-            
-            <button data-pagina="perfil">
-                <i class="fa-solid fa-gear"></i>
-                <span>Meu perfil</span>
-            </button>
-        </nav>
+        <h3 class="usuario-nome"><?php echo explode(' ', $_SESSION['user_nome'])[0]; ?></h3>
+        <span class="usuario-level">ADMIN</span>
+    </div>
 
-        <div class="aside-footer">
-            <button class="btn-logout" onclick="window.location.href='index.php'">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Voltar ao Inicio</span>
-            </button>
-            <button data-pagina="logout" class="btn-logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Sair do Admin</span>
-            </button>
-        </div>
+    <nav class="nav-buttons">
+        <button data-pagina="dashboard" class="active" onclick="carregarConteudo('dashboard')">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Visão Geral</span>
+        </button>
 
-    </aside>
+        <button data-pagina="alunos" onclick="carregarConteudo('alunos')">
+            <i class="fa-solid fa-users"></i>
+            <span>Alunos</span>
+        </button>
+
+        <button data-pagina="treinos_editor" onclick="carregarConteudo('treinos_editor')">
+            <i class="fa-solid fa-dumbbell"></i>
+            <span>Treinos</span>
+        </button>
+
+        <button data-pagina="financeiro" onclick="carregarConteudo('financeiro')">
+            <i class="fa-solid fa-sack-dollar"></i>
+            <span>Financeiro</span>
+        </button>
+
+        <button data-pagina="perfil" onclick="carregarConteudo('perfil')" class="desktop-only">
+            <i class="fa-solid fa-gear"></i>
+            <span>Configurações</span>
+        </button>
+
+        <button onclick="carregarConteudo('admin_menu')" class="mobile-only">
+            <i class="fa-solid fa-bars"></i>
+            <span>Menu</span>
+        </button>
+    </nav>
+
+    <div class="aside-footer">
+        <button class="btn-logout" onclick="window.location.href='index.php'">
+            <i class="fa-solid fa-globe"></i>
+            <span>Ver Site</span>
+        </button>
+        <button data-pagina="logout" class="btn-logout" onclick="window.location.href='actions/logout.php'">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Sair</span>
+        </button>
+    </div>
+
+</aside>
+
+<style>
+    .mobile-only { display: none !important; }
+    @media (max-width: 768px) {
+        .desktop-only { display: none !important; }
+        .mobile-only { display: flex !important; }
+    }
+</style>

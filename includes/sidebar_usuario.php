@@ -46,9 +46,9 @@ $primeiro_nome = strtoupper($partes_nome[0]); // Ex: "JOÃO"
                 <span>Avaliações</span>
             </button>
             
-            <button data-pagina="perfil">
-                <i class="fa-solid fa-user-gear"></i>
-                <span>Configurações</span>
+            <button data-pagina="menu">
+                <i class="fa-solid fa-bars"></i>
+                <span>Menu</span>
             </button>
         </nav>
 

@@ -883,7 +883,7 @@ switch ($pagina) {
                             </div>
                         </div>
 
-                        <div style="text-align: center; margin-top: 10px; margin-bottom: 50px;">
+                        <div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
                             <button type="submit" class="btn-gold">SALVAR ALTERAÇÕES</button>
                         </div>
                     </form>
@@ -1246,13 +1246,115 @@ switch ($pagina) {
         echo '</section>';
         break;
 
-    case 'pagamentos':
-        echo '
-            <section id="pagamentos">
-                <h1>Pagamentos</h1>
-                <p>Status da sua assinatura, histórico de pagamentos, etc.</p>
-            </section>
-        ';
+    // --- NOVA TELA: MENU GERAL (HUB DE NAVEGAÇÃO) ---
+    case 'menu':
+        require_once '../config/db_connect.php';
+        $user_id = $_SESSION['user_id'];
+        
+        // Busca dados básicos
+        $stmt = $pdo->prepare("SELECT nome, email, foto, nivel FROM usuarios WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $foto = $user['foto'] ? $user['foto'] : 'assets/img/user-default.png';
+        
+        echo '<section id="menu-hub" class="fade-in">
+                
+                <div class="menu-profile-header" onclick="carregarConteudo(\'perfil\')">
+                    <div class="mph-left">
+                        <img src="'.$foto.'" class="mph-avatar">
+                        <div class="mph-info">
+                            <h3>'.$user['nome'].'</h3>
+                            <span>'.$user['email'].'</span>
+                            <small class="mph-badge">'.strtoupper($user['nivel']).'</small>
+                        </div>
+                    </div>
+                    <div class="mph-arrow">
+                        <span style="font-size:0.7rem; color:#888; margin-right:5px;">Editar</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <h3 class="section-label" style="margin-left: 10px;">PRINCIPAL</h3>
+                <div class="menu-grid">
+                    
+                    <div class="menu-card" onclick="carregarConteudo(\'treinos\')">
+                        <div class="mc-icon" style="background: rgba(255, 186, 66, 0.1); color: var(--gold);">
+                            <i class="fa-solid fa-dumbbell"></i>
+                        </div>
+                        <span>Treinos</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'avaliacoes\')">
+                        <div class="mc-icon" style="background: rgba(0, 200, 255, 0.1); color: #00c8ff;">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                        </div>
+                        <span>Avaliação</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'historico\')">
+                        <div class="mc-icon" style="background: rgba(100, 255, 100, 0.1); color: #64ff64;">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <span>Histórico</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'dieta\')">
+                        <div class="mc-icon" style="background: rgba(255, 100, 100, 0.1); color: #ff6464;">
+                            <i class="fa-solid fa-apple-whole"></i>
+                        </div>
+                        <span>Dieta</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'financeiro\')">
+                        <div class="mc-icon" style="background: rgba(200, 100, 255, 0.1); color: #c864ff;">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span>Planos</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'perfil\')">
+                        <div class="mc-icon" style="background: rgba(89, 115, 249, 0.1); color: #345dffff;">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <span>Perfil</span>
+                    </div>
+
+                </div>
+
+                <h3 class="section-label" style="margin-left: 10px; margin-top: 30px;">SISTEMA</h3>
+                <div class="settings-list">
+                    
+                    <a href="https://wa.me/55SEUNUMERO" target="_blank" class="setting-item">
+                        <div class="st-left">
+                            <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                            <span>Suporte via WhatsApp</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; color: #666;"></i>
+                    </a>
+
+                    <div class="setting-item" onclick="window.location.href=\'index.php\'">
+                        <div class="st-left">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>Página Inicial do Site</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <div class="setting-item logout" onclick="window.location.href=\'actions/logout.php\'">
+                        <div class="st-left">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Sair da Conta</span>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div style="text-align:center; margin-top:40px; color:#444; font-size:0.7rem;">
+                    <p>Ryan Coach App v1.0</p>
+                </div>
+
+              </section>';
         break;
 
     default:

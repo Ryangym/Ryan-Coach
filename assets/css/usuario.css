@@ -4,7 +4,7 @@
     --sidebar-bg: rgba(15, 15, 15, 0.65); /* Escuro e translúcido */
     --sidebar-width: 280px;
     --gold: #FFBA42;
-    --red-glow: rgba(172, 15, 15, 0.4);
+    --red-glow: #ac0f0f66;
     --red-dark: #360a03;
     --text-main: #ffffff;
     --text-muted: #888888;
@@ -521,15 +521,15 @@ section {
         flex-direction: column; /* Muda fluxo para vertical */
     }
 
-    /* --- Header Mobile (Oculto no Desktop, Visível no Mobile) --- */
+    /* --- Header Mobile (Mantido igual) --- */
     .mobile-top-bar {
-        display: flex; /* Ativa o header mobile */
+        display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
         height: 60px;
         padding: 0 20px;
-        background: rgba(20, 20, 20, 0.9);
+        background: rgba(10, 10, 10, 0.95); /* Ajustei levemente a opacidade */
         backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: fixed;
@@ -570,19 +570,26 @@ section {
     .mobile-logout:hover { color: var(--red-dark); }
 
 
-    /* --- Transformando ASIDE em MENU INFERIOR --- */
+    /* --- MENU INFERIOR (CORRIGIDO E ORGANIZADO) --- */
     #main-aside {
         width: 100%;
-        height: 70px; /* Altura da barra inferior */
+        height: 65px; /* Altura fixa confortável */
         position: fixed;
         bottom: 0;
         left: 0;
-        flex-direction: row; /* Itens lado a lado */
-        padding: 0 10px;
-        background: rgba(10, 10, 10, 0.95); /* Fundo quase sólido */
+        
+        /* Removemos o Flexbox daqui e deixamos o container limpo */
+        display: block; 
+        padding: 0;
+        
+        background: #0f0f0f; /* Fundo sólido para não ver o conteúdo passando atrás */
         border-right: none;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        justify-content: center;
+        
+        /* Ajuste para iPhone (Safe Area) */
+        padding-bottom: env(safe-area-inset-bottom);
+        box-sizing: content-box; 
+        
         z-index: 1000;
         box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
     }
@@ -593,54 +600,64 @@ section {
         display: none !important;
     }
 
-    /* Ajustar botões de navegação para ficarem horizontais */
+    /* O SEGREDO: Grid para dividir o espaço igualmente */
     .nav-buttons {
-        flex-direction: row;
+        display: grid;
+        grid-auto-flow: column; /* Cria colunas automaticamente */
+        grid-auto-columns: 1fr; /* Força todas as colunas a terem o mesmo tamanho */
         width: 100%;
-        justify-content: space-around; /* Espaçamento igual */
-        gap: 0;
+        height: 100%;
+        gap: 0; /* Sem buracos entre os botões */
     }
 
     #main-aside button {
-        flex-direction: column; /* Ícone em cima, texto embaixo */
-        padding: 5px;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
         border-radius: 0;
-        background: transparent !important; /* Remove fundo hover */
-        width: auto;
+        background: transparent !important;
+        width: 100%;
+        height: 100%;
         justify-content: center;
-        box-shadow: none !important; /* Remove sombras complexas */
+        align-items: center;
+        box-shadow: none !important;
         border: none !important;
+        position: relative; /* Necessário para a barra neon */
     }
 
-    /* Ajuste do ícone */
+    /* Ajuste do ícone (Maior e Centralizado) */
     #main-aside button i {
-        margin-right: 0;
-        margin-bottom: 4px;
-        font-size: 1.3rem;
+        margin: 0;
+        font-size: 1.5rem; /* Aumentei para ficar bem visível */
         width: auto;
         text-align: center;
+        color: #666;
+        transition: 0.3s;
     }
 
-    /* Texto do botão menor */
+    /* ESCONDE O TEXTO (Só Símbolos) */
     #main-aside button span {
-        text-align: center;
-        font-size: 0.65rem;
-        letter-spacing: 0.5px;
+        display: none; 
     }
 
     /* --- Indicador de Ativo (Mudança visual para mobile) --- */
-    #main-aside button.active {
+    #main-aside button.active i {
         color: var(--gold);
+        transform: translateY(-3px); /* Leve pulinho pra cima */
+        filter: drop-shadow(0 0 8px rgba(255, 186, 66, 0.4)); /* Brilho */
     }
 
     #main-aside button.active::before {
-        /* Move a barra neon da esquerda para o TOPO do botão */
-        left: 50%;
+        /* Barra neon no TOPO do botão */
+        content: '';
+        position: absolute;
         top: 0;
+        left: 50%;
         transform: translateX(-50%);
-        width: 50%;
+        width: 40px; /* Largura fixa da barra (mais elegante) */
         height: 3px;
-        border-radius: 0 0 4px 4px; /* Arredondado para baixo */
+        border-radius: 0 0 4px 4px;
+        background-color: var(--gold);
         box-shadow: 0 2px 10px var(--gold);
     }
 
@@ -649,17 +666,17 @@ section {
     #conteudo {
         width: 100%;
         padding: 15px;
-        margin-top: 10px; /* Espaço para o header fixo */
-        padding-bottom: 90px; /* Espaço para a barra inferior não cobrir conteúdo */
+        margin-top: 60px; /* Espaço para o header fixo */
+        padding-bottom: 150px; /* Espaço para a barra inferior não cobrir conteúdo */
     }
 
     /* Ajuste dos Cards do Dashboard para Mobile */
     .dash-header h1 {
-        font-size: 1.8rem; /* Título menor */
+        font-size: 1.8rem;
     }
 
     .stats-row {
-        grid-template-columns: 1fr; /* Uma coluna só */
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
 
@@ -667,7 +684,6 @@ section {
         padding: 1rem;
     }
     
-    /* Gráficos e Listas */
     .workout-item {
         padding: 1rem;
     }
@@ -2463,3 +2479,100 @@ section {
     color: var(--gold);
     font-weight: 700;
 }
+
+/* =========================================
+   TELA DE MENU (HUB DE NAVEGAÇÃO)
+   ========================================= */
+
+/* 1. Header do Perfil (Cartão clicável) */
+.menu-profile-header {
+    background: linear-gradient(135deg, #1f1f1f 0%, #161616 100%);
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 25px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.menu-profile-header:active { transform: scale(0.98); background: #222; }
+
+.mph-left { display: flex; align-items: center; gap: 15px; }
+
+.mph-avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+}
+
+.mph-info h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+.mph-info span { display: block; color: #888; font-size: 0.8rem; margin-bottom: 4px; }
+.mph-badge { 
+    background: rgba(255, 186, 66, 0.15); color: var(--gold); 
+    padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.65rem; 
+}
+
+/* 2. Grid de Funcionalidades (Ícones Grandes) */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 por linha */
+    gap: 12px;
+}
+
+.menu-card {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.03);
+    transition: 0.2s;
+}
+.menu-card:active { background: #252525; transform: scale(0.96); }
+
+.mc-icon {
+    width: 45px; height: 45px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+}
+
+.menu-card span { font-size: 0.75rem; color: #ccc; font-weight: 600; }
+
+/* 3. Lista de Configurações (Estilo iOS) */
+.settings-list {
+    background: #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden; /* Para os cantos arredondados */
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    text-decoration: none; /* Para links */
+    transition: 0.2s;
+}
+.setting-item:last-child { border-bottom: none; }
+.setting-item:active { background: #252525; }
+
+.st-left { display: flex; align-items: center; gap: 15px; }
+.st-left i { font-size: 1.1rem; color: #888; width: 20px; text-align: center; }
+.st-left span { color: #eee; font-size: 0.95rem; }
+
+.setting-item i.fa-chevron-right { font-size: 0.8rem; color: #444; }
+
+/* Estilo Especial para Logout */
+.setting-item.logout .st-left i, 
+.setting-item.logout .st-left span { color: #ff4242; }
