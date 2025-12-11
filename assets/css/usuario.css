@@ -666,7 +666,7 @@ section {
     #conteudo {
         width: 100%;
         padding: 15px;
-        margin-top: 60px; /* Espaço para o header fixo */
+        margin-top: 20px;
         padding-bottom: 150px; /* Espaço para a barra inferior não cobrir conteúdo */
     }
 

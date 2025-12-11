@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        echo "<script>alert('Treino estruturado com sucesso!'); window.location.href='../admin.php';</script>";
+        echo "<script>alert('Treino estruturado com sucesso!'); window.location.href='../admin.php?pagina=treinos_editor';</script>";
 
     } catch (Exception $e) {
         $pdo->rollBack();

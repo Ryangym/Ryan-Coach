@@ -1291,6 +1291,9 @@ switch ($pagina) {
                                         $stmtSeries = $pdo->prepare($sqlSeries);
                                         $stmtSeries->execute([$ex['id']]);
                                         $series = $stmtSeries->fetchAll(PDO::FETCH_ASSOC);
+                                        $ex_data = $ex;
+                                        $ex_data['series'] = $series;
+                                        $ex_json = htmlspecialchars(json_encode($ex_data), ENT_QUOTES, 'UTF-8');
 
                                         echo '
                                         <div class="exercise-card">
@@ -1305,8 +1308,15 @@ switch ($pagina) {
                                         echo '  </div>
                                             </div>
                                             <div class="ex-actions">
-                                                <button class="btn-action-icon"><i class="fa-solid fa-pen"></i></button>
-                                                <button class="btn-action-icon btn-delete"><i class="fa-solid fa-trash"></i></button>
+                                                <button class="btn-action-icon" onclick=\'editarExercicio('.$ex_json.', '.$treino_id.', '.$div['id'].')\'>
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+                                                
+                                                <a href="actions/treino_delete_exercicio.php?id='.$ex['id'].'&treino_id='.$treino_id.'" 
+                                                   class="btn-action-icon btn-delete" 
+                                                   onclick="return confirm(\'Excluir este exercício?\')">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
                                             </div>
                                         </div>';
                                     }
@@ -1331,6 +1341,7 @@ switch ($pagina) {
                     <form action="actions/treino_add_exercicio.php" method="POST" id="formExercicio">
                         <input type="hidden" name="divisao_id" id="modal_divisao_id">
                         <input type="hidden" name="treino_id" id="modal_treino_id">
+                        <input type="hidden" name="exercicio_id" id="modal_exercicio_id">
                         <input type="hidden" name="series_data" id="series_json_input">
 
                         <div class="row-flex" style="display:flex; gap:15px; margin-bottom:15px;">
@@ -1364,40 +1375,49 @@ switch ($pagina) {
                         <h4 style="color:#fff; font-size:0.9rem; margin-bottom:10px;">Configuração de Séries</h4>
                         
                         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-                            <div style="display:flex; gap:10px; align-items:end; flex-wrap:wrap;">
-                                <div style="width:60px;">
+    
+                            <label class="input-label" style="color:var(--gold); margin-bottom:10px; display:block;">Adicionar Série</label>
+                            
+                            <div class="set-inputs-row" style="display:flex; gap:10px; align-items:flex-end;">
+                                
+                                <div style="flex:0 0 60px;">
                                     <label class="input-label" style="font-size:0.7rem;">Qtd</label>
                                     <input type="number" id="set_qtd" class="admin-input" value="1" style="padding:8px;">
                                 </div>
+                                
                                 <div style="flex:1; min-width:100px;">
                                     <label class="input-label" style="font-size:0.7rem;">Tipo</label>
                                     <select id="set_tipo" class="admin-input" style="padding:8px;">
-                                        <option value="warmup">Warm Up (Aquecimento)</option>
-                                        <option value="feeder">Feeder (Reconhecimento)</option>
-                                        <option value="work">Work Set (Valendo)</option>
-                                        <option value="top">Top Set (Carga Máx)</option>
-                                        <option value="backoff">Backoff (Redução)</option>
-                                        <option value="falha">Falha Total</option>
+                                        <option value="warmup">Warm Up</option>
+                                        <option value="feeder">Feeder</option>
+                                        <option value="work" selected>Work Set</option>
+                                        <option value="top">Top Set</option>
+                                        <option value="backoff">Backoff</option>
+                                        <option value="falha">Falha</option>
                                     </select>
                                 </div>
-                                <div style="flex:1; min-width:80px;">
+                                
+                                <div style="flex:1; min-width:70px;">
                                     <label class="input-label" style="font-size:0.7rem;">Reps</label>
-                                    <input type="text" id="set_reps" class="admin-input" placeholder="Ex: 8-12" style="padding:8px;">
+                                    <input type="text" id="set_reps" class="admin-input" placeholder="Ex: 10" style="padding:8px;">
                                 </div>
-                                <div style="flex:1; min-width:80px;">
+                                
+                                <div style="flex:1; min-width:70px;">
                                     <label class="input-label" style="font-size:0.7rem;">Descanso</label>
-                                    <input type="text" id="set_desc" class="admin-input" placeholder="Ex: 90s" style="padding:8px;">
+                                    <input type="text" id="set_desc" class="admin-input" placeholder="90s" style="padding:8px;">
                                 </div>
-                                <div style="width:60px;">
+                                
+                                <div style="flex:0 0 60px;">
                                     <label class="input-label" style="font-size:0.7rem;">RPE</label>
-                                    <input type="number" id="set_rpe" class="admin-input" placeholder="1-10" style="padding:8px;">
+                                    <input type="number" id="set_rpe" class="admin-input" placeholder="-" style="padding:8px;">
                                 </div>
-                                <button type="button" class="btn-gold" onclick="addSetToList()" style="padding:8px 15px;">
+
+                                <button type="button" class="btn-gold btn-add-set-mobile" onclick="addSetToList()" style="padding:8px 15px; height:38px;">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
                             </div>
 
-                            <div id="temp-sets-list">
+                            <div id="temp-sets-list" style="margin-top:15px; max-height:150px; overflow-y:auto;">
                                 <p style="color:#666; font-size:0.8rem; text-align:center; margin-top:10px;">Nenhuma série adicionada.</p>
                             </div>
                         </div>

@@ -409,7 +409,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
             // Verifica se voltou de um salvamento
             const params = new URLSearchParams(window.location.search);
             
-            // --- A CORREÇÃO ESTÁ AQUI: Mudamos de 'page' para 'pagina' ---
             const pageParam = params.get('pagina'); 
             const idParam = params.get('id');
             const msgParam = params.get('msg'); // Opcional: Para mostrar alertas de sucesso
@@ -694,12 +693,57 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         // --- MODAL EXERCÍCIO (Com Lista de Séries) ---
         let seriesArray = [];
 
+        // Função para ABRIR NOVO (Limpa tudo)
         function openExercicioModal(divId, treinoId) {
+            // Reseta formulário e variáveis
+            document.getElementById("formExercicio").reset();
+            document.getElementById("formExercicio").action = "actions/treino_add_exercicio.php"; // Ação de Adicionar
             document.getElementById("modal_divisao_id").value = divId;
             document.getElementById("modal_treino_id").value = treinoId;
-            document.getElementById("modalExercicio").style.display = "flex";
-            seriesArray = []; // Reseta lista
+            document.getElementById("modal_exercicio_id").value = ""; // Limpa ID
+            
+            document.querySelector("#modalExercicio .section-title").innerText = "Novo Exercício";
+            document.querySelector("#modalExercicio .btn-gold[type='submit']").innerText = "SALVAR EXERCÍCIO";
+
+            seriesArray = [];
             renderSetsList();
+            
+            document.getElementById("modalExercicio").style.display = "flex";
+        }
+
+        // Função para ABRIR EDIÇÃO (Preenche tudo)
+        function editarExercicio(exData, treinoId, divId) {
+            // Preenche campos simples
+            document.getElementById("formExercicio").action = "actions/treino_edit_exercicio.php"; // Ação de Editar
+            document.getElementById("modal_divisao_id").value = divId;
+            document.getElementById("modal_treino_id").value = treinoId;
+            document.getElementById("modal_exercicio_id").value = exData.id;
+            
+            document.querySelector("input[name='nome_exercicio']").value = exData.nome_exercicio;
+            document.querySelector("select[name='tipo_mecanica']").value = exData.tipo_mecanica;
+            document.querySelector("input[name='video_url']").value = exData.video_url || "";
+            document.querySelector("input[name='observacao']").value = exData.observacao_exercicio || "";
+
+            // Muda Título do Modal
+            document.querySelector("#modalExercicio .section-title").innerText = "Editar Exercício";
+            document.querySelector("#modalExercicio .btn-gold[type='submit']").innerText = "ATUALIZAR EXERCÍCIO";
+
+            // Preenche as Séries
+            seriesArray = [];
+            if (exData.series && exData.series.length > 0) {
+                exData.series.forEach(s => {
+                    seriesArray.push({
+                        qtd: s.quantidade,
+                        tipo: s.categoria,
+                        reps: s.reps_fixas || "",
+                        desc: s.descanso_fixo || "",
+                        rpe: s.rpe_previsto || ""
+                    });
+                });
+            }
+            renderSetsList();
+
+            document.getElementById("modalExercicio").style.display = "flex";
         }
 
         function closeExercicioModal() {

@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'id' => $micro_id
         ]);
 
-        header("Location: ../admin.php?page=treino_painel&id=" . $treino_id);
+        header("Location: ../admin.php?pagina=treino_painel&id=" . $treino_id);
         exit;
 
     } catch (PDOException $e) {

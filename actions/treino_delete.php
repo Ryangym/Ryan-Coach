@@ -23,7 +23,7 @@ if ($id) {
         $stmt->execute(['id' => $id]);
         
         // Retorna para o editor de treinos
-        header("Location: ../admin.php?page=treinos_editor&msg=treino_excluido");
+        header("Location: ../admin.php?pagina=treinos_editor&msg=treino_excluido");
         exit;
 
     } catch (PDOException $e) {
@@ -31,7 +31,7 @@ if ($id) {
     }
 } else {
     // Se não houver ID, apenas volta
-    header("Location: ../admin.php?page=treinos_editor");
+    header("Location: ../admin.php?pagina=treinos_editor");
     exit;
 }
 ?>

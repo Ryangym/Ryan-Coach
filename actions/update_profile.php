@@ -99,7 +99,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_nome'] = $nome;
         $_SESSION['user_email'] = $email;
 
-        $back_url = ($_SESSION['user_nivel'] == 'admin') ? '../admin.php' : '../usuario.php';
+        $back_url = ($_SESSION['user_nivel'] == 'admin') 
+            ? '../admin.php?pagina=perfil' 
+            : '../usuario.php?pagina=perfil';
+            
         echo "<script>alert('Perfil atualizado com sucesso!'); window.location.href='$back_url';</script>";
 
     } catch (PDOException $e) {

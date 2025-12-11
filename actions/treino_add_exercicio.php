@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $exercicio_id = $pdo->lastInsertId();
 
         // 2. Dados das Séries (Recebido como JSON String do Front-end)
-        // Ex: [{"qtd":3, "tipo":"work", "reps":"10", "desc":"60"}]
         $series_json = $_POST['series_data'];
         $series_lista = json_decode($series_json, true);
 
@@ -45,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $exercicio_id,
                     $s['tipo'],
                     $s['qtd'],
-                    $s['reps'],     // Pode ser null se for periodizado (mas vamos salvar por garantia)
+                    $s['reps'],     
                     $s['desc'],
                     $s['rpe']
                 ]);
@@ -53,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        // Redireciona mantendo a aba aberta (usando hash na URL se possível, mas aqui voltamos pro painel)
-        header("Location: ../admin.php?page=treino_painel&id=" . $treino_id);
+        
+        // --- CORREÇÃO AQUI ---
+        header("Location: ../admin.php?pagina=treino_painel&id=" . $treino_id);
         exit;
 
     } catch (Exception $e) {

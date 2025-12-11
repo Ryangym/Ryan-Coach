@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'status' => $status
         ]);
 
-        echo "<script>alert('Lançamento registrado com sucesso!'); window.location.href='../admin.php';</script>";
+        echo "<script>alert('Lançamento registrado com sucesso!'); window.location.href='../admin.php?pagina=financeiro';</script>";
 
     } catch (PDOException $e) {
         echo "Erro ao lançar: " . $e->getMessage();

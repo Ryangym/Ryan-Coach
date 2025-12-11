@@ -29,7 +29,7 @@ if ($id && $acao) {
         $stmt->execute(['id' => $id]);
 
         // Redireciona de volta
-        header("Location: ../admin.php"); 
+        header("Location: ../admin.php?pagina=financeiro");
         exit;
 
     } catch (PDOException $e) {

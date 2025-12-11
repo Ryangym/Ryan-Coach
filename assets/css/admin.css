@@ -157,6 +157,8 @@
     padding: 20px;
 }
 
+
+/* 1. VERSÃO PC (Design Original Elegante) */
 .modal-content {
     background: #1a1a1a;
     border: 1px solid var(--gold);
@@ -167,6 +169,51 @@
     position: relative;
     box-shadow: 0 0 30px rgba(255, 186, 66, 0.2);
     animation: modalPop 0.3s ease;
+    margin: 5% auto; /* Centraliza no meio da tela */
+}
+
+/* 2. VERSÃO MOBILE (Design Fluido com Scroll e Grid) */
+@media (max-width: 768px) {
+    
+    .modal-content {
+        /* Ajustes de Tamanho e Scroll para Mobile */
+        width: 95% !important; /* Quase largura total */
+        max-height: 85vh; /* Limita altura para caber teclado */
+        overflow-y: auto; /* Habilita barra de rolagem interna */
+        -webkit-overflow-scrolling: touch; /* Scroll suave iOS */
+        
+        margin: 20px auto; /* Descola das bordas */
+        padding: 20px 15px; /* Padding menor para ganhar espaço */
+        
+        background: transparent; border: none; box-shadow: none; 
+    }
+
+    /* --- Ajustes Específicos para o Modal de Exercício no Mobile --- */
+    
+    #modalExercicio .modal-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Quebra a linha dos inputs principais */
+    #modalExercicio .row-flex {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    /* Transforma a linha de adicionar série em GRID (2 colunas) */
+    #modalExercicio .set-inputs-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr; 
+        gap: 10px !important;
+    }
+    
+    /* O botão de adicionar (+) ocupa a linha inteira no final */
+    #modalExercicio .btn-add-set-mobile {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: 5px;
+    }
 }
 
 @keyframes modalPop {
@@ -187,6 +234,12 @@
 }
 
 .modal-close:hover { color: #fff; }
+@media (max-width: 768px) {
+    .modal-close {
+    font-size: 2rem;
+    color: #ff4242;
+    }
+}
 
 /* --- Foto na Tabela --- */
 .table-avatar {
@@ -770,11 +823,6 @@
 .modal-header-av h3 { margin: 0; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; }
 .modal-header-av i { color: var(--gold); margin-right: 8px; }
 
-.modal-close {
-    position: absolute; top: 15px; right: 15px;
-    background: transparent; border: none; color: #888;
-    font-size: 1.5rem; cursor: pointer; line-height: 1;
-}
 
 /* 4. O FORMULÁRIO (O Elo Perdido) */
 /* Esta regra faz o form preencher o espaço entre header e footer */
