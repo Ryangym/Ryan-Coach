@@ -722,6 +722,41 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         });
     }
     </script>
+    <script>
+        // --- LÓGICA DE CHECK DA DIETA ---
+    async function toggleRefeicao(refeicaoId, btn) {
+        // 1. Efeito Visual Imediato (UX Rápida)
+        const card = document.getElementById('ref_' + refeicaoId);
+        const icon = btn.querySelector('i');
+        
+        // Alterna classes visualmente antes de esperar o servidor
+        btn.classList.toggle('checked');
+        card.classList.toggle('completed'); // Deixa o card meio transparente
+
+        // 2. Envia para o Servidor (Background)
+        try {
+            const response = await fetch('actions/dieta_check.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refeicao_id: refeicaoId })
+            });
+
+            const data = await response.json();
+            
+            // Se o servidor confirmar, ótimo. Se der erro, desfazemos.
+            if (!response.ok) {
+                throw new Error('Erro ao salvar');
+            }
+
+        } catch (error) {
+            console.error(error);
+            // Reverte o visual se deu erro (feedback de falha)
+            btn.classList.toggle('checked');
+            card.classList.toggle('completed');
+            alert("Erro de conexão. Tente novamente.");
+        }
+    }
+    </script>
         
 
 

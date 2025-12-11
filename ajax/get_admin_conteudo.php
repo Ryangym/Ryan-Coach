@@ -1547,12 +1547,12 @@ switch ($pagina) {
         require_once '../config/db_connect.php';
         $aluno_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
         
-        // Busca Aluno
+        // 1. Busca Aluno
         $stmt = $pdo->prepare("SELECT nome, foto FROM usuarios WHERE id = ?");
         $stmt->execute([$aluno_id]);
         $aluno = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Busca Dieta ATIVA
+        // 2. Busca Dieta ATIVA
         $stmt_d = $pdo->prepare("SELECT * FROM dietas WHERE aluno_id = ? LIMIT 1");
         $stmt_d->execute([$aluno_id]);
         $dieta = $stmt_d->fetch(PDO::FETCH_ASSOC);
@@ -1585,10 +1585,39 @@ switch ($pagina) {
                         
                         <button type="submit" class="btn-gold" style="width:100%;">CRIAR NOVA DIETA</button>
                     </form>
+                    
+                    <div style="margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                        <button class="btn-gold" style="background:transparent; border:1px solid #444; color:#888; font-size:0.8rem;" onclick="abrirModalImportar()">
+                            <i class="fa-solid fa-file-import"></i> IMPORTAR MODELO DE OUTRO ALUNO
+                        </button>
+                    </div>
                   </div>';
         } 
         // --- ESTADO 2: COM DIETA (EDITOR) ---
         else {
+            // Cálculo de Aderência
+            $hoje = date('Y-m-d');
+            $stmt_total = $pdo->prepare("SELECT COUNT(*) FROM refeicoes WHERE dieta_id = ?");
+            $stmt_total->execute([$dieta['id']]);
+            $total_refs = $stmt_total->fetchColumn();
+
+            $stmt_feito = $pdo->prepare("SELECT COUNT(*) FROM dieta_registro WHERE aluno_id = ? AND data_registro = ?");
+            $stmt_feito->execute([$aluno_id, $hoje]);
+            $feitos = $stmt_feito->fetchColumn();
+
+            $porcentagem = ($total_refs > 0) ? round(($feitos / $total_refs) * 100) : 0;
+
+            // Barra de Aderência
+            echo '<div style="background: #222; padding: 10px 20px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #aaa; font-size: 0.8rem;">Aderência Hoje:</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 100px; height: 6px; background: #444; border-radius: 3px; overflow: hidden;">
+                            <div style="width: '.$porcentagem.'%; height: 100%; background: var(--gold);"></div>
+                        </div>
+                        <strong style="color: #fff;">'.$porcentagem.'%</strong>
+                    </div>
+                  </div>';
+
             echo '<div class="glass-card mb-large">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:20px;">
                         <div>
@@ -1600,9 +1629,15 @@ switch ($pagina) {
                         </div>
                     </div>
 
-                    <button class="btn-gold" onclick="abrirModalRefeicao('.$dieta['id'].')" style="width:100%; margin-bottom:30px;">
-                        <i class="fa-solid fa-plus"></i> ADICIONAR REFEIÇÃO
-                    </button>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:30px;">
+                        <button class="btn-gold" onclick="abrirModalRefeicao('.$dieta['id'].')">
+                            <i class="fa-solid fa-plus"></i> NOVA REFEIÇÃO
+                        </button>
+                        
+                        <button class="btn-gold" style="background:transparent; border:1px solid var(--gold); color:var(--gold);" onclick="abrirModalImportar()">
+                            <i class="fa-solid fa-file-import"></i> IMPORTAR MODELO
+                        </button>
+                    </div>
 
                     <div class="diet-editor-list">';
 
@@ -1610,6 +1645,10 @@ switch ($pagina) {
             $stmt_ref = $pdo->prepare("SELECT * FROM refeicoes WHERE dieta_id = ? ORDER BY ordem ASC");
             $stmt_ref->execute([$dieta['id']]);
             $refeicoes = $stmt_ref->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($refeicoes)) {
+                 echo '<p style="text-align:center; color:#666; padding:20px;">Nenhuma refeição cadastrada. Comece adicionando uma.</p>';
+            }
 
             foreach($refeicoes as $ref) {
                 echo '<div class="meal-edit-card" style="background:#1a1a1a; border:1px solid #333; border-radius:12px; margin-bottom:20px; overflow:hidden;">
@@ -1656,9 +1695,12 @@ switch ($pagina) {
             echo '  </div>
                   </div>';
         }
-        echo '</section>
+        echo '</section>';
 
-        <div id="modalNovaRefeicao" class="modal-overlay" style="display:none;">
+        // --- MODAIS (HTML APENAS) ---
+        
+        // 1. Nova Refeição
+        echo '<div id="modalNovaRefeicao" class="modal-overlay" style="display:none;">
             <div class="modal-content selection-modal" style="text-align:left; max-width:400px;">
                 <button class="modal-close" onclick="fecharModalRefeicao()">&times;</button>
                 <h3 class="modal-title" style="text-align:center;">Nova Refeição</h3>
@@ -1679,9 +1721,10 @@ switch ($pagina) {
                     <button type="submit" class="btn-gold" style="width:100%;">CRIAR REFEIÇÃO</button>
                 </form>
             </div>
-        </div>
+        </div>';
 
-        <div id="modalNovoAlimento" class="modal-overlay" style="display:none;">
+        // 2. Novo Alimento
+        echo '<div id="modalNovoAlimento" class="modal-overlay" style="display:none;">
             <div class="modal-content selection-modal" style="text-align:left; max-width:400px;">
                 <button class="modal-close" onclick="fecharModalAlimento()">&times;</button>
                 <h3 class="modal-title" style="text-align:center;">Adicionar Alimento</h3>
@@ -1706,9 +1749,45 @@ switch ($pagina) {
                     <button type="submit" class="btn-gold" style="width:100%;">ADICIONAR</button>
                 </form>
             </div>
-        </div>
+        </div>';
 
-        ';
+        // 3. Importar Dieta (NOVO)
+        echo '<div id="modalImportar" class="modal-overlay" style="display:none;">
+            <div class="modal-content selection-modal" style="text-align:left; max-width:400px;">
+                <button class="modal-close" onclick="fecharModalImportar()">&times;</button>
+                <h3 class="modal-title" style="text-align:center;">Copiar Dieta</h3>
+                <p style="color:#ccc; font-size:0.9rem; text-align:center; margin-bottom:20px;">
+                    Escolha um aluno para copiar a dieta dele para o <strong>'.$aluno['nome'].'</strong>.
+                    <br><span style="color:#ff4242; font-size:0.8rem;">(Isso substituirá a dieta atual!)</span>
+                </p>
+                
+                <form action="actions/dieta_save.php" method="POST">
+                    <input type="hidden" name="acao" value="importar_dieta">
+                    <input type="hidden" name="aluno_destino_id" value="'.$aluno_id.'">
+                    
+                    <label class="input-label">Copiar de qual aluno?</label>
+                    <select name="aluno_origem_id" class="admin-input" required style="margin-bottom:20px;">
+                        <option value="">Selecione...</option>';
+                        
+                        // Busca alunos que JÁ TÊM dieta criada para servir de modelo
+                        // (excluindo o próprio aluno para não copiar de si mesmo)
+                        $stmt_m = $pdo->query("SELECT u.id, u.nome, d.titulo FROM usuarios u JOIN dietas d ON u.id = d.aluno_id WHERE d.ativo = 1 AND u.id != $aluno_id ORDER BY u.nome ASC");
+                        $modelos = $stmt_m->fetchAll(PDO::FETCH_ASSOC);
+                        
+                        if (empty($modelos)) {
+                            echo '<option value="" disabled>Nenhum modelo disponível</option>';
+                        } else {
+                            foreach($modelos as $m) {
+                                echo '<option value="'.$m['id'].'">'.$m['nome'].' - '.$m['titulo'].'</option>';
+                            }
+                        }
+        echo '      </select>
+                    
+                    <button type="submit" class="btn-gold" style="width:100%;">COPIAR AGORA</button>
+                </form>
+            </div>
+        </div>';
+
         break;
 
     // --- NOVO MENU GERAL ADMIN ---

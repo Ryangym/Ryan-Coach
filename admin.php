@@ -402,23 +402,35 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         }
 
         // Inicialização ao carregar a página
+        // Inicialização ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
             const aside = document.getElementById('main-aside');
             
-            // Verifica se voltou de um salvamento (ex: ?page=treino_painel&id=5)
+            // Verifica se voltou de um salvamento
             const params = new URLSearchParams(window.location.search);
-            const pageParam = params.get('page');
+            
+            // --- A CORREÇÃO ESTÁ AQUI: Mudamos de 'page' para 'pagina' ---
+            const pageParam = params.get('pagina'); 
             const idParam = params.get('id');
+            const msgParam = params.get('msg'); // Opcional: Para mostrar alertas de sucesso
 
             let paginaInicial = 'dashboard'; // Padrão
 
             if (pageParam) {
                 paginaInicial = pageParam;
+                
+                // Se tiver ID, adiciona na string para o carregarConteudo usar
                 if (idParam) {
                     paginaInicial += '&id=' + idParam;
                 }
-                // Limpa a URL visualmente (opcional, deixa mais bonito)
+                
+                // Limpa a URL visualmente para não ficar suja (opcional)
                 window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Se tiver mensagem de sucesso, pode exibir um alerta (Opcional)
+            if (msgParam === 'sucesso') {
+                // alert("Salvo com sucesso!"); // Descomente se quiser um feedback
             }
 
             // Evento de clique na Sidebar
@@ -429,7 +441,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                 }
             });
 
-            // Carrega a página definida
+            // Carrega a página correta (agora vai ler 'dieta_editor' em vez de cair no dashboard)
             carregarConteudo(paginaInicial);
         });
 
@@ -485,7 +497,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                         fecharPainelAluno();
                         abrirModalAvaliacao(alunoAtual.id);
                     }
-                    else if (acao === "dieta") {
+                    else if (acao === "dieta_editor") {
                         // 1. Fecha o Hub (Modal do Aluno)
                         fecharPainelAluno();
                         
@@ -1025,23 +1037,31 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         });
     }
 
-        //---------------------------------------------------------------
-        // 6. MODAIS DE DIETA (REFEIÇÕES E ALIMENTOS)
-        //---------------------------------------------------------------
-            function abrirModalRefeicao(id) {
-                document.getElementById("modal_dieta_id").value = id;
-                document.getElementById("modalNovaRefeicao").style.display = "flex";
-            }
-            function fecharModalRefeicao() {
-                document.getElementById("modalNovaRefeicao").style.display = "none";
-            }
-            function abrirModalAlimento(id) {
-                document.getElementById("modal_refeicao_id").value = id;
-                document.getElementById("modalNovoAlimento").style.display = "flex";
-            }
-            function fecharModalAlimento() {
-                document.getElementById("modalNovoAlimento").style.display = "none";
-            }
+    //---------------------------------------------------------------
+    // 6. MODAIS DE DIETA (REFEIÇÕES E ALIMENTOS)
+    //---------------------------------------------------------------
+    function abrirModalRefeicao(id) {
+        document.getElementById("modal_dieta_id").value = id;
+        document.getElementById("modalNovaRefeicao").style.display = "flex";
+    }
+    function fecharModalRefeicao() {
+        document.getElementById("modalNovaRefeicao").style.display = "none";
+    }
+
+    function abrirModalAlimento(id) {
+        document.getElementById("modal_refeicao_id").value = id;
+        document.getElementById("modalNovoAlimento").style.display = "flex";
+    }
+    function fecharModalAlimento() {
+        document.getElementById("modalNovoAlimento").style.display = "none";
+    }
+
+    function abrirModalImportar() {
+        document.getElementById("modalImportar").style.display = "flex";
+    }
+    function fecharModalImportar() {
+        document.getElementById("modalImportar").style.display = "none";
+    }
     
     </script>
 

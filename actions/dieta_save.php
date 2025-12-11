@@ -60,6 +60,51 @@ try {
         $pdo->prepare("DELETE FROM itens_dieta WHERE id = ?")->execute([$id]);
     }
 
+    // 7. IMPORTAR (COPIAR) DIETA
+    elseif ($acao === 'importar_dieta') {
+        $origem_id = $_POST['aluno_origem_id'];
+        $destino_id = $_POST['aluno_destino_id']; // Aluno atual
+
+        // 1. Busca dados da dieta de origem
+        $stmt = $pdo->prepare("SELECT * FROM dietas WHERE aluno_id = ? AND ativo = 1 LIMIT 1");
+        $stmt->execute([$origem_id]);
+        $dietaOrigem = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($dietaOrigem) {
+            // 2. Limpa dieta anterior do destino
+            $pdo->prepare("DELETE FROM dietas WHERE aluno_id = ?")->execute([$destino_id]);
+
+            // 3. Cria nova dieta (cabeçalho)
+            $stmt = $pdo->prepare("INSERT INTO dietas (aluno_id, titulo, objetivo, ativo) VALUES (?, ?, ?, 1)");
+            $stmt->execute([$destino_id, $dietaOrigem['titulo'], $dietaOrigem['objetivo']]);
+            $novaDietaId = $pdo->lastInsertId();
+
+            // 4. Copia Refeições
+            $stmtRef = $pdo->prepare("SELECT * FROM refeicoes WHERE dieta_id = ?");
+            $stmtRef->execute([$dietaOrigem['id']]);
+            $refeicoes = $stmtRef->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach($refeicoes as $ref) {
+                $stmtInsRef = $pdo->prepare("INSERT INTO refeicoes (dieta_id, nome, horario, ordem) VALUES (?, ?, ?, ?)");
+                $stmtInsRef->execute([$novaDietaId, $ref['nome'], $ref['horario'], $ref['ordem']]);
+                $novaRefId = $pdo->lastInsertId();
+
+                // 5. Copia Itens da Refeição
+                $stmtItens = $pdo->prepare("SELECT * FROM itens_dieta WHERE refeicao_id = ?");
+                $stmtItens->execute([$ref['id']]);
+                $itens = $stmtItens->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach($itens as $item) {
+                    $stmtInsItem = $pdo->prepare("INSERT INTO itens_dieta (refeicao_id, opcao_numero, descricao, observacao) VALUES (?, ?, ?, ?)");
+                    $stmtInsItem->execute([$novaRefId, $item['opcao_numero'], $item['descricao'], $item['observacao']]);
+                }
+            }
+        }
+        // Redireciona para o editor do aluno destino
+        header("Location: ../admin.php?pagina=dieta_editor&id=$destino_id&msg=importado");
+        exit;
+    }
+
     // Redireciona de volta para o editor
     header("Location: ../admin.php?pagina=dieta_editor&id=$aluno_id&msg=sucesso");
     exit;
