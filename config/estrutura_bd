@@ -186,3 +186,46 @@ CREATE TABLE avaliacoes_arquivos (
     angulo VARCHAR(50), /* Ex: Frente, Costas, Perfil */
     FOREIGN KEY (avaliacao_id) REFERENCES avaliacoes(id) ON DELETE CASCADE
 );
+
+
+-- 1. A Dieta (Cabeçalho)
+CREATE TABLE dietas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aluno_id INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL, -- Ex: "Protocolo de Definição"
+    objetivo VARCHAR(255), -- Ex: "2.200 Kcal - Baixo Carbo"
+    ativo BOOLEAN DEFAULT 1,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- 2. As Refeições (Horários)
+CREATE TABLE refeicoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dieta_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL, -- Ex: "Café da Manhã"
+    horario TIME, -- Ex: "08:00"
+    ordem INT NOT NULL, -- Para ordenar na tela (1, 2, 3...)
+    FOREIGN KEY (dieta_id) REFERENCES dietas(id) ON DELETE CASCADE
+);
+
+-- 3. Os Alimentos (O que comer)
+CREATE TABLE itens_dieta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    refeicao_id INT NOT NULL,
+    opcao_numero INT DEFAULT 1, -- 1 = Opção Principal, 2 = Substituição
+    descricao TEXT NOT NULL, -- Ex: "3 Ovos mexidos com 30g de Queijo"
+    observacao VARCHAR(255), -- Ex: "Pode usar azeite ou manteiga"
+    FOREIGN KEY (refeicao_id) REFERENCES refeicoes(id) ON DELETE CASCADE
+);
+
+-- 4. O Check do Aluno (Diário)
+CREATE TABLE dieta_registro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aluno_id INT NOT NULL,
+    refeicao_id INT NOT NULL,
+    data_registro DATE NOT NULL,
+    feito BOOLEAN DEFAULT 1,
+    FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (refeicao_id) REFERENCES refeicoes(id) ON DELETE CASCADE
+);

@@ -486,8 +486,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
                         abrirModalAvaliacao(alunoAtual.id);
                     }
                     else if (acao === "dieta") {
-                        alert("Módulo de Dieta em desenvolvimento.");
-                        // Futuro: carregarConteudo("dieta_editor&id=" + alunoAtual.id);
+                        // 1. Fecha o Hub (Modal do Aluno)
+                        fecharPainelAluno();
+                        
+                        // 2. Carrega a tela do Editor de Dieta passando o ID do aluno atual
+                        carregarConteudo("dieta_editor&id=" + alunoAtual.id);
                     }
                     else if (acao === "editar") {
                         // Fecha Hub e abre Editar (Preenche os dados)
@@ -1022,7 +1025,23 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         });
     }
 
-
+        //---------------------------------------------------------------
+        // 6. MODAIS DE DIETA (REFEIÇÕES E ALIMENTOS)
+        //---------------------------------------------------------------
+            function abrirModalRefeicao(id) {
+                document.getElementById("modal_dieta_id").value = id;
+                document.getElementById("modalNovaRefeicao").style.display = "flex";
+            }
+            function fecharModalRefeicao() {
+                document.getElementById("modalNovaRefeicao").style.display = "none";
+            }
+            function abrirModalAlimento(id) {
+                document.getElementById("modal_refeicao_id").value = id;
+                document.getElementById("modalNovoAlimento").style.display = "flex";
+            }
+            function fecharModalAlimento() {
+                document.getElementById("modalNovoAlimento").style.display = "none";
+            }
     
     </script>
 

@@ -37,7 +37,7 @@ $primeiro_nome = strtoupper($partes_nome[0]); // Ex: "JOÃO"
                 <span>Meus Treinos</span>
             </button>
             
-            <button data-pagina="nutrition"> <i class="fa-solid fa-utensils"></i>
+            <button data-pagina="dieta"> <i class="fa-solid fa-utensils"></i>
                 <span>Dieta & Nutrição</span>
             </button>
             

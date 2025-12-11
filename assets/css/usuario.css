@@ -2578,3 +2578,101 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 /* Estilo Especial para Logout */
 .setting-item.logout .st-left i, 
 .setting-item.logout .st-left span { color: #ff4242; }
+
+
+/* ------------ -------------- --------------- */
+/* ------------ DIETA TIMELINE --------------- */
+/* ------------ -------------- --------------- */
+
+.timeline-diet {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 100px;
+}
+
+.diet-card {
+    background: #1a1a1a;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: 0.3s;
+}
+
+/* Barra Lateral Status */
+.diet-status-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--gold); /* Dourado = Pendente */
+    transition: 0.3s;
+}
+
+/* Estado Concluído */
+.diet-card.completed .diet-status-bar { background: #00e676; box-shadow: 0 0 10px #00e676; }
+.diet-card.completed { opacity: 0.6; } /* Fica meio apagado pra focar no próximo */
+
+.diet-content { padding: 20px 20px 20px 26px; }
+
+/* Header do Card */
+.diet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+.diet-time { font-size: 0.8rem; color: #888; font-weight: bold; background: #222; padding: 4px 8px; border-radius: 6px; }
+.diet-title { font-size: 1.1rem; color: #fff; margin: 0; font-family: 'Orbitron'; margin-left: 10px; flex: 1; }
+
+/* Botão de Check */
+.btn-check-meal {
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    border: 2px solid #444;
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-check-meal.checked {
+    background: #00e676;
+    border-color: #00e676;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0,230,118,0.4);
+}
+
+/* Opções de Comida */
+.diet-option-box {
+    background: rgba(255,255,255,0.03);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.opt-label { 
+    display: block; font-size: 0.65rem; text-transform: uppercase; 
+    color: var(--gold); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px;
+}
+.diet-option-box.secondary .opt-label { color: #888; }
+
+.food-item {
+    display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px;
+}
+.food-item strong { color: #eee; font-size: 0.95rem; display: block; }
+.food-item small { color: #777; font-size: 0.8rem; font-style: italic; }
+
+/* Divisor "OU" */
+.diet-divider {
+    text-align: center; margin: 10px 0; position: relative;
+}
+.diet-divider::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #333; z-index: 0;
+}
+.diet-divider span {
+    background: #1a1a1a; padding: 0 10px; color: #666; font-size: 0.7rem; font-weight: bold; position: relative; z-index: 1;
+}

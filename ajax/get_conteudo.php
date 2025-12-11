@@ -1246,6 +1246,110 @@ switch ($pagina) {
         echo '</section>';
         break;
 
+
+    case 'dieta':
+        require_once '../config/db_connect.php';
+        $aluno_id = $_SESSION['user_id'];
+        $hoje = date('Y-m-d');
+
+        // 1. Busca a Dieta Ativa
+        $stmt = $pdo->prepare("SELECT * FROM dietas WHERE aluno_id = ? AND ativo = 1 LIMIT 1");
+        $stmt->execute([$aluno_id]);
+        $dieta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo '<section id="dieta-view" class="fade-in">';
+
+        if (!$dieta) {
+            echo '<div class="empty-state-modern">
+                    <div class="icon-pulse"><i class="fa-solid fa-carrot"></i></div>
+                    <h2>Nenhuma Dieta Ativa</h2>
+                    <p>Seu treinador ainda não publicou seu plano alimentar.</p>
+                  </div>';
+        } else {
+            // Cabeçalho da Dieta
+            echo '<header class="dash-header-clean">
+                    <div>
+                        <h1 class="greeting-clean">Plano <span class="text-gold">Alimentar</span></h1>
+                        <p class="date-clean">'.$dieta['titulo'].' • '.$dieta['objetivo'].'</p>
+                    </div>
+                  </header>
+
+                  <div class="timeline-diet">';
+
+            // 2. Busca Refeições
+            $stmt_ref = $pdo->prepare("SELECT * FROM refeicoes WHERE dieta_id = ? ORDER BY ordem ASC");
+            $stmt_ref->execute([$dieta['id']]);
+            $refeicoes = $stmt_ref->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($refeicoes as $ref) {
+                // Verifica se já comeu hoje
+                $stmt_check = $pdo->prepare("SELECT id FROM dieta_registro WHERE aluno_id = ? AND refeicao_id = ? AND data_registro = ?");
+                $stmt_check->execute([$aluno_id, $ref['id'], $hoje]);
+                $checked = $stmt_check->fetch() ? 'checked' : '';
+                $activeClass = $checked ? 'completed' : '';
+
+                // Busca Itens da Refeição
+                $stmt_itens = $pdo->prepare("SELECT * FROM itens_dieta WHERE refeicao_id = ? ORDER BY opcao_numero ASC");
+                $stmt_itens->execute([$ref['id']]);
+                $itens = $stmt_itens->fetchAll(PDO::FETCH_ASSOC);
+
+                // Agrupa por Opção (1, 2...)
+                $opcoes = [];
+                foreach($itens as $it) {
+                    $opcoes[$it['opcao_numero']][] = $it;
+                }
+
+                $horario = date('H:i', strtotime($ref['horario']));
+
+                echo '<div class="diet-card '.$activeClass.'" id="ref_'.$ref['id'].'">
+                        
+                        <div class="diet-status-bar"></div>
+
+                        <div class="diet-content">
+                            <div class="diet-header">
+                                <span class="diet-time"><i class="fa-regular fa-clock"></i> '.$horario.'</span>
+                                <h3 class="diet-title">'.$ref['nome'].'</h3>
+                                
+                                <button class="btn-check-meal '.$checked.'" onclick="toggleRefeicao('.$ref['id'].', this)">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+
+                            <div class="diet-options-container">';
+                                
+                                foreach($opcoes as $num => $lista_itens) {
+                                    $label = ($num == 1) ? 'Opção Principal' : 'Opção '.$num.' (Substituição)';
+                                    $classeOpcao = ($num == 1) ? 'primary' : 'secondary';
+                                    
+                                    echo '<div class="diet-option-box '.$classeOpcao.'">
+                                            <span class="opt-label">'.$label.'</span>';
+                                            
+                                            foreach($lista_itens as $alimento) {
+                                                echo '<div class="food-item">
+                                                        <i class="fa-solid fa-caret-right text-gold"></i>
+                                                        <div>
+                                                            <strong>'.$alimento['descricao'].'</strong>
+                                                            '.($alimento['observacao'] ? '<small>'.$alimento['observacao'].'</small>' : '').'
+                                                        </div>
+                                                      </div>';
+                                            }
+                                    echo '</div>';
+                                    
+                                    // Se tiver mais opções, mostra um "OU"
+                                    if ($num < count($opcoes)) {
+                                        echo '<div class="diet-divider"><span>OU</span></div>';
+                                    }
+                                }
+
+                echo '      </div>
+                        </div>
+                      </div>';
+            }
+            echo '</div>'; // Fim Timeline
+        }
+        echo '</section>';
+        break;
+
     // --- NOVA TELA: MENU GERAL (HUB DE NAVEGAÇÃO) ---
     case 'menu':
         require_once '../config/db_connect.php';
