@@ -26,8 +26,334 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
 
     <?php include 'includes/sidebar_admin.php'; ?>
 
-    <main id="conteudo">
-        </main>
+    <main id="conteudo"></main>
+
+
+    <!-- --------------------------------------------------->
+    <!------- HTML DOS MODAIS DE AVALIAÇÃO FÍSICA ---------->
+    <!-- --------------------------------------------------->
+    <div id="modalNovaAvaliacao" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            
+            <div class="modal-header-av">
+                <button class="modal-close" onclick="fecharModalAvaliacao()">&times;</button>
+                <h3><i class="fa-solid fa-ruler-combined"></i> NOVA AVALIAÇÃO</h3>
+            </div>
+            
+            <form action="actions/avaliacao_add.php" method="POST" enctype="multipart/form-data" id="formAvaliacao">
+                <input type="hidden" name="aluno_id" id="av_aluno_id" required>
+
+                <div class="modal-body-scroll">
+                    
+                    <div class="form-section-box">
+                        <span class="section-label-gold">DADOS GERAIS</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label class="label-mini">Data</label>
+                                <input type="date" name="data_avaliacao" class="input-dark" value="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                            <div>
+                                <label class="label-mini">Gênero (p/ Cálculo BF)</label>
+                                <select name="genero" class="input-dark">
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label class="label-mini">Idade</label>
+                                <input type="number" name="idade" class="input-dark" placeholder="Anos">
+                            </div>
+                            <div>
+                                <label class="label-mini">Altura (cm)</label>
+                                <input type="number" name="altura" class="input-dark" placeholder="Ex: 175" required>
+                            </div>
+                            <div>
+                                <label class="label-mini">Peso (kg)</label>
+                                <input type="number" step="0.1" name="peso" class="input-dark" placeholder="00.0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">TRONCO & PERÍMETROS</span>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                            <div>
+                                <label class="label-mini">Pescoço</label>
+                                <input type="number" step="0.1" name="pescoco" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Ombros</label>
+                                <input type="number" step="0.1" name="ombro" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                            <div>
+                                <label class="label-mini">Tórax Inspirado</label>
+                                <input type="number" step="0.1" name="torax_inspirado" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Tórax Relaxado</label>
+                                <input type="number" step="0.1" name="torax_relaxado" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label class="label-mini">Cintura</label>
+                                <input type="number" step="0.1" name="cintura" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Abdômen</label>
+                                <input type="number" step="0.1" name="abdomen" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Quadril</label>
+                                <input type="number" step="0.1" name="quadril" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">MEMBROS SUPERIORES (DIR / ESQ)</span>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Braço Relaxado</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="braco_dir_relaxado" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="braco_esq_relaxado" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Braço Contraído</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="braco_dir_contraido" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="braco_esq_contraido" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-mini" style="color:#fff;">Antebraço</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="antebraco_dir" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="antebraco_esq" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">MEMBROS INFERIORES (DIR / ESQ)</span>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Coxa</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="coxa_dir" class="input-dark" placeholder="Direita">
+                                <input type="number" step="0.1" name="coxa_esq" class="input-dark" placeholder="Esquerda">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-mini" style="color:#fff;">Panturrilha</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="panturrilha_dir" class="input-dark" placeholder="Direita">
+                                <input type="number" step="0.1" name="panturrilha_esq" class="input-dark" placeholder="Esquerda">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">FOTOS</span>
+                        <input type="file" name="fotos[]" id="foto_input" multiple accept="image/*" style="display: none;" onchange="previewFiles()">
+                        <label for="foto_input" class="upload-zone">
+                            <i class="fa-solid fa-camera upload-icon"></i>
+                            <div class="upload-text">Adicionar Fotos</div>
+                        </label>
+                        <div id="preview-area" class="preview-container"></div>
+                    </div>
+
+                    <div class="form-section-box" style="margin-bottom:0;">
+                        <span class="section-label-gold">VÍDEO (OPCIONAL)</span>
+                        <label class="label-mini">Link (Youtube / Drive)</label>
+                        <input type="text" name="videos_links" class="input-dark" placeholder="Cole o link aqui...">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn-save-modal">SALVAR E CALCULAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+     
+        <!--------- HTML DO MODAL DE NOVA AVALIAÇÃO ------------>
+        <div id="modalNovaAvaliacao" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            
+            <div class="modal-header-av">
+                <button class="modal-close" onclick="fecharModalAvaliacao()">&times;</button>
+                <h3><i class="fa-solid fa-ruler-combined"></i> NOVA AVALIAÇÃO</h3>
+            </div>
+            
+            <form action="actions/avaliacao_add.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="aluno_id" id="av_aluno_id" value="<?php echo $_SESSION['user_id'] ?? ''; ?>">
+
+                <div class="modal-body-scroll">
+                    
+                    <div class="form-section-box">
+                        <span class="section-label-gold">DADOS GERAIS</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label class="label-mini">Data</label>
+                                <input type="date" name="data_avaliacao" class="input-dark" value="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                            <div>
+                                <label class="label-mini">Gênero (p/ Cálculo BF)</label>
+                                <select name="genero" class="input-dark">
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label class="label-mini">Idade</label>
+                                <input type="number" name="idade" class="input-dark" placeholder="Anos">
+                            </div>
+                            <div>
+                                <label class="label-mini">Altura (cm)</label>
+                                <input type="number" name="altura" class="input-dark" placeholder="Ex: 175" required>
+                            </div>
+                            <div>
+                                <label class="label-mini">Peso (kg)</label>
+                                <input type="number" step="0.1" name="peso" class="input-dark" placeholder="00.0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">TRONCO & PERÍMETROS</span>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                            <div>
+                                <label class="label-mini">Pescoço</label>
+                                <input type="number" step="0.1" name="pescoco" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Ombros</label>
+                                <input type="number" step="0.1" name="ombro" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+                            <div>
+                                <label class="label-mini">Tórax Inspirado</label>
+                                <input type="number" step="0.1" name="torax_inspirado" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Tórax Relaxado</label>
+                                <input type="number" step="0.1" name="torax_relaxado" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label class="label-mini">Cintura</label>
+                                <input type="number" step="0.1" name="cintura" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Abdômen</label>
+                                <input type="number" step="0.1" name="abdomen" class="input-dark" placeholder="0.0">
+                            </div>
+                            <div>
+                                <label class="label-mini">Quadril</label>
+                                <input type="number" step="0.1" name="quadril" class="input-dark" placeholder="0.0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">MEMBROS SUPERIORES (DIR / ESQ)</span>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Braço Relaxado</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="braco_dir_relaxado" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="braco_esq_relaxado" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Braço Contraído</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="braco_dir_contraido" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="braco_esq_contraido" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-mini" style="color:#fff;">Antebraço</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="antebraco_dir" class="input-dark" placeholder="Direito">
+                                <input type="number" step="0.1" name="antebraco_esq" class="input-dark" placeholder="Esquerdo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">MEMBROS INFERIORES (DIR / ESQ)</span>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <label class="label-mini" style="color:#fff;">Coxa</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="coxa_dir" class="input-dark" placeholder="Direita">
+                                <input type="number" step="0.1" name="coxa_esq" class="input-dark" placeholder="Esquerda">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-mini" style="color:#fff;">Panturrilha</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" step="0.1" name="panturrilha_dir" class="input-dark" placeholder="Direita">
+                                <input type="number" step="0.1" name="panturrilha_esq" class="input-dark" placeholder="Esquerda">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-box">
+                        <span class="section-label-gold">FOTOS</span>
+                        <input type="file" name="fotos[]" id="foto_input" multiple accept="image/*" style="display: none;" onchange="previewFiles()">
+                        <label for="foto_input" class="upload-zone">
+                            <i class="fa-solid fa-camera upload-icon"></i>
+                            <div class="upload-text">Adicionar Fotos</div>
+                        </label>
+                        <div id="preview-area" class="preview-container"></div>
+                    </div>
+
+                    <div class="form-section-box" style="margin-bottom:0;">
+                        <span class="section-label-gold">VÍDEO (OPCIONAL)</span>
+                        <label class="label-mini">Link (Youtube / Drive)</label>
+                        <input type="text" name="videos_links" class="input-dark" placeholder="Cole o link aqui...">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn-save-modal">SALVAR E CALCULAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ---------------------------------------------------------------
+        FIM DOS MODAIS DE AVALIAÇÃO FÍSICA
+        --------------------------------------------------------------- -->
+
 
     <script>
         // ---------------------------------------------------------------
@@ -700,167 +1026,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
     
     </script>
 
-    <!-- --------------------------------------------------->
-    <!--------- HTML DO MODAL DE NOVA AVALIAÇÃO ------------>
-    <!-- --------------------------------------------------->
-    <div id="modalNovaAvaliacao" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        
-        <div class="modal-header-av">
-            <button class="modal-close" onclick="fecharModalAvaliacao()">&times;</button>
-            <h3><i class="fa-solid fa-ruler-combined"></i> NOVA AVALIAÇÃO</h3>
-        </div>
-        
-        <form action="actions/avaliacao_add.php" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="aluno_id" id="av_aluno_id" value="<?php echo $_SESSION['user_id'] ?? ''; ?>">
-
-            <div class="modal-body-scroll">
-                
-                <div class="form-section-box">
-                    <span class="section-label-gold">DADOS GERAIS</span>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div>
-                            <label class="label-mini">Data</label>
-                            <input type="date" name="data_avaliacao" class="input-dark" value="<?php echo date('Y-m-d'); ?>">
-                        </div>
-                        <div>
-                            <label class="label-mini">Gênero (p/ Cálculo BF)</label>
-                            <select name="genero" class="input-dark">
-                                <option value="M">Masculino</option>
-                                <option value="F">Feminino</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <label class="label-mini">Idade</label>
-                            <input type="number" name="idade" class="input-dark" placeholder="Anos">
-                        </div>
-                        <div>
-                            <label class="label-mini">Altura (cm)</label>
-                            <input type="number" name="altura" class="input-dark" placeholder="Ex: 175" required>
-                        </div>
-                        <div>
-                            <label class="label-mini">Peso (kg)</label>
-                            <input type="number" step="0.1" name="peso" class="input-dark" placeholder="00.0" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section-box">
-                    <span class="section-label-gold">TRONCO & PERÍMETROS</span>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
-                        <div>
-                            <label class="label-mini">Pescoço</label>
-                            <input type="number" step="0.1" name="pescoco" class="input-dark" placeholder="0.0">
-                        </div>
-                        <div>
-                            <label class="label-mini">Ombros</label>
-                            <input type="number" step="0.1" name="ombro" class="input-dark" placeholder="0.0">
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
-                        <div>
-                            <label class="label-mini">Tórax Inspirado</label>
-                            <input type="number" step="0.1" name="torax_inspirado" class="input-dark" placeholder="0.0">
-                        </div>
-                        <div>
-                            <label class="label-mini">Tórax Relaxado</label>
-                            <input type="number" step="0.1" name="torax_relaxado" class="input-dark" placeholder="0.0">
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <label class="label-mini">Cintura</label>
-                            <input type="number" step="0.1" name="cintura" class="input-dark" placeholder="0.0">
-                        </div>
-                        <div>
-                            <label class="label-mini">Abdômen</label>
-                            <input type="number" step="0.1" name="abdomen" class="input-dark" placeholder="0.0">
-                        </div>
-                        <div>
-                            <label class="label-mini">Quadril</label>
-                            <input type="number" step="0.1" name="quadril" class="input-dark" placeholder="0.0">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section-box">
-                    <span class="section-label-gold">MEMBROS SUPERIORES (DIR / ESQ)</span>
-                    
-                    <div style="margin-bottom: 10px;">
-                        <label class="label-mini" style="color:#fff;">Braço Relaxado</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" step="0.1" name="braco_dir_relaxado" class="input-dark" placeholder="Direito">
-                            <input type="number" step="0.1" name="braco_esq_relaxado" class="input-dark" placeholder="Esquerdo">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 10px;">
-                        <label class="label-mini" style="color:#fff;">Braço Contraído</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" step="0.1" name="braco_dir_contraido" class="input-dark" placeholder="Direito">
-                            <input type="number" step="0.1" name="braco_esq_contraido" class="input-dark" placeholder="Esquerdo">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="label-mini" style="color:#fff;">Antebraço</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" step="0.1" name="antebraco_dir" class="input-dark" placeholder="Direito">
-                            <input type="number" step="0.1" name="antebraco_esq" class="input-dark" placeholder="Esquerdo">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section-box">
-                    <span class="section-label-gold">MEMBROS INFERIORES (DIR / ESQ)</span>
-                    
-                    <div style="margin-bottom: 10px;">
-                        <label class="label-mini" style="color:#fff;">Coxa</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" step="0.1" name="coxa_dir" class="input-dark" placeholder="Direita">
-                            <input type="number" step="0.1" name="coxa_esq" class="input-dark" placeholder="Esquerda">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="label-mini" style="color:#fff;">Panturrilha</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="number" step="0.1" name="panturrilha_dir" class="input-dark" placeholder="Direita">
-                            <input type="number" step="0.1" name="panturrilha_esq" class="input-dark" placeholder="Esquerda">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section-box">
-                    <span class="section-label-gold">FOTOS</span>
-                    <input type="file" name="fotos[]" id="foto_input" multiple accept="image/*" style="display: none;" onchange="previewFiles()">
-                    <label for="foto_input" class="upload-zone">
-                        <i class="fa-solid fa-camera upload-icon"></i>
-                        <div class="upload-text">Adicionar Fotos</div>
-                    </label>
-                    <div id="preview-area" class="preview-container"></div>
-                </div>
-
-                <div class="form-section-box" style="margin-bottom:0;">
-                    <span class="section-label-gold">VÍDEO (OPCIONAL)</span>
-                    <label class="label-mini">Link (Youtube / Drive)</label>
-                    <input type="text" name="videos_links" class="input-dark" placeholder="Cole o link aqui...">
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button type="submit" class="btn-save-modal">SALVAR E CALCULAR</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 
     <script>
         // --- LÓGICA DO MODAL DE AVALIAÇÃO ---
@@ -903,166 +1068,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
     }
     </script>
 
-    <!-- --------------------------------------------------->
-    <!------- HTML DO MODAL DE NAVEGAÇÃO AVALIAÇÃO --------->
-    <!-- --------------------------------------------------->
-    <div id="modalNovaAvaliacao" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            
-            <div class="modal-header-av">
-                <button class="modal-close" onclick="fecharModalAvaliacao()">&times;</button>
-                <h3><i class="fa-solid fa-ruler-combined"></i> NOVA AVALIAÇÃO</h3>
-            </div>
-            
-            <form action="actions/avaliacao_add.php" method="POST" enctype="multipart/form-data" id="formAvaliacao">
-                <input type="hidden" name="aluno_id" id="av_aluno_id" required>
-
-                <div class="modal-body-scroll">
-                    
-                    <div class="form-section-box">
-                        <span class="section-label-gold">DADOS GERAIS</span>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                            <div>
-                                <label class="label-mini">Data</label>
-                                <input type="date" name="data_avaliacao" class="input-dark" value="<?php echo date('Y-m-d'); ?>">
-                            </div>
-                            <div>
-                                <label class="label-mini">Gênero (p/ Cálculo BF)</label>
-                                <select name="genero" class="input-dark">
-                                    <option value="M">Masculino</option>
-                                    <option value="F">Feminino</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                            <div>
-                                <label class="label-mini">Idade</label>
-                                <input type="number" name="idade" class="input-dark" placeholder="Anos">
-                            </div>
-                            <div>
-                                <label class="label-mini">Altura (cm)</label>
-                                <input type="number" name="altura" class="input-dark" placeholder="Ex: 175" required>
-                            </div>
-                            <div>
-                                <label class="label-mini">Peso (kg)</label>
-                                <input type="number" step="0.1" name="peso" class="input-dark" placeholder="00.0" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section-box">
-                        <span class="section-label-gold">TRONCO & PERÍMETROS</span>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
-                            <div>
-                                <label class="label-mini">Pescoço</label>
-                                <input type="number" step="0.1" name="pescoco" class="input-dark" placeholder="0.0">
-                            </div>
-                            <div>
-                                <label class="label-mini">Ombros</label>
-                                <input type="number" step="0.1" name="ombro" class="input-dark" placeholder="0.0">
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
-                            <div>
-                                <label class="label-mini">Tórax Inspirado</label>
-                                <input type="number" step="0.1" name="torax_inspirado" class="input-dark" placeholder="0.0">
-                            </div>
-                            <div>
-                                <label class="label-mini">Tórax Relaxado</label>
-                                <input type="number" step="0.1" name="torax_relaxado" class="input-dark" placeholder="0.0">
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                            <div>
-                                <label class="label-mini">Cintura</label>
-                                <input type="number" step="0.1" name="cintura" class="input-dark" placeholder="0.0">
-                            </div>
-                            <div>
-                                <label class="label-mini">Abdômen</label>
-                                <input type="number" step="0.1" name="abdomen" class="input-dark" placeholder="0.0">
-                            </div>
-                            <div>
-                                <label class="label-mini">Quadril</label>
-                                <input type="number" step="0.1" name="quadril" class="input-dark" placeholder="0.0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section-box">
-                        <span class="section-label-gold">MEMBROS SUPERIORES (DIR / ESQ)</span>
-                        
-                        <div style="margin-bottom: 10px;">
-                            <label class="label-mini" style="color:#fff;">Braço Relaxado</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" step="0.1" name="braco_dir_relaxado" class="input-dark" placeholder="Direito">
-                                <input type="number" step="0.1" name="braco_esq_relaxado" class="input-dark" placeholder="Esquerdo">
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label class="label-mini" style="color:#fff;">Braço Contraído</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" step="0.1" name="braco_dir_contraido" class="input-dark" placeholder="Direito">
-                                <input type="number" step="0.1" name="braco_esq_contraido" class="input-dark" placeholder="Esquerdo">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="label-mini" style="color:#fff;">Antebraço</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" step="0.1" name="antebraco_dir" class="input-dark" placeholder="Direito">
-                                <input type="number" step="0.1" name="antebraco_esq" class="input-dark" placeholder="Esquerdo">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section-box">
-                        <span class="section-label-gold">MEMBROS INFERIORES (DIR / ESQ)</span>
-                        
-                        <div style="margin-bottom: 10px;">
-                            <label class="label-mini" style="color:#fff;">Coxa</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" step="0.1" name="coxa_dir" class="input-dark" placeholder="Direita">
-                                <input type="number" step="0.1" name="coxa_esq" class="input-dark" placeholder="Esquerda">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="label-mini" style="color:#fff;">Panturrilha</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" step="0.1" name="panturrilha_dir" class="input-dark" placeholder="Direita">
-                                <input type="number" step="0.1" name="panturrilha_esq" class="input-dark" placeholder="Esquerda">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section-box">
-                        <span class="section-label-gold">FOTOS</span>
-                        <input type="file" name="fotos[]" id="foto_input" multiple accept="image/*" style="display: none;" onchange="previewFiles()">
-                        <label for="foto_input" class="upload-zone">
-                            <i class="fa-solid fa-camera upload-icon"></i>
-                            <div class="upload-text">Adicionar Fotos</div>
-                        </label>
-                        <div id="preview-area" class="preview-container"></div>
-                    </div>
-
-                    <div class="form-section-box" style="margin-bottom:0;">
-                        <span class="section-label-gold">VÍDEO (OPCIONAL)</span>
-                        <label class="label-mini">Link (Youtube / Drive)</label>
-                        <input type="text" name="videos_links" class="input-dark" placeholder="Cole o link aqui...">
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn-save-modal">SALVAR E CALCULAR</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <script>
         window.toggleAccordion = function(id) {
