@@ -2,69 +2,62 @@
 session_start();
 require_once '../config/db_connect.php';
 
-// Segurança Máxima: Só Admin entra aqui
-if (!isset($_SESSION['user_nivel']) || $_SESSION['user_nivel'] !== 'admin') {
+// Segurança: Apenas Admin
+if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
     die("Acesso negado.");
 }
 
-$acao = $_POST['acao'] ?? $_GET['acao'] ?? '';
+$acao = $_REQUEST['acao'] ?? ''; // Pode vir via POST (editar) ou GET (excluir)
 
 try {
-    // --- PROMOVER A ADMIN (NOVO) ---
-    if ($acao === 'promover') {
-        $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-        if ($id) {
-            // Muda o nível para 'admin'
-            $stmt = $pdo->prepare("UPDATE usuarios SET nivel = 'admin' WHERE id = :id");
-            $stmt->execute(['id' => $id]);
-        }
-        // Redireciona avisando
-        header("Location: ../admin.php?msg=promovido");
-        exit;
-    }
-
-    // --- EXCLUIR ALUNO ---
-    if ($acao === 'excluir') {
-        $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-        if ($id) {
-            $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id AND nivel = 'aluno'");
-            $stmt->execute(['id' => $id]);
-        }
-        header("Location: ../admin.php?msg=excluido");
-        exit;
-    }
-
-    // --- EDITAR ALUNO ---
-    if ($acao === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($acao === 'editar') {
+        // --- EDITAR ALUNO (INCLUINDO NÍVEL) ---
         $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
         $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $telefone = filter_input(INPUT_POST, 'telefone', FILTER_SANITIZE_STRING);
-        $data_expiracao = $_POST['data_expiracao']; // <--- NOVO CAMPO
-        $nova_senha = $_POST['nova_senha'];
+        $data_exp = $_POST['data_expiracao'] ?: NULL;
+        $nivel = $_POST['nivel'] ?? 'aluno'; // Novo campo: aluno ou admin
+        
+        $nova_senha = $_POST['nova_senha'] ?? '';
 
-        $sql_senha = "";
+        // Monta Query Dinâmica (para senha opcional)
+        $sql = "UPDATE usuarios SET nome = :nome, email = :email, telefone = :telefone, data_expiracao = :dexp, nivel = :nivel";
         $params = [
-            'nome' => $nome, 
-            'email' => $email, 
-            'telefone' => $telefone, 
-            'expiracao' => $data_expiracao, // <--- NOVO PARAM
+            'nome' => $nome,
+            'email' => $email,
+            'telefone' => $telefone,
+            'dexp' => $data_exp,
+            'nivel' => $nivel,
             'id' => $id
         ];
 
         if (!empty($nova_senha)) {
-            $senhaHash = password_hash($nova_senha, PASSWORD_DEFAULT);
-            $sql_senha = ", senha = :senha";
-            $params['senha'] = $senhaHash;
+            $sql .= ", senha = :senha";
+            $params['senha'] = password_hash($nova_senha, PASSWORD_DEFAULT);
         }
 
-        // Atualiza a query incluindo data_expiracao
-        $sql = "UPDATE usuarios SET nome = :nome, email = :email, telefone = :telefone, data_expiracao = :expiracao $sql_senha WHERE id = :id";
-        
+        $sql .= " WHERE id = :id";
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
 
-        header("Location: ../admin.php?msg=atualizado");
+        header("Location: ../admin.php?pagina=alunos&msg=editado");
+        exit;
+
+    } elseif ($acao === 'excluir') {
+        // --- EXCLUIR ALUNO ---
+        $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        
+        // Evita que o admin se exclua
+        if ($id == $_SESSION['user_id']) {
+            die("Você não pode excluir sua própria conta.");
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
+        $stmt->execute([$id]);
+
+        header("Location: ../admin.php?pagina=alunos&msg=excluido");
         exit;
     }
 

@@ -17,34 +17,32 @@ $primeiro_nome_admin = strtoupper($partes_admin[0]);
     <aside id="main-aside">
     
     <div class="aside-header">
-        <h1 class="logo">Ryan Coach</h1>
-        
+        <h2 class="logo">Ryan Coach</h2>
         <div class="profile-container">
-            <img src="<?php echo !empty($_SESSION['user_foto']) ? $_SESSION['user_foto'] : 'assets/img/user-default.png'; ?>" class="foto-perfil">
-            <div class="status-indicator"></div>
+            <img src="<?php echo $foto_admin; ?>" alt="Admin Profile" class="foto-perfil" style="border-color: #ff4242;"> 
+            <div class="status-indicator" style="background-color: #ff4242;"></div>
         </div>
-        
-        <h3 class="usuario-nome"><?php echo explode(' ', $_SESSION['user_nome'])[0]; ?></h3>
-        <span class="usuario-level">ADMIN</span>
+        <p class="usuario-nome"><?php echo $primeiro_nome_admin; ?></p>
+        <p class="usuario-level" style="color: #ff4242; background: rgba(255, 66, 66, 0.1);">Master Coach</p>
     </div>
 
     <nav class="nav-buttons">
-        <button data-pagina="dashboard" class="active" onclick="carregarConteudo('dashboard')">
+        <button data-pagina="dashboard" class="active">
             <i class="fa-solid fa-chart-pie"></i>
             <span>Visão Geral</span>
         </button>
-
-        <button data-pagina="alunos" onclick="carregarConteudo('alunos')">
+            
+        <button data-pagina="alunos">
             <i class="fa-solid fa-users"></i>
-            <span>Alunos</span>
+            <span>Gerenciar Alunos</span>
         </button>
-
-        <button data-pagina="treinos_editor" onclick="carregarConteudo('treinos_editor')">
+            
+        <button data-pagina="treinos_editor">
             <i class="fa-solid fa-dumbbell"></i>
-            <span>Treinos</span>
+            <span>Editor de Treinos</span>
         </button>
-
-        <button data-pagina="financeiro" onclick="carregarConteudo('financeiro')">
+            
+        <button data-pagina="financeiro">
             <i class="fa-solid fa-sack-dollar"></i>
             <span>Financeiro</span>
         </button>

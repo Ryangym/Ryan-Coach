@@ -179,24 +179,22 @@ switch ($pagina) {
     case 'alunos':
         require_once '../config/db_connect.php';
         
-        // Busca todos os alunos
-        $sql = "SELECT * FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC";
+        $sql = "SELECT * FROM usuarios WHERE nivel != 'master' ORDER BY nome ASC";
         $alunos = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $total_alunos = count($alunos);
 
         echo '
             <section id="gerenciar-alunos">
                 <header class="dash-header">
-                    <h1>GERENCIAR <span class="highlight-text">ALUNOS</span></h1>
-                    <p class="text-desc">Controle total da base de atletas ('.$total_alunos.')</p>
+                    <h1>GERENCIAR <span class="highlight-text">USUÁRIOS</span></h1>
+                    <p class="text-desc">Painel de controle dos atletas e administradores.</p>
                 </header>
                 
                 <div class="glass-card mt-large">
-                    
                     <div class="section-header-row">
                         <div style="flex: 1; position: relative; max-width: 400px;">
                             <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-                            <input type="text" id="searchAluno" onkeyup="filtrarAlunos()" placeholder="Buscar por nome ou email..." class="admin-input" style="padding-left: 40px;">
+                            <input type="text" id="searchAluno" onkeyup="filtrarAlunos()" placeholder="Buscar por nome..." class="admin-input" style="padding-left: 40px;">
                         </div>
                     </div>
 
@@ -204,28 +202,24 @@ switch ($pagina) {
                         <table class="admin-table" id="tabelaAlunos">
                             <thead>
                                 <tr>
-                                    <th>ALUNO</th>
-                                    <th>CONTATO</th>
-                                    <th>CADASTRO</th>
-                                    <th style="text-align: right;">AÇÕES</th>
+                                    <th>NOME</th>
+                                    <th>STATUS</th>
+                                    <th style="text-align: right;">AÇÃO</th>
                                 </tr>
                             </thead>
                             <tbody>';
                             
                             if ($total_alunos > 0) {
                                 foreach ($alunos as $a) {
-                                    $foto = !empty($a['foto']) ? $a['foto'] : 'assets/img/icones/user-default.png';
-                                    $data_cadastro = date('d/m/y', strtotime($a['data_cadastro']));
+                                    $foto = !empty($a['foto']) ? $a['foto'] : 'assets/img/user-default.png';
+                                    $nivelTag = ($a['nivel'] === 'admin') 
+                                        ? '<span class="status-badge" style="background:rgba(255,66,66,0.2); color:#ff4242; border:1px solid #ff4242;">ADMIN</span>' 
+                                        : '<span class="status-badge" style="background:rgba(0,255,0,0.1); color:#00ff00; border:1px solid #00ff00;">ALUNO</span>';
                                     
-                                    // Link do Zap limpo (remove caracteres não numéricos)
-                                    $zap_clean = preg_replace('/[^0-9]/', '', $a['telefone']);
-                                    $link_zap = "https://wa.me/55".$zap_clean;
-
-                                    // Dados para o Modal (Json no atributo data)
                                     $dados_json = htmlspecialchars(json_encode($a), ENT_QUOTES, 'UTF-8');
 
                                     echo '
-                                    <tr class="aluno-row">
+                                    <tr>
                                         <td>
                                             <div class="user-cell">
                                                 <img src="'.$foto.'" class="table-avatar" alt="Foto">
@@ -235,39 +229,16 @@ switch ($pagina) {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div style="display:flex; align-items:center; gap:10px;">
-                                                <span style="color:#ccc; font-size:0.9rem;">'.$a['telefone'].'</span>
-                                                <a href="'.$link_zap.'" target="_blank" class="btn-action-icon btn-confirm" title="Chamar no WhatsApp" style="width: 25px; height: 25px; font-size: 0.8rem;">
-                                                    <i class="fa-brands fa-whatsapp"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td style="color:#888;">'.$data_cadastro.'</td>
+                                        <td>'.$nivelTag.'</td>
                                         <td style="text-align: right;">
-                                            <div style="display:flex; gap:5px; justify-content:flex-end;">
-                                                
-                                                <button class="btn-action-icon" onclick="carregarConteudo(\'aluno_historico&id='.$a['id'].'\')" title="Ver Histórico de Treinos" style="border-color: #888; color: #ccc;">
-                                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                                </button>
-
-                                                <button class="btn-action-icon" onclick=\'openEditModal('.$dados_json.')\' title="Editar Dados">
-                                                    <i class="fa-solid fa-pen"></i>
-                                                </button>
-                                                
-                                                <a href="actions/admin_aluno.php?id='.$a['id'].'&acao=promover" class="btn-action-icon" style="border-color: var(--gold); color: var(--gold);" onclick="return confirm(\'ATENÇÃO: Tem certeza que deseja transformar este aluno em ADMINISTRADOR?\n\nEle terá acesso total ao sistema, incluindo financeiro.\')" title="Promover a Admin">
-                                                    <i class="fa-solid fa-user-shield"></i>
-                                                </a>
-
-                                                <a href="actions/admin_aluno.php?id='.$a['id'].'&acao=excluir" class="btn-action-icon btn-delete" onclick="return confirm(\'Tem certeza que deseja remover este aluno?\')" title="Remover Aluno">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </a>
-                                            </div>
+                                            <button class="btn-gold" style="padding: 8px 20px; font-size: 0.75rem;" onclick=\'abrirPainelAluno('.$dados_json.')\'>
+                                                <i class="fa-solid fa-gear"></i> GERENCIAR
+                                            </button>
                                         </td>
                                     </tr>';
                                 }
                             } else {
-                                echo '<tr><td colspan="4" style="text-align:center; padding:30px;">Nenhum aluno encontrado.</td></tr>';
+                                echo '<tr><td colspan="3" style="text-align:center; padding:30px;">Nenhum usuário encontrado.</td></tr>';
                             }
 
         echo '              </tbody>
@@ -276,25 +247,70 @@ switch ($pagina) {
                 </div>
             </section>
 
-            <div id="modalEditarAluno" class="modal-overlay">
+            <div id="modalGerenciarAluno" class="modal-overlay" style="display:none;">
+                <div class="modal-content" style="max-width: 500px;">
+                    <button class="modal-close" onclick="fecharPainelAluno()">&times;</button>
+                    
+                    <div style="text-align:center; margin-bottom:30px;">
+                        <img id="hub-foto" src="" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--gold); object-fit:cover; margin-bottom:10px;">
+                        <h3 id="hub-nome" style="color:#fff; margin:0; font-family:Orbitron;">Nome do Aluno</h3>
+                        <span id="hub-email" style="color:#888; font-size:0.9rem;">email@email.com</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        
+                        <div class="menu-card" onclick="hubAcao(\'historico\')" style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid #333;">
+                            <i class="fa-solid fa-dumbbell" style="font-size:1.5rem; color:var(--gold); margin-bottom:5px;"></i>
+                            <span style="display:block; font-size:0.8rem; color:#ccc;">Histórico de Treinos</span>
+                        </div>
+
+                        <div class="menu-card" onclick="hubAcao(\'avaliacao_lista\')" style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid #333;">
+                            <i class="fa-solid fa-ruler-combined" style="font-size:1.5rem; color:#00e676; margin-bottom:5px;"></i>
+                            <span style="display:block; font-size:0.8rem; color:#ccc;">Avaliações Físicas</span>
+                        </div>
+
+                        <div class="menu-card" onclick="hubAcao(\'dieta\')" style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid #333;">
+                            <i class="fa-solid fa-utensils" style="font-size:1.5rem; color:#ff4242; margin-bottom:5px;"></i>
+                            <span style="display:block; font-size:0.8rem; color:#ccc;">Plano Alimentar</span>
+                        </div>
+
+                        <div class="menu-card" onclick="hubAcao(\'editar\')" style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid #333;">
+                            <i class="fa-solid fa-user-pen" style="font-size:1.5rem; color:#fff; margin-bottom:5px;"></i>
+                            <span style="display:block; font-size:0.8rem; color:#ccc;">Editar Dados</span>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                        <button onclick="hubAcao(\'excluir\')" style="width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4242; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">
+                            <i class="fa-solid fa-trash"></i> EXCLUIR USUÁRIO
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modalEditarAluno" class="modal-overlay" style="display:none;">
                 <div class="modal-content">
                     <button class="modal-close" onclick="closeEditModal()">&times;</button>
-                    
                     <h3 class="section-title" style="color: var(--gold); margin-bottom: 20px; text-align: center;">
-                        <i class="fa-solid fa-user-pen"></i> Editar Aluno
+                        <i class="fa-solid fa-user-pen"></i> Editar Dados
                     </h3>
-                    
                     <form action="actions/admin_aluno.php" method="POST">
                         <input type="hidden" name="acao" value="editar">
                         <input type="hidden" name="id" id="edit_id">
-
                         <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 1;">
                                 <label style="color:#ccc; font-size: 0.8rem;">Nome Completo</label>
                                 <input type="text" name="nome" id="edit_nome" class="admin-input" required>
                             </div>
                         </div>
-
+                        <div style="margin-bottom: 15px;">
+                            <label style="color:var(--gold); font-size: 0.8rem; font-weight:bold;">Tipo de Usuário (Permissão)</label>
+                            <select name="nivel" id="edit_nivel" class="admin-input" style="border-color:var(--gold);">
+                                <option value="aluno">Aluno (Padrão)</option>
+                                <option value="admin">Administrador (Acesso Total)</option>
+                            </select>
+                        </div>
                         <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 1;">
                                 <label style="color:#ccc; font-size: 0.8rem;">Email</label>
@@ -305,27 +321,293 @@ switch ($pagina) {
                                 <input type="text" name="telefone" id="edit_telefone" class="admin-input">
                             </div>
                         </div>
-
                         <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 1;">
-                                <label style="color:#FFBA42; font-size: 0.8rem;">Vencimento do Plano (Acesso)</label>
+                                <label style="color:#ccc; font-size: 0.8rem;">Vencimento do Plano</label>
                                 <input type="date" name="data_expiracao" id="edit_expiracao" class="admin-input">
-                                <p style="font-size:0.7rem; color:#666; margin-top:5px;">Se passar desta data, o aluno perde o acesso.</p>
                             </div>
                         </div>
-
                         <div style="margin-bottom: 20px;">
-                            <label style="color:#ff4242; font-size: 0.8rem;">Redefinir Senha (Opcional)</label>
-                            <input type="text" name="nova_senha" class="admin-input" placeholder="Deixe vazio para não alterar">
-                            <p style="font-size:0.7rem; color:#666; margin-top:5px;">Se preencher, a senha do aluno será trocada.</p>
+                            <label style="color:#ff4242; font-size: 0.8rem;">Redefinir Senha</label>
+                            <input type="text" name="nova_senha" class="admin-input" placeholder="Deixe vazio para manter">
                         </div>
-
                         <button type="submit" class="btn-gold" style="width: 100%; padding: 15px;">SALVAR ALTERAÇÕES</button>
                     </form>
                 </div>
             </div>
 
         ';
+        break;
+
+    // --- NOVA TELA: LISTA DE AVALIAÇÕES DO ALUNO (Visão Admin) ---
+    case 'aluno_avaliacoes':
+        require_once '../config/db_connect.php';
+        $aluno_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        if (!$aluno_id) { echo "ID inválido"; break; }
+
+        // Dados do Aluno para o Cabeçalho
+        $stmt_u = $pdo->prepare("SELECT nome, foto FROM usuarios WHERE id = ?");
+        $stmt_u->execute([$aluno_id]);
+        $aluno = $stmt_u->fetch(PDO::FETCH_ASSOC);
+
+        // Lista de Avaliações
+        $sql = "SELECT * FROM avaliacoes WHERE aluno_id = ? ORDER BY data_avaliacao DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$aluno_id]);
+        $avaliacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Helpers de Medidas (Cópia do Usuário)
+        $renderMeasure = function($label, $val) {
+            if(!$val) return '';
+            return '<div class="m-box"><span>'.$label.'</span><strong>'.$val.'</strong></div>';
+        };
+        $renderMeasureDouble = function($label, $val1, $val2) {
+            if(!$val1 && !$val2) return '';
+            return '<div class="m-box-double"><span>'.$label.'</span><div class="vals"><strong>'.($val1?:'-').'</strong><small>/</small><strong>'.($val2?:'-').'</strong></div></div>';
+        };
+
+        echo '<section id="aluno-avaliacoes">
+                
+                <header class="dash-header">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                        <button onclick="carregarConteudo(\'alunos\')" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-arrow-left"></i></button>
+                        <img src="'.($aluno['foto'] ?: 'assets/img/user-default.png').'" style="width:40px; height:40px; border-radius:50%; border:1px solid var(--gold);">
+                        <div>
+                            <h1 style="font-size:1.5rem; margin:0;">AVALIAÇÕES</h1>
+                            <span style="color:#888; font-size:0.8rem;">Atleta: '.$aluno['nome'].'</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="glass-card">
+                    <div class="section-header-row" style="margin-bottom:20px;">
+                        <button class="btn-gold" style="background:transparent; border:1px solid var(--gold); color:var(--gold);" onclick="carregarConteudo(\'aluno_progresso&id='.$aluno_id.'\')">
+                            <i class="fa-solid fa-chart-line"></i> PROGRESSO
+                        </button>
+                        
+                        <button class="btn-gold" onclick="abrirModalAvaliacao('.$aluno_id.')">
+                            <i class="fa-solid fa-plus"></i> NOVA AVALIAÇÃO
+                        </button>
+                    </div>';
+
+        if (empty($avaliacoes)) {
+            echo '<p style="text-align:center; color:#666; padding:40px;">Nenhuma avaliação registrada.</p>';
+        } else {
+            echo '<div class="eval-timeline-wrapper">';
+            foreach ($avaliacoes as $av) {
+                // Arquivos
+                $stmt_arq = $pdo->prepare("SELECT * FROM avaliacoes_arquivos WHERE avaliacao_id = ?");
+                $stmt_arq->execute([$av['id']]);
+                $arquivos = $stmt_arq->fetchAll(PDO::FETCH_ASSOC);
+
+                $dia = date('d', strtotime($av['data_avaliacao']));
+                $mes = date('M', strtotime($av['data_avaliacao']));
+                $card_id = 'eval_card_' . $av['id'];
+
+                echo '<div class="accordion-card" id="'.$card_id.'">
+                        <div class="accordion-header" onclick="toggleAccordion(\''.$card_id.'\')">
+                            <div class="date-badge"><span class="d-day">'.$dia.'</span><span class="d-month">'.$mes.'</span></div>
+                            <div class="header-info">
+                                <div class="info-main">
+                                    <span class="weight-display">'.($av['peso_kg'] * 1).' <small>kg</small></span>
+                                    '.($av['percentual_gordura'] ? '<span class="bf-tag">BF '.($av['percentual_gordura']*1).'%</span>' : '').'
+                                </div>
+                                <span class="info-sub">'.count($arquivos).' mídias anexadas</span>
+                            </div>
+                            <div class="accordion-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                        </div>
+
+                        <div class="accordion-body" style="display: none;">
+                            <div class="body-padding">
+                                <div class="stats-tiles">
+                                    <div class="tile"><small>IMC</small><strong>'.($av['imc'] ?: '-').'</strong></div>
+                                    <div class="tile"><small>M. MAGRA</small><strong>'.($av['massa_magra_kg'] ? $av['massa_magra_kg'].'kg' : '-').'</strong></div>
+                                    <div class="tile"><small>M. GORDA</small><strong>'.($av['massa_gorda_kg'] ? $av['massa_gorda_kg'].'kg' : '-').'</strong></div>
+                                </div>';
+                                
+                                if (!empty($arquivos)) {
+                                    echo '<div class="gallery-strip"><div class="strip-scroll">';
+                                    foreach ($arquivos as $arq) {
+                                        if ($arq['tipo'] == 'foto') echo '<div class="strip-item"><img src="assets/uploads/'.$arq['caminho_ou_url'].'" onclick="window.open(this.src)"></div>';
+                                        else echo '<a href="'.$arq['caminho_ou_url'].'" target="_blank" class="strip-item video-item"><i class="fa-solid fa-play"></i></a>';
+                                    }
+                                    echo '</div></div>';
+                                }
+
+                                echo '<div class="measures-container">
+                                        <div class="m-group">
+                                            <span class="mg-label">TRONCO</span>
+                                            <div class="mg-grid">
+                                                '.$renderMeasure('Ombros', $av['ombro']).'
+                                                '.$renderMeasure('Tórax', $av['torax_relaxado']).'
+                                                '.$renderMeasure('Cintura', $av['cintura']).'
+                                                '.$renderMeasure('Abdômen', $av['abdomen']).'
+                                                '.$renderMeasure('Quadril', $av['quadril']).'
+                                            </div>
+                                        </div>
+                                        <div class="m-group">
+                                            <span class="mg-label">MEMBROS</span>
+                                            <div class="mg-grid-wide">
+                                                '.$renderMeasureDouble('Braço (Rel)', $av['braco_dir_relaxado'], $av['braco_esq_relaxado']).'
+                                                '.$renderMeasureDouble('Braço (Con)', $av['braco_dir_contraido'], $av['braco_esq_contraido']).'
+                                                '.$renderMeasureDouble('Coxa', $av['coxa_dir'], $av['coxa_esq']).'
+                                                '.$renderMeasureDouble('Panturrilha', $av['panturrilha_dir'], $av['panturrilha_esq']).'
+                                            </div>
+                                        </div>
+                                      </div>';
+                                
+                                if($av['observacoes']) echo '<div class="obs-box"><i class="fa-solid fa-quote-left"></i> '.$av['observacoes'].'</div>';
+
+                                // Botão de Excluir (Admin tem poder)
+                                echo '<div class="card-footer-actions" style="margin-top:30px; text-align:center; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                                        <a href="actions/avaliacao_delete.php?id='.$av['id'].'" class="btn-danger-outline" onclick="return confirm(\'Apagar avaliação permanentemente?\');">
+                                            <i class="fa-solid fa-trash-can"></i> Excluir Avaliação
+                                        </a>
+                                      </div>';
+
+                echo '      </div>
+                        </div>
+                      </div>';
+            }
+            echo '</div>';
+        }
+        echo '</div></section>';
+        break;
+
+    // --- NOVA TELA: PROGRESSO DO ALUNO (GRÁFICOS) ---
+    case 'aluno_progresso':
+        require_once '../config/db_connect.php';
+        $aluno_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+        
+        // Busca Nome
+        $stmt_u = $pdo->prepare("SELECT nome FROM usuarios WHERE id = ?");
+        $stmt_u->execute([$aluno_id]);
+        $nome_aluno = $stmt_u->fetchColumn();
+
+        // 1. DADOS CRONOLÓGICOS (Chart)
+        $sql = "SELECT * FROM avaliacoes WHERE aluno_id = ? ORDER BY data_avaliacao ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$aluno_id]);
+        $historico = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $json_data = ['labels' => [], 'peso' => [], 'bf' => [], 'magra' => []];
+        foreach ($historico as $h) {
+            if ($h['peso_kg'] > 0) {
+                $json_data['labels'][] = date('d/m/y', strtotime($h['data_avaliacao']));
+                $json_data['peso'][] = (float)$h['peso_kg'];
+                $json_data['bf'][] = (float)$h['percentual_gordura'];
+                $json_data['magra'][] = (float)$h['massa_magra_kg'];
+            }
+        }
+        $chart_config = htmlspecialchars(json_encode($json_data), ENT_QUOTES, 'UTF-8');
+        
+        // 2. DADOS REVERSOS (Tabela)
+        $historico_reverso = array_reverse($historico);
+        
+        $renderVal = function($historico_reverso, $idx, $key, $inverse = false) {
+            $val = $historico_reverso[$idx][$key] ?? null;
+            if (!$val) return '-';
+            $prev = $historico_reverso[$idx + 1][$key] ?? null;
+            $html = '<strong>'.$val.'</strong>';
+            if ($prev) {
+                $diff = $val - $prev;
+                if ($diff != 0) {
+                    $isGood = $inverse ? ($diff < 0) : ($diff > 0);
+                    $color = $isGood ? '#00e676' : '#ff1744';
+                    $html .= ' <small style="color:'.$color.'; font-size:0.7em;">'.($diff>0?'+':'').number_format($diff, 1).'</small>';
+                }
+            }
+            return $html;
+        };
+
+        echo '<section id="aluno-progresso" class="fade-in">
+                <input type="hidden" id="chart-master-data" value="'.$chart_config.'">
+                
+                <header class="dash-header">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <button onclick="carregarConteudo(\'aluno_avaliacoes&id='.$aluno_id.'\')" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-arrow-left"></i></button>
+                        <div>
+                            <h1 style="font-size:1.5rem; margin:0;">ANÁLISE</h1>
+                            <span style="color:#888; font-size:0.8rem;">Evolução de '.$nome_aluno.'</span>
+                        </div>
+                    </div>
+                </header>';
+
+        if (count($historico) < 2) {
+            echo '<div class="glass-card" style="text-align:center; padding:40px; color:#666;">
+                    <i class="fa-solid fa-chart-line" style="font-size:2rem; margin-bottom:10px;"></i>
+                    <p>Dados insuficientes para gerar gráficos. Cadastre pelo menos 2 avaliações.</p>
+                  </div>';
+        } else {
+            echo '<div class="chart-master-container mb-large">
+                    <div class="chart-controls">
+                        <button class="chart-btn active" onclick="switchChart(\'peso\', this)">Peso</button>
+                        <button class="chart-btn" onclick="switchChart(\'bf\', this)">% Gordura</button>
+                        <button class="chart-btn" onclick="switchChart(\'magra\', this)">M. Magra</button>
+                    </div>
+                    <div class="canvas-wrapper-master" style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="masterChart"></canvas>
+                    </div>
+                    <img src="" onerror="setTimeout(initMasterChart, 300)" style="display:none;">
+                  </div>
+
+                  <div class="comparison-section">
+                    <div class="comp-tabs">
+                        <button class="tab-pill active" onclick="switchTable(\'tronco\', this)">Tronco</button>
+                        <button class="tab-pill" onclick="switchTable(\'bracos\', this)">Braços</button>
+                        <button class="tab-pill" onclick="switchTable(\'pernas\', this)">Pernas</button>
+                    </div>
+
+                    <div id="tab-tronco" class="table-container active">
+                        <table class="comp-table">
+                            <thead><tr><th>DATA</th><th>Ombro</th><th>Tórax</th><th>Cintura</th><th>Abdômen</th></tr></thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'ombro').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'torax_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'cintura', true).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'abdomen', true).'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody></table>
+                    </div>
+
+                    <div id="tab-bracos" class="table-container" style="display:none;">
+                        <table class="comp-table">
+                            <thead><tr><th>DATA</th><th>B. Dir (R)</th><th>B. Esq (R)</th><th>B. Dir (C)</th><th>B. Esq (C)</th></tr></thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_dir_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_esq_relaxado').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_dir_contraido').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'braco_esq_contraido').'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody></table>
+                    </div>
+
+                    <div id="tab-pernas" class="table-container" style="display:none;">
+                        <table class="comp-table">
+                            <thead><tr><th>DATA</th><th>Coxa Dir</th><th>Coxa Esq</th><th>Pant. Dir</th><th>Pant. Esq</th></tr></thead>
+                            <tbody>';
+                            foreach($historico_reverso as $i => $h) {
+                                echo '<tr>
+                                        <td class="fixed-col">'.date('d/m/y', strtotime($h['data_avaliacao'])).'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'coxa_dir').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'coxa_esq').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'panturrilha_dir').'</td>
+                                        <td>'.$renderVal($historico_reverso, $i, 'panturrilha_esq').'</td>
+                                      </tr>';
+                            }
+            echo '          </tbody></table>
+                    </div>
+                  </div>';
+        }
+        echo '</section>';
         break;
 
     case 'aluno_historico':
@@ -471,15 +753,14 @@ switch ($pagina) {
         require_once '../config/db_connect.php';
         
         // 1. LISTAR TREINOS EXISTENTES
-        // Busca treinos com nome do aluno
         $sql_list = "SELECT t.*, u.nome as nome_aluno, u.foto as foto_aluno 
                      FROM treinos t 
                      JOIN usuarios u ON t.aluno_id = u.id 
                      ORDER BY t.criado_em DESC";
         $treinos = $pdo->query($sql_list)->fetchAll(PDO::FETCH_ASSOC);
 
-        // 2. LISTA DE ALUNOS (Para o Form de Cadastro)
-        $alunos = $pdo->query("SELECT id, nome FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
+        // 2. LISTA DE ALUNOS (Para o Dropdown)
+        $alunos = $pdo->query("SELECT id, nome, foto FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 
         echo '
             <section id="editor-treinos">
@@ -497,7 +778,7 @@ switch ($pagina) {
                     </div>
 
                     <div class="table-responsive">
-                        <table class="admin-table">
+                        <table class="admin-table responsive-table">
                             <thead>
                                 <tr>
                                     <th>ALUNO</th>
@@ -515,21 +796,29 @@ switch ($pagina) {
                                     $inicio = date('d/m', strtotime($t['data_inicio']));
                                     $fim = date('d/m', strtotime($t['data_fim']));
                                     
-                                    // Badge de Nível
                                     $corBadge = ($t['nivel_plano'] == 'basico') ? '#ccc' : (($t['nivel_plano'] == 'avancado') ? '#FFBA42' : '#ff4242');
                                     
                                     echo '
                                     <tr>
-                                        <td>
+                                        <td data-label="Aluno">
                                             <div class="user-cell">
                                                 <img src="'.$foto.'" class="table-avatar" alt="Foto">
                                                 <span>'.$t['nome_aluno'].'</span>
                                             </div>
                                         </td>
-                                        <td><strong style="color:#fff;">'.$t['nome'].'</strong><br><span style="font-size:0.8rem; color:#666;">Divisão '.$t['divisao_nome'].'</span></td>
-                                        <td><span class="status-badge" style="color:'.$corBadge.'; border-color:'.$corBadge.'; background:transparent;">'.strtoupper($t['nivel_plano']).'</span></td>
-                                        <td style="color:#888;">'.$inicio.' a '.$fim.'</td>
-                                        <td style="text-align:right;">
+                                        
+                                        <td data-label="Treino">
+                                            <strong style="color:#fff;">'.$t['nome'].'</strong><br>
+                                            <span style="font-size:0.8rem; color:#666;">Divisão '.$t['divisao_nome'].'</span>
+                                        </td>
+                                        
+                                        <td data-label="Tipo">
+                                            <span class="status-badge" style="color:'.$corBadge.'; border-color:'.$corBadge.'; background:transparent;">'.strtoupper($t['nivel_plano']).'</span>
+                                        </td>
+                                        
+                                        <td data-label="Vigência" style="color:#888;">'.$inicio.' a '.$fim.'</td>
+                                        
+                                        <td data-label="Ação" class="actions" style="text-align:right;">
                                             <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
                                                 <a href="actions/treino_delete.php?id='.$t['id'].'" 
                                                 class="btn-action-icon btn-delete" 
@@ -554,77 +843,88 @@ switch ($pagina) {
                     </div>
                 </div>
 
-                <div class="glass-card mt-large" id="box-novo-treino" style="display:none; border: 1px solid var(--gold); margin-top: 30px;">
-                    <h3 class="section-title" style="color: var(--gold);"><i class="fa-solid fa-dumbbell"></i> Criar Nova Estrutura</h3>
-                    
-                    <form action="actions/treino_create.php" method="POST">
+                <div id="box-novo-treino" class="modal-overlay" style="display:none;">
+                    <div class="modal-content selection-modal" style="max-width: 650px; text-align: left; position: relative;">
                         
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="input-label">Selecione o Atleta</label>
-                                <select name="aluno_id" class="admin-input" required>
-                                    <option value="">Escolha...</option>';
-                                    foreach($alunos as $al) { echo '<option value="'.$al['id'].'">'.$al['nome'].'</option>'; }
-        echo '                  </select>
-                            </div>
-                            <div class="form-col">
-                                <label class="input-label">Nome do Planejamento</label>
-                                <input type="text" name="nome" class="admin-input" placeholder="Ex: Hipertrofia Fase 1" required>
-                            </div>
-                        </div>
+                        <button class="modal-close" onclick="toggleNovoTreino()">&times;</button>
 
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="input-label">Tipo de Plano</label>
-                                <select name="nivel" class="admin-input" id="selectNivel" onchange="togglePeriodizacao()" required>
-                                    <option value="basico">Básico (Ficha Fixa)</option>
-                                    <option value="avancado">Avançado (Periodizado)</option>
-                                    <option value="premium">Premium (Periodizado +)</option>
-                                </select>
-                            </div>
-                            <div class="form-col">
-                                <label class="input-label">Data de Início</label>
-                                <input type="date" name="data_inicio" class="admin-input" required value="'.date('Y-m-d').'">
-                            </div>
-                            <div class="form-col" style="flex: 0 0 150px;">
-                                <label class="input-label">Divisão</label>
-                                <input type="text" name="divisao" class="admin-input" placeholder="Ex: ABC" maxlength="5" style="text-transform:uppercase;" required>
-                            </div>
-                        </div>
+                        <h3 class="section-title" style="color: var(--gold); margin-bottom: 25px; text-align: center;">
+                            <i class="fa-solid fa-dumbbell"></i> Criar Nova Estrutura
+                        </h3>
+                        
+                        <form action="actions/treino_create.php" method="POST">
+                            
+                            <div class="form-row">
+                                <div class="form-col" style="position: relative;">
+                                    <label class="input-label">Selecione o Atleta</label>
+                                    <input type="text" id="busca-aluno-treino" class="admin-input" placeholder="Digite para buscar..." autocomplete="off" onkeyup="filtrarAlunosTreino()">
+                                    <input type="hidden" name="aluno_id" id="id-aluno-treino-selecionado" required>
+                                    <div id="dropdown-alunos-treino" class="custom-dropdown-list" style="display:none;">';
+                                        foreach($alunos as $al) {
+                                            $ft = !empty($al['foto']) ? $al['foto'] : 'assets/img/icones/user-default.png';
+                                            echo '<div class="dropdown-item" onclick="selecionarAlunoTreino('.$al['id'].', \''.$al['nome'].'\')">
+                                                    <img src="'.$ft.'">
+                                                    <span>'.$al['nome'].'</span>
+                                                  </div>';
+                                        }
+            echo '                  </div>
+                                </div>
 
-                        <div style="margin-bottom: 30px;">
-                            <label class="input-label">Dias de Treino</label>
-                            <div class="days-selector">
-                                <label><input type="checkbox" name="dias_semana[]" value="1" class="day-checkbox"><span class="day-label">SEG</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="2" class="day-checkbox"><span class="day-label">TER</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="3" class="day-checkbox"><span class="day-label">QUA</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="4" class="day-checkbox"><span class="day-label">QUI</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="5" class="day-checkbox"><span class="day-label">SEX</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="6" class="day-checkbox"><span class="day-label">SÁB</span></label>
-                                <label><input type="checkbox" name="dias_semana[]" value="7" class="day-checkbox"><span class="day-label">DOM</span></label>
+                                <div class="form-col">
+                                    <label class="input-label">Nome do Planejamento</label>
+                                    <input type="text" name="nome" class="admin-input" placeholder="Ex: Hipertrofia Fase 1" required>
+                                </div>
                             </div>
-                        </div>
 
-                        <div id="aviso-periodizacao" class="alert-box">
-                            <span class="alert-title">Modo Periodização Ativo</span>
-                            <p class="alert-text">Serão gerados 12 Microciclos automaticamente.</p>
-                        </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label class="input-label">Tipo de Plano</label>
+                                    <select name="nivel" class="admin-input" id="selectNivel" onchange="togglePeriodizacao()" required>
+                                        <option value="basico">Básico (Ficha Fixa)</option>
+                                        <option value="avancado">Avançado (Periodizado)</option>
+                                        <option value="premium">Premium (Periodizado +)</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label class="input-label">Data de Início</label>
+                                    <input type="date" name="data_inicio" class="admin-input" required value="'.date('Y-m-d').'">
+                                </div>
+                                <div class="form-col" style="flex: 0 0 120px;">
+                                    <label class="input-label">Divisão</label>
+                                    <input type="text" name="divisao" class="admin-input" placeholder="ABC" maxlength="5" style="text-transform:uppercase;" required>
+                                </div>
+                            </div>
 
-                        <div style="text-align: right; margin-top: 20px;">
-                            <button type="button" class="btn-gold" style="background: transparent; border: 1px solid #555; color: #ccc; margin-right: 10px;" onclick="toggleNovoTreino()">Cancelar</button>
-                            <button type="submit" class="btn-gold">CRIAR ESTRUTURA</button>
-                        </div>
-                    </form>
+                            <div style="margin-bottom: 25px;">
+                                <label class="input-label">Dias de Treino</label>
+                                <div class="days-selector">
+                                    <label><input type="checkbox" name="dias_semana[]" value="1" class="day-checkbox"><span class="day-label">SEG</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="2" class="day-checkbox"><span class="day-label">TER</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="3" class="day-checkbox"><span class="day-label">QUA</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="4" class="day-checkbox"><span class="day-label">QUI</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="5" class="day-checkbox"><span class="day-label">SEX</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="6" class="day-checkbox"><span class="day-label">SÁB</span></label>
+                                    <label><input type="checkbox" name="dias_semana[]" value="7" class="day-checkbox"><span class="day-label">DOM</span></label>
+                                </div>
+                            </div>
+
+                            <div id="aviso-periodizacao" class="alert-box">
+                                <span class="alert-title">Modo Periodização Ativo</span>
+                                <p class="alert-text">Serão gerados 12 Microciclos automaticamente.</p>
+                            </div>
+
+                            <button type="submit" class="btn-gold" style="width:100%; margin-top: 15px; padding: 15px;">CRIAR ESTRUTURA</button>
+                        </form>
+                    </div>
                 </div>
             </section>
-
         ';
         break;
 
     case 'financeiro':
         require_once '../config/db_connect.php';
         
-        // 1. CÁLCULOS (Mantive igual)
+        // 1. CÁLCULOS (Corrigido para tabela 'pagamentos')
         $sql_fat = "SELECT SUM(valor) as total FROM pagamentos WHERE status = 'pago' AND MONTH(data_pagamento) = MONTH(CURRENT_DATE()) AND YEAR(data_pagamento) = YEAR(CURRENT_DATE())";
         $stmt_fat = $pdo->query($sql_fat);
         $faturamento = $stmt_fat->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
@@ -633,14 +933,14 @@ switch ($pagina) {
         $stmt_pend = $pdo->query($sql_pend);
         $pendente = $stmt_pend->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-        // 2. LISTA DE ALUNOS (Para o Select)
-        $alunos = $pdo->query("SELECT id, nome FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
+        // 2. LISTA DE ALUNOS (Para o Dropdown com Pesquisa)
+        $alunos = $pdo->query("SELECT id, nome, foto FROM usuarios WHERE nivel = 'aluno' ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. HISTÓRICO (Agora buscando a FOTO também)
+        // 3. HISTÓRICO (Corrigido para tabela 'pagamentos' e campo 'usuario_id')
         $sql_hist = "SELECT p.*, u.nome as nome_aluno, u.foto as foto_aluno 
                      FROM pagamentos p 
-                     JOIN usuarios u ON p.usuario_id = u.id 
-                     ORDER BY p.id DESC LIMIT 10";
+                     LEFT JOIN usuarios u ON p.usuario_id = u.id 
+                     ORDER BY p.id DESC LIMIT 20";
         $transacoes = $pdo->query($sql_hist)->fetchAll(PDO::FETCH_ASSOC);
 
         echo '
@@ -700,22 +1000,28 @@ switch ($pagina) {
                             if (count($transacoes) > 0) {
                                 foreach ($transacoes as $t) {
                                     $statusClass = ($t['status'] == 'pago') ? 'pago' : 'pendente';
-                                    $dataExibicao = date('d/m/Y', strtotime($t['data_vencimento']));
                                     
-                                    $fotoUser = !empty($t['foto_aluno']) ? $t['foto_aluno'] : 'assets/img/icones/user-default.png';
+                                    // Se for pendente usa vencimento, se for pago usa data_pagamento se existir
+                                    $dataShow = $t['data_vencimento'];
+                                    if($t['status'] == 'pago' && !empty($t['data_pagamento'])) {
+                                        $dataShow = $t['data_pagamento'];
+                                    }
+                                    $dataExibicao = date('d/m/Y', strtotime($dataShow));
                                     
-                                    // Botões de Ação
-                                    $btns = '<div style="display:flex; gap:15px; justify-content:flex-end;">';
+                                    $fotoUser = !empty($t['foto_aluno']) ? $t['foto_aluno'] : 'assets/img/user-default.png';
                                     
-                                    // 1. Botão Pagar/Estornar
+                                    // BOTÕES DE AÇÃO (Restaurados)
+                                    $btns = '<div style="display:flex; gap:10px; justify-content:flex-end;">';
+                                    
+                                    // 1. Pagar/Estornar
                                     if ($t['status'] == 'pendente') {
                                         $btns .= '<a href="actions/financeiro_status.php?id='.$t['id'].'&acao=pagar" class="btn-action-icon btn-confirm" title="Confirmar Pagamento"><i class="fa-solid fa-check"></i></a>';
                                     } else {
                                         $btns .= '<a href="actions/financeiro_status.php?id='.$t['id'].'&acao=estornar" class="btn-action-icon btn-undo" title="Desfazer/Estornar"><i class="fa-solid fa-rotate-left"></i></a>';
                                     }
 
-                                    // 2. Botão Excluir (NOVO)
-                                    $btns .= '<a href="actions/financeiro_status.php?id='.$t['id'].'&acao=excluir" class="btn-action-icon btn-delete" title="Excluir Registro" onclick="return confirm(\'Tem certeza que deseja excluir este lançamento? Isso não pode ser desfeito.\')"><i class="fa-solid fa-trash"></i></a>';
+                                    // 2. Excluir (RESTAURADO)
+                                    $btns .= '<a href="actions/financeiro_status.php?id='.$t['id'].'&acao=excluir" class="btn-action-icon btn-delete" title="Excluir Registro" onclick="return confirm(\'Tem certeza que deseja excluir este lançamento permanentemente?\')"><i class="fa-solid fa-trash"></i></a>';
                                     
                                     $btns .= '</div>';
 
@@ -724,7 +1030,7 @@ switch ($pagina) {
                                         <td>
                                             <div class="user-cell">
                                                 <img src="'.$fotoUser.'" class="table-avatar" alt="Foto">
-                                                <span>'.$t['nome_aluno'].'</span>
+                                                <span>'.($t['nome_aluno'] ?: 'Avulso').'</span>
                                             </div>
                                         </td>
                                         <td>'.$t['descricao'].'</td>
@@ -744,7 +1050,7 @@ switch ($pagina) {
                 </div>
             </section>
 
-            <div id="modalLancamento" class="modal-overlay">
+            <div id="modalLancamento" class="modal-overlay" style="display:none;">
                 <div class="modal-content">
                     <button class="modal-close" onclick="closeModal()">&times;</button>
                     
@@ -753,16 +1059,24 @@ switch ($pagina) {
                     </h3>
                     
                     <form action="actions/financeiro_add.php" method="POST">
-                        <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                            <div style="flex: 1;">
-                                <label style="color:#ccc; font-size: 0.8rem;">Aluno</label>
-                                <select name="usuario_id" class="admin-input" required>
-                                    <option value="">Selecione o aluno...</option>';
-                                    foreach($alunos as $aluno) {
-                                        echo '<option value="'.$aluno['id'].'">'.$aluno['nome'].'</option>';
-                                    }
-        echo '                  </select>
-                            </div>
+                        
+                        <div style="margin-bottom: 15px; position: relative;">
+                            <label style="color:#ccc; font-size: 0.8rem;">Aluno</label>
+                            
+                            <input type="text" id="busca-aluno-input" class="admin-input" placeholder="Digite o nome para buscar..." autocomplete="off" onkeyup="filtrarAlunosFinanceiro()">
+                            
+                            <input type="hidden" name="usuario_id" id="id-aluno-selecionado" required>
+
+                            <div id="dropdown-alunos" class="custom-dropdown-list" style="display:none;">';
+                                foreach($alunos as $al) {
+                                    $ft = !empty($al['foto']) ? $al['foto'] : 'assets/img/user-default.png';
+                                    // O JS vai ler o nome dentro do span
+                                    echo '<div class="dropdown-item" onclick="selecionarAlunoFinanceiro('.$al['id'].', \''.$al['nome'].'\')">
+                                            <img src="'.$ft.'">
+                                            <span>'.$al['nome'].'</span>
+                                          </div>';
+                                }
+        echo '              </div>
                         </div>
 
                         <div class="row-flex" style="display: flex; gap: 15px; margin-bottom: 15px;">
@@ -784,8 +1098,8 @@ switch ($pagina) {
                             <div style="flex: 1;">
                                 <label style="color:#ccc; font-size: 0.8rem;">Status</label>
                                 <select name="status" class="admin-input">
-                                    <option value="pago">Pago (Entrada)</option>
-                                    <option value="pendente">Pendente (Aguardando)</option>
+                                    <option value="pago">Pago (Recebido)</option>
+                                    <option value="pendente">Pendente (A receber)</option>
                                 </select>
                             </div>
                         </div>
@@ -794,7 +1108,6 @@ switch ($pagina) {
                     </form>
                 </div>
             </div>
-
         ';
         break;
     
@@ -1158,6 +1471,79 @@ switch ($pagina) {
                 </div>
             </section>
         ';
+        break;
+
+    // --- NOVO MENU GERAL ADMIN ---
+    case 'admin_menu':
+        require_once '../config/db_connect.php';
+        $user_id = $_SESSION['user_id'];
+        
+        $stmt = $pdo->prepare("SELECT nome, email, foto FROM usuarios WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        $foto = $admin['foto'] ? $admin['foto'] : 'assets/img/user-default.png';
+
+        echo '<section id="admin-hub" class="fade-in">
+                
+                <div class="menu-profile-header" onclick="carregarConteudo(\'perfil\')" style="background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); margin-bottom: 25px; padding: 20px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="'.$foto.'" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold);">
+                        <div>
+                            <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">'.$admin['nome'].'</h3>
+                            <span style="color: var(--gold); font-size: 0.8rem; font-weight: bold;">ADMINISTRADOR</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #666;"></i>
+                </div>
+
+                <h3 class="section-label" style="margin-left: 10px; color: #666; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px;">FERRAMENTAS</h3>
+                
+                <div class="menu-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                    
+                    <div class="menu-card" onclick="carregarConteudo(\'alunos\')" style="background: #161616; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333;">
+                        <i class="fa-solid fa-users" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px; display: block;"></i>
+                        <span style="color: #ccc; font-size: 0.9rem;">Gerenciar Alunos</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'treinos_editor\')" style="background: #161616; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333;">
+                        <i class="fa-solid fa-dumbbell" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px; display: block;"></i>
+                        <span style="color: #ccc; font-size: 0.9rem;">Editor de Treinos</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'financeiro\')" style="background: #161616; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333;">
+                        <i class="fa-solid fa-sack-dollar" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px; display: block;"></i>
+                        <span style="color: #ccc; font-size: 0.9rem;">Fluxo de Caixa</span>
+                    </div>
+
+                    <div class="menu-card" onclick="carregarConteudo(\'perfil\')" style="background: #161616; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333;">
+                        <i class="fa-solid fa-gear" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px; display: block;"></i>
+                        <span style="color: #ccc; font-size: 0.9rem;">Configurações</span>
+                    </div>
+
+                </div>
+
+                <h3 class="section-label" style="margin-left: 10px; color: #666; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px;">SISTEMA</h3>
+                
+                <div class="settings-list" style="background: #161616; border-radius: 16px; border: 1px solid #333;">
+                    
+                    <div class="setting-item" onclick="window.location.href=\'index.php\'" style="padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; cursor: pointer;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <i class="fa-solid fa-globe" style="color: #888;"></i>
+                            <span style="color: #fff;">Ver Site Principal</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square" style="color: #444; font-size: 0.8rem;"></i>
+                    </div>
+
+                    <div class="setting-item" onclick="window.location.href=\'actions/logout.php\'" style="padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <i class="fa-solid fa-right-from-bracket" style="color: #ff4242;"></i>
+                            <span style="color: #ff4242;">Sair do Sistema</span>
+                        </div>
+                    </div>
+
+                </div>
+
+              </section>';
         break;
 
     default:

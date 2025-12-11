@@ -120,28 +120,164 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
         }
 
         // ---------------------------------------------------------------
+        // 1. Gerenciamento DE ALUNOS 
+        // ---------------------------------------------------------------
+ // Variável global para guardar o aluno selecionado atualmente
+                let alunoAtual = null;
+
+                function abrirPainelAluno(aluno) {
+                    alunoAtual = aluno; // Salva o obj aluno para usar nos botões
+                    
+                    // Preenche o Hub
+                    document.getElementById("hub-nome").innerText = aluno.nome;
+                    document.getElementById("hub-email").innerText = aluno.email;
+                    document.getElementById("hub-foto").src = aluno.foto || "assets/img/user-default.png";
+                    
+                    document.getElementById("modalGerenciarAluno").style.display = "flex";
+                }
+
+                function fecharPainelAluno() {
+                    document.getElementById("modalGerenciarAluno").style.display = "none";
+                }
+
+                // Roteador de Ações do Hub
+                function hubAcao(acao) {
+                    if(!alunoAtual) return;
+
+                    if (acao === "historico") {
+                        // Fecha modal e vai pro histórico
+                        fecharPainelAluno();
+                        carregarConteudo("aluno_historico&id=" + alunoAtual.id);
+                    }
+                    else if (acao === "avaliacao") {
+                        // Fecha o Hub e abre o modal de avaliação JÁ EXISTENTE
+                        fecharPainelAluno();
+                        // Chama a função global que já existe no admin.php
+                        if(typeof abrirModalAvaliacao === "function") {
+                            abrirModalAvaliacao(alunoAtual.id);
+                        } else {
+                            alert("Erro: Função de avaliação não encontrada.");
+                        }
+                    }
+                    else if (acao === "dieta") {
+                        alert("Módulo de Dieta em desenvolvimento.");
+                        // Futuro: carregarConteudo("dieta_editor&id=" + alunoAtual.id);
+                    }
+                    else if (acao === "editar") {
+                        // Fecha Hub e abre Editar (Preenche os dados)
+                        fecharPainelAluno();
+                        preencherModalEditar(alunoAtual);
+                    }
+                    else if (acao === "excluir") {
+                        if(confirm("Tem certeza que deseja apagar o usuário " + alunoAtual.nome + "?")) {
+                            window.location.href = "actions/admin_aluno.php?id=" + alunoAtual.id + "&acao=excluir";
+                        }
+                    }
+                }
+
+                // Função auxiliar para preencher o modal de edição
+                function preencherModalEditar(aluno) {
+                    document.getElementById("edit_id").value = aluno.id;
+                    document.getElementById("edit_nome").value = aluno.nome;
+                    document.getElementById("edit_email").value = aluno.email;
+                    document.getElementById("edit_telefone").value = aluno.telefone;
+                    document.getElementById("edit_expiracao").value = aluno.data_expiracao || "";
+                    document.getElementById("edit_nivel").value = aluno.nivel || "aluno"; // Preenche o Select
+                    
+                    document.getElementById("modalEditarAluno").style.display = "flex";
+                }
+
+                function closeEditModal() {
+                    document.getElementById("modalEditarAluno").style.display = "none";
+                    // Reabre o Hub para não perder o fluxo? Opcional.
+                    // abrirPainelAluno(alunoAtual); 
+                }       
+
+
+
+        // ---------------------------------------------------------------
         // 2. FINANCEIRO (MODAL)
         // ---------------------------------------------------------------
+        // Abre Modal
         function openModal() {
-            document.getElementById("modalLancamento").style.display = "flex";
+            document.getElementById('modalLancamento').style.display = 'flex';
         }
+
+        // Fecha Modal
         function closeModal() {
-            document.getElementById("modalLancamento").style.display = "none";
+            document.getElementById('modalLancamento').style.display = 'none';
         }
+
+        // Filtra a lista enquanto digita
+        function filtrarAlunosFinanceiro() {
+            let input = document.getElementById("busca-aluno-input");
+            let filter = input.value.toUpperCase();
+            let dropdown = document.getElementById("dropdown-alunos");
+            let items = dropdown.getElementsByClassName("dropdown-item");
+            
+            // Se estiver vazio, esconde a lista
+            if (filter === "") {
+                dropdown.style.display = "none";
+                return;
+            }
+            
+            dropdown.style.display = "block";
+            let encontrou = false;
+
+            for (let i = 0; i < items.length; i++) {
+                let span = items[i].getElementsByTagName("span")[0];
+                let txtValue = span.textContent || span.innerText;
+                
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    items[i].style.display = ""; // Mostra
+                    encontrou = true;
+                } else {
+                    items[i].style.display = "none"; // Esconde
+                }
+            }
+
+            // Se não achou ninguém, esconde a lista
+            if (!encontrou) dropdown.style.display = "none";
+        }
+
+        // Seleciona o aluno e preenche o input oculto
+        function selecionarAlunoFinanceiro(id, nome) {
+            document.getElementById("busca-aluno-input").value = nome; // Mostra nome visualmente
+            document.getElementById("id-aluno-selecionado").value = id; // Define ID para o PHP
+            document.getElementById("dropdown-alunos").style.display = "none"; // Fecha lista
+        }
+
+        // Fecha a lista se clicar fora dela
+        window.addEventListener('click', function(e) {
+            let dropdown = document.getElementById("dropdown-alunos");
+            let input = document.getElementById("busca-aluno-input");
+            if (dropdown && e.target !== input && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
 
 
         // ---------------------------------------------------------------
         // 3. EDITOR DE TREINOS (CRIAÇÃO)
         // ---------------------------------------------------------------
+
         function toggleNovoTreino() {
-            var box = document.getElementById("box-novo-treino");
-            if (box.style.display === "none") {
-                box.style.display = "block";
-                box.scrollIntoView({behavior: "smooth"});
+            const modal = document.getElementById('box-novo-treino');
+            
+            if (modal.style.display === 'none' || modal.style.display === '') {
+                modal.style.display = 'flex'; // FLEX é essencial para centralizar
             } else {
-                box.style.display = "none";
+                modal.style.display = 'none';
             }
         }
+
+        // Fecha se clicar fora do modal (fundo escuro)
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('box-novo-treino');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
 
         function togglePeriodizacao() {
             var nivel = document.getElementById("selectNivel").value;
@@ -149,6 +285,54 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
             if (nivel === "basico") { aviso.style.display = "none"; } 
             else { aviso.style.display = "block"; }
         }
+        // --- LÓGICA DO SELETOR DE ALUNOS (CRIAR TREINO) ---
+
+        // Filtra a lista
+        function filtrarAlunosTreino() {
+            let input = document.getElementById("busca-aluno-treino");
+            let filter = input.value.toUpperCase();
+            let dropdown = document.getElementById("dropdown-alunos-treino");
+            let items = dropdown.getElementsByClassName("dropdown-item");
+            
+            if (filter === "") {
+                dropdown.style.display = "none";
+                return;
+            }
+            
+            dropdown.style.display = "block";
+            let encontrou = false;
+
+            for (let i = 0; i < items.length; i++) {
+                let span = items[i].getElementsByTagName("span")[0];
+                let txtValue = span.textContent || span.innerText;
+                
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    items[i].style.display = ""; // Mostra
+                    encontrou = true;
+                } else {
+                    items[i].style.display = "none"; // Esconde
+                }
+            }
+
+            if (!encontrou) dropdown.style.display = "none";
+        }
+
+        // Seleciona o aluno
+        function selecionarAlunoTreino(id, nome) {
+            document.getElementById("busca-aluno-treino").value = nome; // Mostra nome visual
+            document.getElementById("id-aluno-treino-selecionado").value = id; // Preenche ID oculto
+            document.getElementById("dropdown-alunos-treino").style.display = "none"; // Fecha lista
+        }
+
+        // Fecha a lista se clicar fora (Genérico para qualquer dropdown)
+        window.addEventListener('click', function(e) {
+            // Dropdown Treino
+            let dropTreino = document.getElementById("dropdown-alunos-treino");
+            let inputTreino = document.getElementById("busca-aluno-treino");
+            if (dropTreino && e.target !== inputTreino && !dropTreino.contains(e.target)) {
+                dropTreino.style.display = 'none';
+            }
+        });
 
 
         // ---------------------------------------------------------------
@@ -486,5 +670,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
     }
     </script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

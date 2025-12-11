@@ -244,6 +244,54 @@
     box-shadow: 0 0 10px rgba(255, 66, 66, 0.4);
 }
 
+/* --- DROPDOWN CUSTOMIZADO (FINANCEIRO) --- */
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%; /* Logo abaixo do input */
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100; /* Fica acima de tudo */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    margin-top: 2px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #222;
+    transition: 0.2s;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: #252525;
+    color: var(--gold);
+}
+
+.dropdown-item img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #444;
+}
+
+.dropdown-item span {
+    color: #fff;
+    font-size: 0.9rem;
+}
+
 /* Responsividade do Formulário no Modal */
 @media (max-width: 600px) {
     .modal-content {
@@ -349,6 +397,29 @@
     margin-top: 5px;
 }
 
+/* Caixa de Aviso */
+.alert-box {
+    display: none; /* JS mostra quando necessário */
+    background: rgba(255, 186, 66, 0.1);
+    border-left: 3px solid var(--gold);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.alert-title {
+    display: block;
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.alert-text {
+    color: #ccc;
+    font-size: 0.8rem;
+    margin: 0;
+}
 /* =========================================
    MÓDULO: PAINEL DO TREINO (Timeline & Tabs)
    ========================================= */
