@@ -875,6 +875,7 @@
         height: 100%; /* Ocupa tela toda no mobile */
         max-height: 100%;
         border-radius: 0;
+        padding: 0;
     }
     
     .modal-body-scroll { padding: 15px; }

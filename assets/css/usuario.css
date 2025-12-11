@@ -2021,30 +2021,10 @@ section {
     margin: auto;
 }
 /* Botão de Excluir Avaliação */
-.btn-delete-eval {
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    background: transparent;
-    border-radius: 50%;
-    margin-right: 10px; /* Espaço antes da seta */
-    transition: 0.2s;
-    font-size: 0.9rem;
-    z-index: 5; /* Garante que fique clicável */
+.btn-danger-outline {
+width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4242; padding:10px; border-radius:8px; text-decoration: none; cursor:pointer; font-weight:bold;
 }
-
-.btn-delete-eval:hover {
-    background: rgba(255, 77, 77, 0.15);
-    color: #ff4d4d; /* Vermelho */
-    transform: scale(1.1);
-}
-
-.btn-delete-eval:active {
-    transform: scale(0.95);
-}
+                            
 /* --- 1. LISTA ACCORDION (CARDS) --- */
 .eval-timeline-wrapper {
     display: flex; flex-direction: column; gap: 15px; padding-bottom: 100px; margin-top: 20px;
@@ -2068,10 +2048,23 @@ section {
 /* HEADER DO CARD */
 .accordion-header {
     padding: 18px 20px;
+    gap: 10px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     cursor: pointer;
     background: rgba(255,255,255,0.02);
+}
+
+@media screen and (max-width: 400px) {
+    .accordion-header {
+        padding: 18px 10px;
+    }
+}
+@media screen and (max-width: 380px) {
+    .date-badge {
+        min-width: 50px;
+    }
 }
 
 /* Data */
@@ -2080,7 +2073,6 @@ section {
     padding: 10px 14px;
     border-radius: 10px;
     text-align: center;
-    margin-right: 15px;
     border: 1px solid rgba(255,255,255,0.15); /* Borda mais nítida */
     min-width: 65px;
 }
@@ -2107,6 +2099,7 @@ section {
 
 .weight-display { 
     font-size: 1.5rem; 
+    white-space: nowrap;
     color: #fff; 
     font-weight: 800; 
     font-family: 'Orbitron', sans-serif;
@@ -2117,6 +2110,15 @@ section {
     color: #aaa; /* Cinza claro, não escuro */
     font-family: sans-serif; 
     font-weight: 500;
+}
+@media screen and (max-width: 316px) {
+    .weight-display {
+        font-size: 1.2rem;
+    }
+    .date-badge {
+        padding: 8px 10px;
+        min-width: 40px;
+    }
 }
 
 .bf-tag {

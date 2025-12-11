@@ -971,13 +971,6 @@ switch ($pagina) {
                                 <span class="info-sub">'.count($arquivos).' mídias anexadas</span>
                             </div>
 
-                            <a href="actions/avaliacao_delete.php?id='.$av['id'].'" 
-                               class="btn-delete-eval" 
-                               onclick="event.stopPropagation(); return confirm(\'Tem certeza que deseja EXCLUIR esta avaliação permanentemente?\');"
-                               title="Excluir Avaliação">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
-
                             <div class="accordion-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                         </div>
 
@@ -1045,6 +1038,13 @@ switch ($pagina) {
                                 if($av['observacoes']) {
                                     echo '<div class="obs-box"><i class="fa-solid fa-quote-left"></i> '.$av['observacoes'].'</div>';
                                 }
+
+                                // Botão de Excluir (Admin tem poder)
+                                echo '<div class="card-footer-actions" style="margin-top:30px; text-align:center; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                                        <a href="actions/avaliacao_delete.php?id='.$av['id'].'" class="btn-danger-outline" onclick="return confirm(\'Apagar avaliação permanentemente?\');">
+                                            <i class="fa-solid fa-trash-can"></i> Excluir Avaliação
+                                        </a>
+                                      </div>';
 
                 echo '      </div> </div> </div> ';
             }

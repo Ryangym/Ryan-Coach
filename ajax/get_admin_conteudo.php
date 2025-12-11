@@ -1487,10 +1487,10 @@ switch ($pagina) {
                 
                 <div class="menu-profile-header" onclick="carregarConteudo(\'perfil\')" style="background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); margin-bottom: 25px; padding: 20px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <img src="'.$foto.'" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold);">
+                        <img src="'.$foto.'" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ff4242;">
                         <div>
-                            <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">'.$admin['nome'].'</h3>
-                            <span style="color: var(--gold); font-size: 0.8rem; font-weight: bold;">ADMINISTRADOR</span>
+                            <h3 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1rem;">'.$admin['nome'].'</h3>
+                            <span class="usuario-level" style="color: #ff4242; background: rgba(255, 66, 66, 0.1);">MASTER COACH</span>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: #666;"></i>
