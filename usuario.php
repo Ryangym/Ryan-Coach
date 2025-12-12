@@ -757,7 +757,159 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         }
     }
     </script>
+    
+    <script>
+    // --- LÓGICA DO CRONÔMETRO ---
+    let timerInterval;
+    let seconds = 0;
+    let isRunning = false;
+
+    // Funções de Visibilidade
+    function mostrarTimer() {
+        document.getElementById('float-timer').style.display = 'flex';
+    }
+
+    function fecharTimer() {
+        document.getElementById('float-timer').style.display = 'none';
+        resetTimer(); // Opcional: reseta ao fechar
+    }
+
+    function toggleTimer() {
+        const btn = document.getElementById('btn-timer-toggle');
+        const icon = btn.querySelector('i');
+        const widget = document.getElementById('float-timer');
+
+        if (isRunning) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
+            widget.classList.remove('running');
+        } else {
+            isRunning = true;
+            icon.classList.remove('fa-play');
+            icon.classList.add('fa-pause');
+            widget.classList.add('running');
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        seconds = 0;
+        isRunning = false;
+        updateTimerDisplay();
         
+        const btn = document.getElementById('btn-timer-toggle');
+        const icon = btn.querySelector('i');
+        const widget = document.getElementById('float-timer');
+        
+        if(icon) {
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
+        }
+        if(widget) widget.classList.remove('running');
+    }
+
+    function updateTimerDisplay() {
+        const display = document.getElementById('timer-val');
+        if (!display) return;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        display.innerText = (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
+    }
+
+    // --- LÓGICA DE ARRASTAR (DRAG & DROP) ---
+    // Agora que o elemento está no HTML fixo, o JS o encontra facilmente.
+    
+    const dragItem = document.getElementById("float-timer");
+    let active = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    // Eventos de Toque (Mobile)
+    dragItem.addEventListener("touchstart", dragStart, {passive: false});
+    dragItem.addEventListener("touchend", dragEnd, {passive: false});
+    dragItem.addEventListener("touchmove", drag, {passive: false});
+
+    // Eventos de Mouse (PC)
+    dragItem.addEventListener("mousedown", dragStart);
+    dragItem.addEventListener("mouseup", dragEnd);
+    dragItem.addEventListener("mousemove", drag);
+
+    function dragStart(e) {
+        // Ignora se clicar nos botões (Play/Reset/Fechar)
+        if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.fa-times')) {
+            return;
+        }
+
+        if (e.type === "touchstart") {
+            initialX = e.touches[0].clientX - xOffset;
+            initialY = e.touches[0].clientY - yOffset;
+        } else {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+        }
+
+        if (e.target === dragItem || dragItem.contains(e.target)) {
+            active = true;
+        }
+    }
+
+    function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
+        active = false;
+    }
+
+    function drag(e) {
+        if (active) {
+            e.preventDefault(); // Impede a tela de rolar
+        
+            if (e.type === "touchmove") {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
+
+            setTranslate(currentX, currentY, dragItem);
+        }
+    }
+
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+    }
+</script>
+
+    <div id="float-timer" class="timer-widget" style="display: none;">
+        
+        <div style="position: absolute; top: -8px; left: -8px; background: #333; border: 1px solid #555; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; z-index: 10;" onclick="fecharTimer()">
+            <i class="fa-solid fa-times"></i>
+        </div>
+
+        <div class="timer-display" id="timer-val">00:00</div>
+        <div class="timer-controls">
+            <button type="button" class="t-btn reset" onclick="resetTimer()">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+            <button type="button" class="t-btn toggle" id="btn-timer-toggle" onclick="toggleTimer()">
+                <i class="fa-solid fa-play"></i>
+            </button>
+        </div>
+    </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

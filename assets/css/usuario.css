@@ -1366,6 +1366,74 @@ section {
     accent-color: var(--gold); 
 }
 
+/* --- CRONÔMETRO FLUTUANTE --- */
+.timer-widget {
+    position: fixed;
+    bottom: 100px; 
+    right: 20px;
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: 50px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 999;
+    backdrop-filter: blur(10px);
+    transition: box-shadow 0.3s, border-color 0.3s; /* Removi transition de 'all' para não atrasar o arrastar */
+    
+    /* NOVAS PROPRIEDADES PARA ARRASTAR */
+    cursor: move; /* Mostra a mãozinha no PC */
+    touch-action: none; /* Impede que a tela role ao arrastar o widget no celular */
+    user-select: none; /* Impede selecionar o texto enquanto arrasta */
+}
+
+/* Quando ativo, brilha um pouco */
+.timer-widget.running {
+    box-shadow: 0 0 20px rgba(255, 186, 66, 0.3);
+    border-color: #fff;
+}
+
+.timer-display {
+    font-family: 'Monda', sans-serif; /* Fonte monospaced fica melhor */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    min-width: 60px;
+    text-align: center;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.t-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.t-btn.toggle {
+    background: var(--gold);
+    color: #000;
+}
+
+.t-btn.reset {
+    background: rgba(255,255,255,0.1);
+    color: #ccc;
+}
+
+.t-btn:active { transform: scale(0.9); }
+
 /* Informação Anterior (Histórico) */
 .prev-data {
     font-size: 0.65rem;

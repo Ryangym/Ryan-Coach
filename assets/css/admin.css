@@ -185,7 +185,6 @@
         margin: 20px auto; /* Descola das bordas */
         padding: 20px 15px; /* Padding menor para ganhar espaço */
         
-        background: transparent; border: none; box-shadow: none; 
     }
 
     /* --- Ajustes Específicos para o Modal de Exercício no Mobile --- */

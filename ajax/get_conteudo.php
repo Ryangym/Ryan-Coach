@@ -393,7 +393,12 @@ switch ($pagina) {
             echo '</div>';
         }
 
-        echo '  </div>
+        echo '  </div> <div style="text-align: center; margin-bottom: 20px;">
+                    <button type="button" class="btn-gold" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; font-size: 0.8rem; border-radius: 50px;" onclick="mostrarTimer()">
+                        <i class="fa-solid fa-stopwatch"></i> ABRIR CRONÔMETRO
+                    </button>
+                </div>
+
                 <button type="submit" class="btn-finish">
                     <i class="fa-solid fa-check"></i> FINALIZAR TREINO
                 </button>
