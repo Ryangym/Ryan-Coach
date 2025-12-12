@@ -1366,73 +1366,127 @@ section {
     accent-color: var(--gold); 
 }
 
-/* --- CRONÔMETRO FLUTUANTE --- */
+/* =========================================
+   CRONÔMETRO PREMIUM (GLASSMORPHISM)
+   ========================================= */
+
 .timer-widget {
     position: fixed;
-    bottom: 100px; 
+    top: 90px;
     right: 20px;
-    background: rgba(15, 15, 15, 0.95);
-    border: 1px solid var(--gold);
-    border-radius: 50px;
-    padding: 10px 20px;
+    
+    /* Vidro Escuro Premium */
+    background: rgba(20, 20, 20, 0.75); /* Mais transparente */
+    backdrop-filter: blur(15px); /* Desfoque de fundo (Vidro) */
+    -webkit-backdrop-filter: blur(15px); /* Safari */
+    
+    /* Borda sutil e brilho */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); /* Sombra difusa */
+    
+    border-radius: 40px; /* Cápsula perfeita */
+    padding: 8px 12px 8px 18px; /* Espaçamento interno */
+    
     display: flex;
     align-items: center;
     gap: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 999;
-    backdrop-filter: blur(10px);
-    transition: box-shadow 0.3s, border-color 0.3s; /* Removi transition de 'all' para não atrasar o arrastar */
+    z-index: 9999;
     
-    /* NOVAS PROPRIEDADES PARA ARRASTAR */
-    cursor: move; /* Mostra a mãozinha no PC */
-    touch-action: none; /* Impede que a tela role ao arrastar o widget no celular */
-    user-select: none; /* Impede selecionar o texto enquanto arrasta */
+    /* Comportamento */
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    transition: transform 0.1s, box-shadow 0.3s;
 }
 
-/* Quando ativo, brilha um pouco */
+/* Estado Ativo (Contando) */
 .timer-widget.running {
-    box-shadow: 0 0 20px rgba(255, 186, 66, 0.3);
-    border-color: #fff;
+    border-color: rgba(255, 186, 66, 0.5); /* Borda Dourada sutil */
+    box-shadow: 0 0 20px rgba(255, 186, 66, 0.2), 0 8px 32px 0 rgba(0,0,0,0.5);
 }
 
+/* O Display de Tempo */
 .timer-display {
-    font-family: 'Monda', sans-serif; /* Fonte monospaced fica melhor */
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-family: 'Monda', monospace; /* Fonte técnica */
+    font-size: 1.4rem;
+    font-weight: 700;
     color: #fff;
-    min-width: 60px;
+    min-width: 65px;
     text-align: center;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Brilho Neon suave */
+    letter-spacing: 1px;
 }
 
+/* Área dos Botões */
 .timer-controls {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,0.1); /* Separador vertical */
 }
 
+/* Botões de Ação (Play/Reset) */
 .t-btn {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
+}
+
+/* Botão Play/Pause (Destaque) */
+.t-btn.toggle {
+    background: linear-gradient(135deg, var(--gold), #ffa000);
+    color: #000;
+    box-shadow: 0 4px 10px rgba(255, 186, 66, 0.4);
+}
+
+/* Botão Reset (Discreto) */
+.t-btn.reset {
+    background: rgba(255,255,255,0.1);
+    color: #bbb;
+}
+.t-btn.reset:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+/* Efeito de clique */
+.t-btn:active { transform: scale(0.85); }
+
+/* --- BOTÃO FECHAR (CORRIGIDO E INTEGRADO) --- */
+.timer-close-btn {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    
+    width: 20px;
+    height: 20px;
+    
+    background: #222; /* Fundo escuro para destacar do vidro */
+    border: 2px solid #ff4242; /* Borda vermelha */
+    border-radius: 50%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    color: #ff4242;
+    font-size: 0.65rem;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     transition: 0.2s;
 }
 
-.t-btn.toggle {
-    background: var(--gold);
-    color: #000;
+.timer-close-btn:active {
+    transform: scale(0.9);
+    background: #ff4242;
+    color: #fff;
 }
-
-.t-btn.reset {
-    background: rgba(255,255,255,0.1);
-    color: #ccc;
-}
-
-.t-btn:active { transform: scale(0.9); }
 
 /* Informação Anterior (Histórico) */
 .prev-data {
@@ -1449,17 +1503,17 @@ section {
     bottom: 95px; 
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
+    width: 70%;
     max-width: 400px;
     background: #00ff00;
     color: #000;
     font-family: 'Orbitron', sans-serif;
     font-weight: 800;
-    padding: 15px;
+    padding: 10px;
     border-radius: 50px;
     border: none;
     box-shadow: 0 5px 20px rgba(0, 255, 0, 0.3);
-    z-index: 1000; /* Z-index alto para ficar por cima de tudo */
+    z-index: 900;
     font-size: 1.1rem;
     transition: transform 0.2s;
 }

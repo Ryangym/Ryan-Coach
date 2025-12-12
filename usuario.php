@@ -129,6 +129,25 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
             }
         </script>
 
+    <div id="float-timer" class="timer-widget" style="display: none;">
+        
+        <div class="timer-close-btn" onclick="fecharTimer()">
+            <i class="fa-solid fa-times"></i>
+        </div>
+
+        <div class="timer-display" id="timer-val">00:00</div>
+        
+        <div class="timer-controls">
+            <button type="button" class="t-btn reset" onclick="resetTimer()">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+            
+            <button type="button" class="t-btn toggle" id="btn-timer-toggle" onclick="toggleTimer()">
+                <i class="fa-solid fa-play"></i>
+            </button>
+        </div>
+    </div>
+
     <div id="modalTreinoOpcoes" class="modal-overlay" style="display: none;">
         <div class="modal-content selection-modal">
             <button class="modal-close" onclick="fecharModalTreinos()">&times;</button>
@@ -764,14 +783,13 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
     let seconds = 0;
     let isRunning = false;
 
-    // Funções de Visibilidade
     function mostrarTimer() {
         document.getElementById('float-timer').style.display = 'flex';
     }
 
     function fecharTimer() {
         document.getElementById('float-timer').style.display = 'none';
-        resetTimer(); // Opcional: reseta ao fechar
+        resetTimer();
     }
 
     function toggleTimer() {
@@ -790,7 +808,6 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
             icon.classList.remove('fa-play');
             icon.classList.add('fa-pause');
             widget.classList.add('running');
-            
             timerInterval = setInterval(() => {
                 seconds++;
                 updateTimerDisplay();
@@ -803,11 +820,9 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         seconds = 0;
         isRunning = false;
         updateTimerDisplay();
-        
         const btn = document.getElementById('btn-timer-toggle');
         const icon = btn.querySelector('i');
         const widget = document.getElementById('float-timer');
-        
         if(icon) {
             icon.classList.remove('fa-pause');
             icon.classList.add('fa-play');
@@ -823,9 +838,7 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         display.innerText = (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
     }
 
-    // --- LÓGICA DE ARRASTAR (DRAG & DROP) ---
-    // Agora que o elemento está no HTML fixo, o JS o encontra facilmente.
-    
+    // --- LÓGICA DE ARRASTAR (CORRIGIDA) ---
     const dragItem = document.getElementById("float-timer");
     let active = false;
     let currentX;
@@ -835,19 +848,20 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
     let xOffset = 0;
     let yOffset = 0;
 
-    // Eventos de Toque (Mobile)
+    // 1. O clique inicial TEM que ser no cronômetro
     dragItem.addEventListener("touchstart", dragStart, {passive: false});
-    dragItem.addEventListener("touchend", dragEnd, {passive: false});
-    dragItem.addEventListener("touchmove", drag, {passive: false});
-
-    // Eventos de Mouse (PC)
     dragItem.addEventListener("mousedown", dragStart);
-    dragItem.addEventListener("mouseup", dragEnd);
-    dragItem.addEventListener("mousemove", drag);
+
+    // 2. O movimento e a soltura são no DOCUMENTO (Global)
+    // Isso impede que o cronômetro "escape" se você mexer o mouse rápido
+    document.addEventListener("touchend", dragEnd, {passive: false});
+    document.addEventListener("touchmove", drag, {passive: false});
+    document.addEventListener("mouseup", dragEnd);
+    document.addEventListener("mousemove", drag);
 
     function dragStart(e) {
-        // Ignora se clicar nos botões (Play/Reset/Fechar)
-        if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.fa-times')) {
+        // Não arrasta se clicar nos botões ou no X de fechar
+        if (e.target.closest('button') || e.target.closest('.fa-times') || e.target.onclick) {
             return;
         }
 
@@ -859,6 +873,7 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
             initialY = e.clientY - yOffset;
         }
 
+        // Verifica se o clique foi realmente no widget
         if (e.target === dragItem || dragItem.contains(e.target)) {
             active = true;
         }
@@ -872,7 +887,7 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
 
     function drag(e) {
         if (active) {
-            e.preventDefault(); // Impede a tela de rolar
+            e.preventDefault(); // Impede o celular de rolar a tela enquanto arrasta
         
             if (e.type === "touchmove") {
                 currentX = e.touches[0].clientX - initialX;
@@ -894,22 +909,6 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
     }
 </script>
 
-    <div id="float-timer" class="timer-widget" style="display: none;">
-        
-        <div style="position: absolute; top: -8px; left: -8px; background: #333; border: 1px solid #555; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; z-index: 10;" onclick="fecharTimer()">
-            <i class="fa-solid fa-times"></i>
-        </div>
-
-        <div class="timer-display" id="timer-val">00:00</div>
-        <div class="timer-controls">
-            <button type="button" class="t-btn reset" onclick="resetTimer()">
-                <i class="fa-solid fa-rotate-left"></i>
-            </button>
-            <button type="button" class="t-btn toggle" id="btn-timer-toggle" onclick="toggleTimer()">
-                <i class="fa-solid fa-play"></i>
-            </button>
-        </div>
-    </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

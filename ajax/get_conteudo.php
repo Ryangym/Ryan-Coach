@@ -297,6 +297,12 @@ switch ($pagina) {
                     <p style="padding:0 15px; color:#666; font-size:0.8rem; margin-top:5px;">'.($micro_atual ? 'Fase: '.$micro_atual['nome_fase'] : 'Treino Livre').'</p>
                 </div>
 
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button type="button" class="btn-gold" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; font-size: 0.8rem; border-radius: 50px;" onclick="mostrarTimer()">
+                        <i class="fa-solid fa-stopwatch"></i> ABRIR CRONÔMETRO
+                    </button>
+                </div>
+
                 <div style="padding-bottom: 160px;">'; 
 
         foreach ($exercicios as $ex) {
@@ -393,11 +399,7 @@ switch ($pagina) {
             echo '</div>';
         }
 
-        echo '  </div> <div style="text-align: center; margin-bottom: 20px;">
-                    <button type="button" class="btn-gold" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; font-size: 0.8rem; border-radius: 50px;" onclick="mostrarTimer()">
-                        <i class="fa-solid fa-stopwatch"></i> ABRIR CRONÔMETRO
-                    </button>
-                </div>
+        echo '  </div> 
 
                 <button type="submit" class="btn-finish">
                     <i class="fa-solid fa-check"></i> FINALIZAR TREINO
