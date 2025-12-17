@@ -25,7 +25,7 @@
         <div class="card-box">
             <div class="card">
                 <div class="img-card">
-                    <img src="assets/img/corrida.png" alt="">
+                    <img src="assets/img/corrida2.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Corrida</h4>
@@ -34,7 +34,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="assets/img/musculacao.png" alt="">
+                    <img src="assets/img/musculacao2.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Musculação</h4>
@@ -52,7 +52,7 @@
             </div>
             <div class="card">
                 <div class="img-card">
-                    <img src="assets/img/força.png" alt="">
+                    <img src="assets/img/força2.png" alt="">
                 </div>
                 <div class="info-card">
                     <h4>Força</h4>

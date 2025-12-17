@@ -1357,7 +1357,129 @@ switch ($pagina) {
         echo '</section>';
         break;
 
-    // --- NOVA TELA: MENU GERAL (HUB DE NAVEGAÇÃO) ---
+    case 'gerar_pdf':
+        require_once '../config/db_connect.php';
+        $aluno_id = $_SESSION['user_id'];
+
+        // 1. Busca o Plano Ativo
+        $stmt = $pdo->prepare("SELECT * FROM treinos WHERE aluno_id = ? ORDER BY criado_em DESC LIMIT 1");
+        $stmt->execute([$aluno_id]);
+        $plano = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$plano) {
+            echo '<section class="empty-state"><h2>Sem plano ativo</h2></section>';
+            break;
+        }
+
+        // 2. Busca Divisões e Exercícios
+        $stmt_div = $pdo->prepare("SELECT * FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
+        $stmt_div->execute([$plano['id']]);
+        $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
+
+        // Monta o array gigante de dados
+        $dados_treinos = [];
+        foreach ($divisoes as $div) {
+            $stmt_ex = $pdo->prepare("SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC");
+            $stmt_ex->execute([$div['id']]);
+            $exercicios = $stmt_ex->fetchAll(PDO::FETCH_ASSOC);
+
+            // Resumo das séries
+            foreach ($exercicios as &$ex) {
+                $stmt_s = $pdo->prepare("SELECT COUNT(*) as qtd, reps_fixas, descanso_fixo FROM series WHERE exercicio_id = ? GROUP BY reps_fixas LIMIT 1");
+                $stmt_s->execute([$ex['id']]);
+                $s = $stmt_s->fetch(PDO::FETCH_ASSOC);
+                
+                $ex['series_resumo'] = $s ? $s['qtd'] : '-';
+                $ex['reps_resumo']   = $s && $s['reps_fixas'] ? $s['reps_fixas'] : 'Falha';
+                $ex['desc_resumo']   = $s && $s['descanso_fixo'] ? $s['descanso_fixo'] : '60s';
+            }
+            $dados_treinos[$div['letra']] = [
+                'nome' => $div['nome'],
+                'exercicios' => $exercicios
+            ];
+        }
+        
+        $json_treinos = htmlspecialchars(json_encode($dados_treinos), ENT_QUOTES, 'UTF-8');
+
+        echo '<section id="area-relatorios" class="fade-in">
+                
+                <header class="dash-header-clean">
+                    <div>
+                        <h1 class="greeting-clean">Gerador de <span class="text-gold">Fichas</span></h1>
+                        <p class="date-clean">Plano Atual: <strong>'.$plano['nome'].'</strong></p>
+                    </div>
+                </header>
+
+                <input type="hidden" id="json-dados-treinos" value="'.$json_treinos.'">
+                <input type="hidden" id="plano-nome-atual" value="'.$plano['nome'].'">
+
+                <div class="pdf-action-card" onclick="abrirModalPDFCompleto()">
+                    <div class="pac-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="pac-info">
+                        <h3>Ficha de Treino Completa</h3>
+                        <p>Gera um PDF único contendo todas as divisões (A, B, C...) formatado para impressão.</p>
+                    </div>
+                    <div class="pac-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+
+                <div id="modalPDFConfig" class="modal-overlay" style="display:none;">
+                    <div class="modal-content" style="max-width: 400px; text-align:center;">
+                        <h3 style="color:var(--gold); margin-bottom:15px;">Personalizar Ficha</h3>
+                        
+                        <div style="text-align:left; margin-bottom:15px;">
+                            <label style="color:#fff; display:block; margin-bottom:5px;">Nome no Cabeçalho</label>
+                            <input type="text" id="pdf_aluno_nome" class="admin-input" value="'.$_SESSION['user_nome'].'">
+                        </div>
+
+                        <div style="text-align:left; margin-bottom:20px;">
+                            <label style="color:#fff; display:block; margin-bottom:5px;">Cor de Destaque</label>
+                            <div style="display:flex; gap:10px; justify-content:center;">
+                                <div class="color-pick active" style="background:#000;" onclick="selectPdfColor(this, \'#000\')"></div>
+                                <div class="color-pick" style="background:#0d47a1;" onclick="selectPdfColor(this, \'#0d47a1\')"></div> <div class="color-pick" style="background:#b71c1c;" onclick="selectPdfColor(this, \'#b71c1c\')"></div> <div class="color-pick" style="background:#1b5e20;" onclick="selectPdfColor(this, \'#1b5e20\')"></div> <div class="color-pick" style="background:#ff6f00;" onclick="selectPdfColor(this, \'#ff6f00\')"></div> </div>
+                            <input type="hidden" id="pdf_selected_color" value="#000">
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 1;">
+                                <i class="fa-solid fa-print"></i> BAIXAR
+                            </button>
+                            
+                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer;">
+                                <i class="fa-solid fa-eye"></i> PREVIEW
+                            </button>
+                        </div>
+                        <button class="btn-outline" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="margin-top:10px; width:100%; background:transparent; border:none; color:#999;">Cancelar</button>
+                    </div>
+                </div>
+
+                <div id="template-impressao-full" style="display:none;">
+                    <div class="pdf-sheet">
+                        
+                        <div class="sheet-header" id="pdf-header-main">
+                            <div class="sh-logo">
+                                <img src="assets/img/ryancoach.png" alt="Ryan Coach">
+                            </div>
+                            <div class="sh-info">
+                                <h1 id="render-plano-nome">HIPERTROFIA AVANÇADA</h1>
+                                <div class="sh-meta">
+                                    <span>ALUNO: <strong id="render-aluno-nome">NOME DO ALUNO</strong></span>
+                                    <span>DATA: <strong>'.date('d/m/Y').'</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pdf-container-treinos"></div>
+
+                        <div class="sheet-footer">
+                            <p>Consultoria Online <strong>RYAN COACH</strong> • Documento gerado via App</p>
+                        </div>
+                    </div>
+                </div>
+
+              </section>';
+        break;
+
+    // --- MENU GERAL (HUB DE NAVEGAÇÃO) ---
     case 'menu':
         require_once '../config/db_connect.php';
         $user_id = $_SESSION['user_id'];
@@ -1424,11 +1546,11 @@ switch ($pagina) {
                         <span>Planos</span>
                     </div>
 
-                    <div class="menu-card" onclick="carregarConteudo(\'perfil\')">
-                        <div class="mc-icon" style="background: rgba(89, 115, 249, 0.1); color: #345dffff;">
-                            <i class="fa-solid fa-user-gear"></i>
+                    <div class="menu-card" onclick="carregarConteudo(\'gerar_pdf\')">
+                        <div class="mc-icon" style="background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid #555;">
+                            <i class="fa-solid fa-print"></i>
                         </div>
-                        <span>Perfil</span>
+                        <span>Relatórios</span>
                     </div>
 
                 </div>
