@@ -922,95 +922,37 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         document.getElementById('pdf_selected_color').value = color;
     }
 
+    // --- AÇÃO 1: BAIXAR PDF ---
     function gerarFichaCompleta() {
+        // Pega dados
         const nomeAluno = document.getElementById('pdf_aluno_nome').value;
         const nomePlano = document.getElementById('plano-nome-atual').value;
         const corTema = document.getElementById('pdf_selected_color').value;
         const jsonRaw = document.getElementById('json-dados-treinos').value;
         const dados = JSON.parse(jsonRaw);
 
-        // 1. Configura Cabeçalho Principal
-        const template = document.getElementById('template-impressao-full');
-        template.querySelector('#render-aluno-nome').innerText = nomeAluno.toUpperCase();
-        template.querySelector('#render-plano-nome').innerText = nomePlano.toUpperCase();
-        
-        // Aplica cor no cabeçalho principal
-        template.querySelector('#pdf-header-main').style.borderBottom = `4px solid ${corTema}`;
-        template.querySelector('#render-plano-nome').style.color = corTema;
+        // 1. Desenha o HTML usando a função auxiliar
+        const template = renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano);
 
-        // 2. Loop para criar as tabelas (A, B, C...)
-        const container = document.getElementById('pdf-container-treinos');
-        container.innerHTML = ''; // Limpa anterior
-
-        for (const [letra, conteudo] of Object.entries(dados)) {
-            const exercicios = conteudo.exercicios;
-            
-            // Cria o HTML da Tabela deste dia
-            let htmlTable = `
-                <div class="workout-block" style="page-break-inside: avoid;">
-                    <div class="wb-header" style="background: ${corTema};">
-                        <span class="wb-letter">TREINO ${letra}</span>
-                        <span class="wb-name">${conteudo.nome}</span>
-                    </div>
-
-                    <table class="sheet-table">
-                        <thead>
-                            <tr>
-                                <th width="5%">#</th>
-                                <th width="35%">EXERCÍCIO</th>
-                                <th width="10%">SETS</th>
-                                <th width="10%">REPS</th>
-                                <th width="15%">CARGA (Kg)</th>
-                                <th width="10%">DESC.</th>
-                                <th width="15%">OBS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            exercicios.forEach((ex, idx) => {
-                // Zebra Striping manual para garantir contraste
-                const bgRow = (idx % 2 === 0) ? '#ffffff' : '#f4f4f4';
-                
-                htmlTable += `
-                    <tr style="background:${bgRow}">
-                        <td class="center"><strong>${idx + 1}</strong></td>
-                        <td class="ex-name">
-                            ${ex.nome_exercicio}
-                            ${ex.video_url ? '<span class="video-mark">▶</span>' : ''}
-                        </td>
-                        <td class="center"><strong>${ex.series_resumo}</strong></td>
-                        <td class="center">${ex.reps_resumo}</td>
-                        <td class="write-box"></td> <td class="center">${ex.desc_resumo}</td>
-                        <td class="obs-text">${ex.observacao_exercicio || '-'}</td>
-                    </tr>
-                `;
-            });
-
-            htmlTable += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            container.innerHTML += htmlTable;
-        }
-
-        // 3. Gerar PDF
+        // 2. Configura e Baixa
         const btn = document.querySelector('#modalPDFConfig .btn-gold');
         const oldText = btn.innerHTML;
-        btn.innerHTML = 'Gerando...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando...';
         btn.disabled = true;
 
-        template.style.display = 'block'; // Mostra
-
         const opt = {
-            margin:       [10, 10, 10, 10], // Margem compacta
-            filename:     `Ficha_${nomeAluno.replace(/\s/g,'_')}.pdf`,
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { scale: 2, useCORS: true }, 
+            margin:       0, // <--- COLOCAR ZERO AQUI (Remove as margens do PDF)
+            filename:     `Ficha_${nomeAluno}.pdf`,
+            image:        { type: 'jpeg', quality: 1 }, // Qualidade máxima
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true,
+                scrollY: 0 // Garante que comece do topo absoluto
+            },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
+
+        template.style.display = 'block'; // Mostra pro html2pdf ver
 
         html2pdf().set(opt).from(template).save().then(() => {
             template.style.display = 'none'; // Esconde
@@ -1020,87 +962,110 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         });
     }
 
-    // Adicione no final do usuario.php
+    // --- AÇÃO 2: PREVIEW NA TELA ---
+    function debugPreviewPDF() {
+        // Pega dados
+        const nomeAluno = document.getElementById('pdf_aluno_nome').value;
+        const nomePlano = document.getElementById('plano-nome-atual').value;
+        const corTema = document.getElementById('pdf_selected_color').value;
+        const jsonRaw = document.getElementById('json-dados-treinos').value;
+        const dados = JSON.parse(jsonRaw);
 
-function debugPreviewPDF() {
-    // 1. Roda a mesma lógica de preencher os dados
-    const nomeAluno = document.getElementById('pdf_aluno_nome').value;
-    const nomePlano = document.getElementById('plano-nome-atual').value;
-    const corTema = document.getElementById('pdf_selected_color').value;
-    const jsonRaw = document.getElementById('json-dados-treinos').value;
-    const dados = JSON.parse(jsonRaw);
+        // 1. Desenha o HTML usando a MESMA função auxiliar
+        const template = renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano);
 
-    const template = document.getElementById('template-impressao-full');
-    const container = document.getElementById('pdf-container-treinos');
-    
-    // Preenche cabeçalhos e cores (igualzinho à função de baixar)
-    template.querySelector('#render-aluno-nome').innerText = nomeAluno.toUpperCase();
-    template.querySelector('#render-plano-nome').innerText = nomePlano.toUpperCase();
-    template.querySelector('#pdf-header-main').style.borderBottom = `4px solid ${corTema}`;
-    template.querySelector('#render-plano-nome').style.color = corTema;
+        // 2. Ativa Modo Preview
+        document.getElementById('modalPDFConfig').style.display = 'none';
+        template.style.display = 'block';
+        template.classList.add('preview-mode-active');
 
-    container.innerHTML = ''; 
-
-    // Loop de renderização (copie o mesmo loop da função gerarFichaCompleta aqui)
-    for (const [letra, conteudo] of Object.entries(dados)) {
-        // ... (código que gera as tabelas - HTML IDÊNTICO) ...
-        // Para facilitar, vou resumir: USE O MESMO CÓDIGO DO LOOP QUE JÁ FIZEMOS
-        const exercicios = conteudo.exercicios;
-        let htmlTable = `
-            <div class="workout-block" style="margin-bottom: 30px; border: 2px solid #000;">
-                <div class="wb-header" style="background: ${corTema}; color:#fff; padding: 8px 15px; display: flex; justify-content: space-between; font-weight: bold; border-bottom: 2px solid #000; -webkit-print-color-adjust: exact;">
-                    <span style="font-size: 18px;">TREINO ${letra}</span>
-                    <span style="font-size: 14px; opacity: 0.9;">${conteudo.nome}</span>
-                </div>
-                <table class="sheet-table" style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                    <thead>
-                        <tr>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000;">#</th>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000; width:35%;">EXERCÍCIO</th>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000;">SETS</th>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000;">REPS</th>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000; width:15%;">CARGA</th>
-                            <th style="background: #e0e0e0; color: #000; padding: 6px; border: 1px solid #000;">DESC.</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-        
-        exercicios.forEach((ex, idx) => {
-            const bgRow = (idx % 2 === 0) ? '#ffffff' : '#f4f4f4';
-            htmlTable += `
-                <tr style="background:${bgRow}">
-                    <td style="padding: 6px; border: 1px solid #000; text-align:center;"><strong>${idx + 1}</strong></td>
-                    <td style="padding: 6px; border: 1px solid #000;">${ex.nome_exercicio}</td>
-                    <td style="padding: 6px; border: 1px solid #000; text-align:center;">${ex.series_resumo}</td>
-                    <td style="padding: 6px; border: 1px solid #000; text-align:center;">${ex.reps_resumo}</td>
-                    <td style="padding: 6px; border: 1px solid #000; background:#fff;"></td>
-                    <td style="padding: 6px; border: 1px solid #000; text-align:center;">${ex.desc_resumo}</td>
-                </tr>`;
-        });
-        htmlTable += `</tbody></table></div>`;
-        container.innerHTML += htmlTable;
+        // Botão Fechar Preview (Se não existir, cria)
+        if (!document.getElementById('btn-close-preview')) {
+            const btn = document.createElement('button');
+            btn.id = 'btn-close-preview';
+            btn.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
+            btn.className = 'btn-fechar-preview';
+            btn.onclick = function() {
+                template.style.display = 'none';
+                template.classList.remove('preview-mode-active');
+                document.getElementById('modalPDFConfig').style.display = 'flex'; // Volta pro modal
+            };
+            document.body.appendChild(btn);
+        }
     }
 
-    // 2. ATIVA O MODO VISUALIZAÇÃO
-    // Esconde o modal e mostra o template
-    document.getElementById('modalPDFConfig').style.display = 'none';
-    
-    // Aqui está o segredo: Adicionamos uma classe que faz ele aparecer na tela
-    template.style.display = 'block';
-    template.classList.add('preview-mode-active');
-    
-    // Adiciona um botão flutuante para fechar o preview
-    const btnFechar = document.createElement('button');
-    btnFechar.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
-    btnFechar.className = 'btn-fechar-preview';
-    btnFechar.onclick = function() {
-        template.style.display = 'none';
-        template.classList.remove('preview-mode-active');
-        this.remove();
-        document.getElementById('modalPDFConfig').style.display = 'flex'; // Volta pro modal
-    };
-    document.body.appendChild(btnFechar);
-}
+// --- FUNÇÃO AUXILIAR: Desenha o Treino (SEM ZEBRA) ---
+    function renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano) {
+        const template = document.getElementById('template-impressao-full');
+        template.querySelector('#render-aluno-nome').innerText = nomeAluno.toUpperCase();
+        
+        if(template.querySelector('#render-plano-nome')) {
+             template.querySelector('#render-plano-nome').innerText = nomePlano.toUpperCase();
+        }
+        
+        const headerMain = template.querySelector('#pdf-header-main');
+        if(headerMain) headerMain.style.borderTop = `14px solid ${corTema}`;
+
+        const container = document.getElementById('pdf-container-treinos');
+        container.innerHTML = ''; 
+
+        const mapaDias = {
+            'A': 'SEGUNDA-FEIRA', 'B': 'TERÇA-FEIRA', 'C': 'QUARTA-FEIRA',
+            'D': 'QUINTA-FEIRA', 'E': 'SEXTA-FEIRA', 'F': 'SÁBADO', 'G': 'DOMINGO'
+        };
+
+        for (const [letra, conteudo] of Object.entries(dados)) {
+            const exercicios = conteudo.exercicios;
+            const nomeDia = mapaDias[letra] || `TREINO ${letra}`;
+
+            let htmlBlock = `
+                <div class="day-block" style="page-break-inside: avoid;">
+                    <div class="day-header" style="background: ${corTema};">
+                        <span class="day-title">${nomeDia}</span>
+                    </div>
+                    <div class="day-subheader" style="border-bottom: 2px solid ${corTema};">
+                    <span class="day-subtitle">${conteudo.nome.toUpperCase()}</span>
+                    </div>
+                    
+                    <div class="exercises-list">
+            `;
+
+            exercicios.forEach((ex, idx) => {
+                // REMOVIDO: const isEven = ...
+                
+                // A classe bg-white/bg-gray foi removida da div abaixo
+                htmlBlock += `
+                    <div class="ex-row">
+                        <div class="ex-info-side" style="background: ${corTema};">
+                            <span class="ex-text">${ex.nome_exercicio}</span>
+                        </div>
+                        
+                        <div class="ex-sets-side">
+                `;
+
+                if (ex.lista_series && ex.lista_series.length > 0) {
+                    ex.lista_series.forEach(serie => {
+                        const tipo = serie.categoria.toUpperCase();
+                        let label = tipo;
+                        if(tipo === 'WARMUP') label = 'WARM UP';
+                        if(tipo === 'TOP') label = 'TOP SET';
+                        if(tipo === 'WORK') label = 'WORK SET';
+                        
+                        htmlBlock += `<span class="set-box type-${serie.categoria}">${label}</span>`;
+                    });
+                } else {
+                    htmlBlock += `<span style="font-size:10px; color:#ccc;">-</span>`;
+                }
+
+                htmlBlock += `</div></div>`;
+            });
+
+            htmlBlock += `</div></div>`;
+            container.innerHTML += htmlBlock;
+        }
+        
+        return template;
+    }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

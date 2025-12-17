@@ -2945,10 +2945,9 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 
 /* --- FOLHA A4 --- */
 .pdf-sheet {
-    background: #fff;
-    color: #000;
+    background: #000000;
     font-family: 'Helvetica', 'Arial', sans-serif; /* Fonte técnica */
-    padding: 20px;
+    padding: 0px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -2975,46 +2974,92 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 .wb-name { font-size: 14px; opacity: 0.9; text-transform: uppercase;}
 
 
-/* --- TABELA TIPO EXCEL --- */
-.sheet-table {
-    width: 100%;
-    border-collapse: collapse; /* Bordas coladas igual Excel */
-    font-size: 11px;
+/* =========================================
+   ESTILO PDF - BLOCOS E SÉRIES
+   ========================================= */
+
+#pdf-container-treinos{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+/* Bloco do Dia */
+.day-block {
+    flex: 30%;
+    border: 2px solid #000;
+    margin-bottom: 25px; /* Espaço entre dias */
+    background: #ffffff00;
+    border-radius: 4px; /* Leve arredondado */
+    overflow: hidden;
 }
 
-.sheet-table th {
-    background: #e0e0e0; /* Cinza cabeçalho */
-    color: #000;
-    padding: 6px;
+/* Cabeçalho do Dia (Segunda...) */
+.day-header {
+    /* Cor de fundo vem do JS */
+    color: #fff;
+    padding: 4px;
+    font-weight: 400;
     text-transform: uppercase;
+    -webkit-print-color-adjust: exact;
+}
+.day-subheader{
+    margin: 10px 0px;
+}
+.day-title { font-size: 12px; letter-spacing: 1px; }
+.day-subtitle { font-size: 12px; }
+
+/* Linha do Exercício */
+.ex-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent; /* Fundo transparente agora */
+}
+.ex-row:last-child { border-bottom: none; }
+
+
+/* Lado Esquerdo (Nome) */
+.ex-info-side {
+    color: white;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%; /* Ocupa quase metade */
+}
+.ex-text {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+/* Lado Direito (Séries) */
+.ex-sets-side {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Caixinha da Série (Badge) */
+.set-box {
+    font-size: 9px;
     font-weight: 800;
-    border-right: 1px solid #000; /* Linhas verticais pretas */
-    border-bottom: 1px solid #000;
-    text-align: left;
+    padding: 2px;
+    text-transform: uppercase;
+    color: white;
+    min-width: 55px;
+    text-align: center;
 }
-.sheet-table th:last-child { border-right: none; }
 
-.sheet-table td {
-    padding: 6px;
-    border-right: 1px solid #000; /* Linhas verticais pretas */
-    border-bottom: 1px solid #000; /* Linhas horizontais pretas */
-    vertical-align: middle;
-    color: #000;
-}
-.sheet-table tr:last-child td { border-bottom: none; }
-.sheet-table td:last-child { border-right: none; }
-
-/* Utilitários de Célula */
-.sheet-table td.center { text-align: center; }
-.sheet-table td.ex-name { font-weight: bold; font-size: 12px; }
-.sheet-table td.obs-text { font-size: 9px; color: #333; font-style: italic; }
-
-/* Caixa de Escrita (Carga) */
-.write-box {
-    background: #fff;
-    /* Truque visual: parece um campo vazio pra escrever */
-    min-width: 50px;
-}
+/* Cores Opcionais para Tipos (Visual Clean) */
+/* .type-warmup { background: #eee; border-color: #999; color: #555; }
+.type-feeder { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+.type-top    { background: #000; border-color: #000; color: #fff; }
+.type-work   { background: #fff; border-color: #000; }
+.type-falha  { background: #ffebee; border-color: #ef5350; color: #c62828; } */
 
 .video-mark { font-size: 8px; vertical-align: middle; color: #666; margin-left: 3px; }
 
@@ -3045,7 +3090,7 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 .preview-mode-active .pdf-sheet {
     width: 210mm; /* Largura A4 Real */
     min-height: 297mm; /* Altura A4 Real */
-    background: #fff;
+    background: #000000;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     margin: 0 auto;
     /* Importante: para o html2pdf funcionar depois, ele precisa "ver" o CSS. 
@@ -3078,12 +3123,10 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 /* --- CABEÇALHO DO DOCUMENTO --- */
 .sheet-header {
     display: flex;
-    margin-bottom: 20px;
-    background-color: #dbdada;
-    /* Borda inferior definida via JS (border-bottom) */
+    background-color: #dbdada00;
 }
 
-.sh-logo img { height: 70px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));}
+.sh-logo img { height: 60px; filter: drop-shadow(0 0 7px rgba(135, 38, 38, 0.3));}
 
 #render-aluno-nome {
     font-family: 'Orbitron', sans-serif;
@@ -3091,6 +3134,7 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     margin: 0 0 5px 0;
     font-weight: 900;
     text-transform: uppercase;
+    color: white;
 }
 .sheet-header h1{
     margin-left: auto;
@@ -3103,4 +3147,4 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     font-size: 9px;
     color: #444; }
 
-.sh-meta span { margin-left: 5px; }
+.sh-meta span { margin-left: 5px; color: white; font-size: 10px; letter-spacing: 0.8px; }

@@ -1376,25 +1376,23 @@ switch ($pagina) {
         $stmt_div->execute([$plano['id']]);
         $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
 
-        // Monta o array gigante de dados
+        // 3. Monta os dados detalhados (Incluindo todas as séries)
         $dados_treinos = [];
         foreach ($divisoes as $div) {
             $stmt_ex = $pdo->prepare("SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC");
             $stmt_ex->execute([$div['id']]);
             $exercicios = $stmt_ex->fetchAll(PDO::FETCH_ASSOC);
 
-            // Resumo das séries
+            // Busca as séries detalhadas para cada exercício
             foreach ($exercicios as &$ex) {
-                $stmt_s = $pdo->prepare("SELECT COUNT(*) as qtd, reps_fixas, descanso_fixo FROM series WHERE exercicio_id = ? GROUP BY reps_fixas LIMIT 1");
+                $stmt_s = $pdo->prepare("SELECT * FROM series WHERE exercicio_id = ? ORDER BY id ASC");
                 $stmt_s->execute([$ex['id']]);
-                $s = $stmt_s->fetch(PDO::FETCH_ASSOC);
-                
-                $ex['series_resumo'] = $s ? $s['qtd'] : '-';
-                $ex['reps_resumo']   = $s && $s['reps_fixas'] ? $s['reps_fixas'] : 'Falha';
-                $ex['desc_resumo']   = $s && $s['descanso_fixo'] ? $s['descanso_fixo'] : '60s';
+                $ex['lista_series'] = $stmt_s->fetchAll(PDO::FETCH_ASSOC); 
             }
+            
             $dados_treinos[$div['letra']] = [
                 'nome' => $div['nome'],
+                'letra' => $div['letra'],
                 'exercicios' => $exercicios
             ];
         }
@@ -1413,30 +1411,26 @@ switch ($pagina) {
                 <input type="hidden" id="json-dados-treinos" value="'.$json_treinos.'">
                 <input type="hidden" id="plano-nome-atual" value="'.$plano['nome'].'">
 
-                <div class="pdf-action-card" onclick="abrirModalPDFCompleto()">
+                <div class="pdf-action-card" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'flex\'">
                     <div class="pac-icon"><i class="fa-solid fa-file-pdf"></i></div>
                     <div class="pac-info">
                         <h3>Ficha de Treino Completa</h3>
-                        <p>Gera um PDF único contendo todas as divisões (A, B, C...) formatado para impressão.</p>
+                        <p>Visualização em blocos com dias da semana e tipos de série.</p>
                     </div>
                     <div class="pac-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                 </div>
 
                 <div id="modalPDFConfig" class="modal-overlay" style="display:none;">
                     <div class="modal-content-premium">
-                        
-                        <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size:1.3rem;">
-                            <i class="fa-solid fa-sliders"></i> PERSONALIZAR
-                        </h3>
+                        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> PERSONALIZAR</h3>
                         
                         <div style="text-align:left; margin-bottom:15px;">
-                            <label style="color:#ccc; font-size:0.9rem; margin-bottom:5px; display:block;">Nome no Relatório</label>
-                            <input type="text" id="pdf_aluno_nome" class="admin-input" value="'.$_SESSION['user_nome'].'" style="width:100%;">
+                            <label class="input-label">Nome no Relatório</label>
+                            <input type="text" id="pdf_aluno_nome" class="modal-input" value="'.$_SESSION['user_nome'].'">
                         </div>
 
                         <div style="text-align:left; margin-bottom:20px;">
-                            <label style="color:#ccc; font-size:0.9rem; margin-bottom:5px; display:block;">Cor do Tema</label>
-                            
+                            <label class="input-label">Cor do Tema</label>
                             <div class="color-options-container">
                                 <div class="color-pick active" style="background:#000000;" onclick="selectPdfColor(this, \'#000000\')"></div>
                                 <div class="color-pick" style="background:#0d47a1;" onclick="selectPdfColor(this, \'#0d47a1\')"></div>
@@ -1444,23 +1438,16 @@ switch ($pagina) {
                                 <div class="color-pick" style="background:#1b5e20;" onclick="selectPdfColor(this, \'#1b5e20\')"></div>
                                 <div class="color-pick" style="background:#ff6f00;" onclick="selectPdfColor(this, \'#ff6f00\')"></div>
                             </div>
-                            
                             <input type="hidden" id="pdf_selected_color" value="#000000">
                         </div>
 
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 2; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <i class="fa-solid fa-file-pdf"></i> BAIXAR
-                            </button>
-                            
-                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent; border-radius:8px; cursor: pointer;">
+                        <div class="modal-actions">
+                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 2;">BAIXAR PDF</button>
+                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent;">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-
-                        <button onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="width:100%; background:transparent; border:none; color:#666; margin-top:15px; cursor:pointer;">
-                            Cancelar
-                        </button>
+                        <button class="btn-cancel" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="margin-top:10px;">Cancelar</button>
                     </div>
                 </div>
 
@@ -1481,7 +1468,7 @@ switch ($pagina) {
                         <div id="pdf-container-treinos"></div>
 
                         <div class="sheet-footer">
-                            <p>Consultoria Online <strong>RYAN COACH</strong> • Documento gerado via App</p>
+                            <p>Metodologia <strong>RYAN COACH</strong></p>
                         </div>
                     </div>
                 </div>
