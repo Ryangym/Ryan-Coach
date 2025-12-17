@@ -1423,32 +1423,44 @@ switch ($pagina) {
                 </div>
 
                 <div id="modalPDFConfig" class="modal-overlay" style="display:none;">
-                    <div class="modal-content" style="max-width: 400px; text-align:center;">
-                        <h3 style="color:var(--gold); margin-bottom:15px;">Personalizar Ficha</h3>
+                    <div class="modal-content-premium">
+                        
+                        <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size:1.3rem;">
+                            <i class="fa-solid fa-sliders"></i> PERSONALIZAR
+                        </h3>
                         
                         <div style="text-align:left; margin-bottom:15px;">
-                            <label style="color:#fff; display:block; margin-bottom:5px;">Nome no Cabeçalho</label>
-                            <input type="text" id="pdf_aluno_nome" class="admin-input" value="'.$_SESSION['user_nome'].'">
+                            <label style="color:#ccc; font-size:0.9rem; margin-bottom:5px; display:block;">Nome no Relatório</label>
+                            <input type="text" id="pdf_aluno_nome" class="admin-input" value="'.$_SESSION['user_nome'].'" style="width:100%;">
                         </div>
 
                         <div style="text-align:left; margin-bottom:20px;">
-                            <label style="color:#fff; display:block; margin-bottom:5px;">Cor de Destaque</label>
-                            <div style="display:flex; gap:10px; justify-content:center;">
-                                <div class="color-pick active" style="background:#000;" onclick="selectPdfColor(this, \'#000\')"></div>
-                                <div class="color-pick" style="background:#0d47a1;" onclick="selectPdfColor(this, \'#0d47a1\')"></div> <div class="color-pick" style="background:#b71c1c;" onclick="selectPdfColor(this, \'#b71c1c\')"></div> <div class="color-pick" style="background:#1b5e20;" onclick="selectPdfColor(this, \'#1b5e20\')"></div> <div class="color-pick" style="background:#ff6f00;" onclick="selectPdfColor(this, \'#ff6f00\')"></div> </div>
-                            <input type="hidden" id="pdf_selected_color" value="#000">
+                            <label style="color:#ccc; font-size:0.9rem; margin-bottom:5px; display:block;">Cor do Tema</label>
+                            
+                            <div class="color-options-container">
+                                <div class="color-pick active" style="background:#000000;" onclick="selectPdfColor(this, \'#000000\')"></div>
+                                <div class="color-pick" style="background:#0d47a1;" onclick="selectPdfColor(this, \'#0d47a1\')"></div>
+                                <div class="color-pick" style="background:#b71c1c;" onclick="selectPdfColor(this, \'#b71c1c\')"></div>
+                                <div class="color-pick" style="background:#1b5e20;" onclick="selectPdfColor(this, \'#1b5e20\')"></div>
+                                <div class="color-pick" style="background:#ff6f00;" onclick="selectPdfColor(this, \'#ff6f00\')"></div>
+                            </div>
+                            
+                            <input type="hidden" id="pdf_selected_color" value="#000000">
                         </div>
 
-                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 1;">
-                                <i class="fa-solid fa-print"></i> BAIXAR
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 2; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                <i class="fa-solid fa-file-pdf"></i> BAIXAR
                             </button>
                             
-                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer;">
-                                <i class="fa-solid fa-eye"></i> PREVIEW
+                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent; border-radius:8px; cursor: pointer;">
+                                <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-                        <button class="btn-outline" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="margin-top:10px; width:100%; background:transparent; border:none; color:#999;">Cancelar</button>
+
+                        <button onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="width:100%; background:transparent; border:none; color:#666; margin-top:15px; cursor:pointer;">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
 
@@ -1456,15 +1468,13 @@ switch ($pagina) {
                     <div class="pdf-sheet">
                         
                         <div class="sheet-header" id="pdf-header-main">
-                            <div class="sh-logo">
-                                <img src="assets/img/ryancoach.png" alt="Ryan Coach">
+                            <div class="sh-meta">
+                                <span id="render-plano-nome">HIPERTROFIA AVANÇADA</span>
+                                <span>DATA: <strong>'.date('d/m/Y').'</strong></span>
                             </div>
-                            <div class="sh-info">
-                                <h1 id="render-plano-nome">HIPERTROFIA AVANÇADA</h1>
-                                <div class="sh-meta">
-                                    <span>ALUNO: <strong id="render-aluno-nome">NOME DO ALUNO</strong></span>
-                                    <span>DATA: <strong>'.date('d/m/Y').'</strong></span>
-                                </div>
+                            <h1><strong id="render-aluno-nome">NOME DO ALUNO</strong></h1>
+                            <div class="sh-logo">
+                                <img src="assets/img/icones/icon-nav.png" alt="Ryan Coach">
                             </div>
                         </div>
 

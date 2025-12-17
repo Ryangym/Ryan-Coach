@@ -2804,24 +2804,143 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
    ESTILO PLANILHA IMPRESSA (EXCEL-LIKE)
    ========================================= */
 
-/* Card Novo no Menu PDF */
-.pdf-action-card {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    padding: 20px;
-    border-radius: 10px;
+/* =========================================
+   MODAL DE PDF PREMIUM & SELETOR DE CORES
+   ========================================= */
+
+/* Fundo Escuro do Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Bem escuro para foco */
+    backdrop-filter: blur(5px);
+    z-index: 10000; /* Acima de tudo */
     display: flex;
     align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: 0.2s;
-    margin-top: 20px;
+    justify-content: center;
+    padding: 20px;
 }
-.pdf-action-card:hover { border-color: var(--gold); background: #222; }
-.pac-icon { font-size: 2rem; color: var(--gold); }
-.pac-info h3 { margin: 0; font-size: 1.1rem; color: #fff; }
-.pac-info p { margin: 5px 0 0; font-size: 0.85rem; color: #888; }
-.pac-arrow { margin-left: auto; color: #555; }
+
+/* O Cartão do Modal (Vidro) */
+.modal-content-premium {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 0 40px rgba(255, 186, 66, 0.15);
+    text-align: center;
+    position: relative;
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Título e Labels */
+.modal-title {
+    color: var(--gold);
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.input-label {
+    color: #ccc;
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Input Bonito */
+.modal-input {
+    width: 100%;
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+.modal-input:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 186, 66, 0.2);
+}
+
+/* --- SELETOR DE CORES (BOLINHAS) --- */
+.color-options-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+    padding: 10px;
+    background: #111;
+    border-radius: 15px;
+    border: 1px solid #333;
+}
+
+.color-pick {
+    width: 35px;       /* Tamanho fixo */
+    height: 35px;      /* Tamanho fixo */
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent; /* Borda invisível base */
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.color-pick:hover {
+    transform: scale(1.15);
+}
+
+/* Estado Ativo (Selecionado) */
+.color-pick.active {
+    border-color: #fff; /* Borda branca */
+    box-shadow: 0 0 15px rgba(255,255,255,0.6);
+    transform: scale(1.1);
+}
+/* Checkmark interno no ativo */
+.color-pick.active::after {
+    content: '✓';
+    color: #fff;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Botões de Ação */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #555;
+    color: #888;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+    width: 100%;
+}
+.btn-cancel:hover { border-color: #fff; color: #fff; }
 
 
 /* --- FOLHA A4 --- */
@@ -2833,29 +2952,6 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     width: 100%;
     box-sizing: border-box;
 }
-
-/* --- CABEÇALHO DO DOCUMENTO --- */
-.sheet-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    /* Borda inferior definida via JS (border-bottom) */
-}
-
-.sh-logo img { height: 50px; filter: brightness(0); /* Logo Preto */ }
-
-.sh-info { text-align: right; }
-.sh-info h1 {
-    font-size: 24px;
-    margin: 0 0 5px 0;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: -1px;
-}
-.sh-meta { font-size: 12px; color: #444; }
-.sh-meta span { margin-left: 15px; }
 
 
 /* --- BLOCOS DE TREINO (A, B, C...) --- */
@@ -2971,3 +3067,40 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     z-index: 100000;
 }
+
+
+
+/* =========================================
+   CSS FEITO MANUAL DAS FICHAS EM PDF
+   ========================================= */
+
+
+/* --- CABEÇALHO DO DOCUMENTO --- */
+.sheet-header {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: #dbdada;
+    /* Borda inferior definida via JS (border-bottom) */
+}
+
+.sh-logo img { height: 70px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));}
+
+#render-aluno-nome {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 34px;
+    margin: 0 0 5px 0;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+.sheet-header h1{
+    margin-left: auto;
+    margin-right: auto;
+}
+.sh-meta {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 9px;
+    color: #444; }
+
+.sh-meta span { margin-left: 5px; }
