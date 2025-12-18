@@ -31,6 +31,8 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
     <link rel="stylesheet" href="assets/css/usuario.css">
 
     <?php include 'includes/head_main.php'; ?>
+
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
     
@@ -922,90 +924,27 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         document.getElementById('pdf_selected_color').value = color;
     }
 
-    // --- AÇÃO 1: BAIXAR PDF ---
-    function gerarFichaCompleta() {
-        // Pega dados
-        const nomeAluno = document.getElementById('pdf_aluno_nome').value;
-        const nomePlano = document.getElementById('plano-nome-atual').value;
-        const corTema = document.getElementById('pdf_selected_color').value;
-        const jsonRaw = document.getElementById('json-dados-treinos').value;
-        const dados = JSON.parse(jsonRaw);
-
-        // 1. Desenha o HTML usando a função auxiliar
-        const template = renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano);
-
-        // 2. Configura e Baixa
-        const btn = document.querySelector('#modalPDFConfig .btn-gold');
-        const oldText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando...';
-        btn.disabled = true;
-
-        const opt = {
-            margin:       0, // <--- COLOCAR ZERO AQUI (Remove as margens do PDF)
-            filename:     `Ficha_${nomeAluno}.pdf`,
-            image:        { type: 'jpeg', quality: 1 }, // Qualidade máxima
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true,
-                scrollY: 0 // Garante que comece do topo absoluto
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        template.style.display = 'block'; // Mostra pro html2pdf ver
-
-        html2pdf().set(opt).from(template).save().then(() => {
-            template.style.display = 'none'; // Esconde
-            btn.innerHTML = oldText;
-            btn.disabled = false;
-            document.getElementById('modalPDFConfig').style.display = 'none';
-        });
-    }
-
-    // --- AÇÃO 2: PREVIEW NA TELA ---
-    function debugPreviewPDF() {
-        // Pega dados
-        const nomeAluno = document.getElementById('pdf_aluno_nome').value;
-        const nomePlano = document.getElementById('plano-nome-atual').value;
-        const corTema = document.getElementById('pdf_selected_color').value;
-        const jsonRaw = document.getElementById('json-dados-treinos').value;
-        const dados = JSON.parse(jsonRaw);
-
-        // 1. Desenha o HTML usando a MESMA função auxiliar
-        const template = renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano);
-
-        // 2. Ativa Modo Preview
-        document.getElementById('modalPDFConfig').style.display = 'none';
-        template.style.display = 'block';
-        template.classList.add('preview-mode-active');
-
-        // Botão Fechar Preview (Se não existir, cria)
-        if (!document.getElementById('btn-close-preview')) {
-            const btn = document.createElement('button');
-            btn.id = 'btn-close-preview';
-            btn.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
-            btn.className = 'btn-fechar-preview';
-            btn.onclick = function() {
-                template.style.display = 'none';
-                template.classList.remove('preview-mode-active');
-                document.getElementById('modalPDFConfig').style.display = 'flex'; // Volta pro modal
-            };
-            document.body.appendChild(btn);
-        }
-    }
-
-// --- FUNÇÃO AUXILIAR: Desenha o Treino (SEM ZEBRA) ---
-    function renderizarTemplateTreino(dados, nomeAluno, corTema, nomePlano) {
-        const template = document.getElementById('template-impressao-full');
-        template.querySelector('#render-aluno-nome').innerText = nomeAluno.toUpperCase();
+    // --- FUNÇÃO DESENHISTA FINAL (COM QUANTIDADE DO BD) ---
+    function renderizarTemplateTreino(dados, nomeAluno, nomePlano, configCores) {
         
+        const { tema, fundo, borda } = configCores;
+
+        const template = document.getElementById('template-impressao-full');
+        
+        // Aplica o Fundo da Folha
+        template.querySelector('.pdf-sheet').style.backgroundColor = fundo;
+        
+        // Cabeçalho Principal
+        template.querySelector('#render-aluno-nome').innerText = nomeAluno;
         if(template.querySelector('#render-plano-nome')) {
              template.querySelector('#render-plano-nome').innerText = nomePlano.toUpperCase();
         }
         
+        // Borda do Cabeçalho Principal
         const headerMain = template.querySelector('#pdf-header-main');
-        if(headerMain) headerMain.style.borderTop = `14px solid ${corTema}`;
+        if(headerMain) headerMain.style.borderBottom = `4px solid ${tema}`;
 
+        // Limpa container
         const container = document.getElementById('pdf-container-treinos');
         container.innerHTML = ''; 
 
@@ -1019,40 +958,55 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
             const nomeDia = mapaDias[letra] || `TREINO ${letra}`;
 
             let htmlBlock = `
-                <div class="day-block" style="page-break-inside: avoid;">
-                    <div class="day-header" style="background: ${corTema};">
-                        <span class="day-title">${nomeDia}</span>
+                <div class="day-block" style="page-break-inside: avoid; background: transparent; margin-bottom: 20px;">
+                    
+                    <div class="day-header" style="background: ${tema}; border: 1px solid ${borda};">
+                        <span class="day-title" style="color: #fff; font-weight:800;">${nomeDia}</span>
                     </div>
-                    <div class="day-subheader" style="border-bottom: 2px solid ${corTema};">
-                    <span class="day-subtitle">${conteudo.nome.toUpperCase()}</span>
+
+                    <div class="day-subheader" style="border-bottom: 1px solid ${borda}; margin-bottom: 10px; padding: 5px 10px;">
+                        <span class="day-subtitle" style="text-transform:uppercase; font-weight:bold; font-size:12px;">
+                            ${conteudo.nome.toUpperCase()}
+                        </span>
                     </div>
                     
                     <div class="exercises-list">
             `;
 
             exercicios.forEach((ex, idx) => {
-                // REMOVIDO: const isEven = ...
-                
-                // A classe bg-white/bg-gray foi removida da div abaixo
                 htmlBlock += `
-                    <div class="ex-row">
-                        <div class="ex-info-side" style="background: ${corTema};">
-                            <span class="ex-text">${ex.nome_exercicio}</span>
+                    <div class="ex-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        
+                        <div class="ex-info-side" style="border-top: 1px solid ${borda}; border-right: 1px solid ${borda}; border-left: 1px solid ${borda}; background: ${tema};">
+                            <span class="ex-text" style="font-weight: bold; text-transform: uppercase; font-size: 11px;">
+                                ${ex.nome_exercicio}
+                            </span>
                         </div>
                         
-                        <div class="ex-sets-side">
+                        <div class="ex-sets-side" style="width: 50%; display: flex; justify-content: flex-end; gap: 5px; flex-wrap: wrap;">
                 `;
 
+                // --- LÓGICA CORRIGIDA: Usa o campo 'quantidade' do BD ---
                 if (ex.lista_series && ex.lista_series.length > 0) {
+                    
                     ex.lista_series.forEach(serie => {
-                        const tipo = serie.categoria.toUpperCase();
+                        const tipo = serie.categoria;
                         let label = tipo;
-                        if(tipo === 'WARMUP') label = 'WARM UP';
-                        if(tipo === 'TOP') label = 'TOP SET';
-                        if(tipo === 'WORK') label = 'WORK SET';
                         
-                        htmlBlock += `<span class="set-box type-${serie.categoria}">${label}</span>`;
+                        if(tipo === 'WARMUP') label = 'WARM UP';
+                        else if(tipo === 'TOP') label = 'TOP SET';
+                        else if(tipo === 'WORK') label = 'WORK SET';
+                        else if(tipo === 'BACKOFF') label = 'BACKOFF';
+                        else if(tipo === 'FEEDER') label = 'FEEDER';
+                        else if(tipo === 'FALHA') label = 'FALHA';
+
+                        // Garante que tenha valor (se for null ou 0, assume 1)
+                        const qtd = serie.quantidade ? serie.quantidade : 1;
+
+                        // Imprime direto: "2x WARM UP"
+                        htmlBlock += `<span class="set-box type-${serie.categoria}" style="border: none;">${qtd}x ${label}</span>`;
                     });
+
                 } else {
                     htmlBlock += `<span style="font-size:10px; color:#ccc;">-</span>`;
                 }
@@ -1060,11 +1014,86 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
                 htmlBlock += `</div></div>`;
             });
 
-            htmlBlock += `</div></div>`;
+            htmlBlock += `</div></div>`; 
             container.innerHTML += htmlBlock;
         }
         
         return template;
+    }
+
+    // 2. AÇÃO: BAIXAR PDF
+    function gerarFichaCompleta() {
+        const nomeAluno = document.getElementById('pdf_aluno_nome').value;
+        const nomePlano = document.getElementById('plano-nome-atual').value;
+        
+        // Pega as Cores Novas
+        const configCores = {
+            tema: document.getElementById('pdf_theme_color').value,
+            fundo: document.getElementById('pdf_bg_color').value,
+            borda: document.getElementById('pdf_border_color').value
+        };
+
+        const jsonRaw = document.getElementById('json-dados-treinos').value;
+        const dados = JSON.parse(jsonRaw);
+
+        // Renderiza
+        const template = renderizarTemplateTreino(dados, nomeAluno, nomePlano, configCores);
+
+        const btn = document.querySelector('#modalPDFConfig .btn-gold');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando...';
+        btn.disabled = true;
+
+        const opt = {
+            margin: 0,
+            filename: `Ficha_${nomeAluno}.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        template.style.display = 'block';
+
+        html2pdf().set(opt).from(template).save().then(() => {
+            template.style.display = 'none';
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+            document.getElementById('modalPDFConfig').style.display = 'none';
+        });
+    }
+
+    // 3. AÇÃO: PREVIEW
+    function debugPreviewPDF() {
+        const nomeAluno = document.getElementById('pdf_aluno_nome').value;
+        const nomePlano = document.getElementById('plano-nome-atual').value;
+        
+        const configCores = {
+            tema: document.getElementById('pdf_theme_color').value,
+            fundo: document.getElementById('pdf_bg_color').value,
+            borda: document.getElementById('pdf_border_color').value
+        };
+
+        const jsonRaw = document.getElementById('json-dados-treinos').value;
+        const dados = JSON.parse(jsonRaw);
+
+        const template = renderizarTemplateTreino(dados, nomeAluno, nomePlano, configCores);
+
+        document.getElementById('modalPDFConfig').style.display = 'none';
+        template.style.display = 'block';
+        template.classList.add('preview-mode-active');
+
+        if (!document.getElementById('btn-close-preview')) {
+            const btn = document.createElement('button');
+            btn.id = 'btn-close-preview';
+            btn.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
+            btn.className = 'btn-fechar-preview';
+            btn.onclick = function() {
+                template.style.display = 'none';
+                template.classList.remove('preview-mode-active');
+                document.getElementById('modalPDFConfig').style.display = 'flex';
+            };
+            document.body.appendChild(btn);
+        }
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

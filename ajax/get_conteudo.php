@@ -1421,33 +1421,57 @@ switch ($pagina) {
                 </div>
 
                 <div id="modalPDFConfig" class="modal-overlay" style="display:none;">
-                    <div class="modal-content-premium">
-                        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> PERSONALIZAR</h3>
+                    <div class="modal-content-premium" style="max-width: 450px;">
+                        
+                        <h3 class="modal-title">
+                            <i class="fa-solid fa-sliders"></i> PERSONALIZAR FICHA
+                        </h3>
                         
                         <div style="text-align:left; margin-bottom:15px;">
                             <label class="input-label">Nome no Relatório</label>
                             <input type="text" id="pdf_aluno_nome" class="modal-input" value="'.$_SESSION['user_nome'].'">
                         </div>
 
-                        <div style="text-align:left; margin-bottom:20px;">
-                            <label class="input-label">Cor do Tema</label>
-                            <div class="color-options-container">
-                                <div class="color-pick active" style="background:#000000;" onclick="selectPdfColor(this, \'#000000\')"></div>
-                                <div class="color-pick" style="background:#0d47a1;" onclick="selectPdfColor(this, \'#0d47a1\')"></div>
-                                <div class="color-pick" style="background:#b71c1c;" onclick="selectPdfColor(this, \'#b71c1c\')"></div>
-                                <div class="color-pick" style="background:#1b5e20;" onclick="selectPdfColor(this, \'#1b5e20\')"></div>
-                                <div class="color-pick" style="background:#ff6f00;" onclick="selectPdfColor(this, \'#ff6f00\')"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px; text-align: left;">
+                            
+                            <div>
+                                <label class="input-label">Tema</label>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <input type="color" id="pdf_theme_color" value="#000000" style="width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;">
+                                    <span style="font-size:0.8rem; color:#888;">Cabeçalhos</span>
+                                </div>
                             </div>
-                            <input type="hidden" id="pdf_selected_color" value="#000000">
+
+                            <div>
+                                <label class="input-label">Fundo</label>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <input type="color" id="pdf_bg_color" value="#ffffff" style="width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;">
+                                    <span style="font-size:0.8rem; color:#888;">Folha</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="input-label">Bordas</label>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <input type="color" id="pdf_border_color" value="#000000" style="width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;">
+                                    <span style="font-size:0.8rem; color:#888;">Linhas</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="modal-actions">
-                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 2;">BAIXAR PDF</button>
-                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent;">
+                            <button class="btn-gold" onclick="gerarFichaCompleta()" style="flex: 2; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                <i class="fa-solid fa-file-pdf"></i> BAIXAR PDF
+                            </button>
+                            
+                            <button type="button" class="btn-outline" onclick="debugPreviewPDF()" style="flex: 1; border: 1px solid var(--gold); color: var(--gold); background: transparent; border-radius:10px;">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-                        <button class="btn-cancel" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="margin-top:10px;">Cancelar</button>
+
+                        <button class="btn-cancel" onclick="document.getElementById(\'modalPDFConfig\').style.display=\'none\'" style="margin-top:15px;">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
 
