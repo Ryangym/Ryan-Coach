@@ -1480,7 +1480,7 @@ switch ($pagina) {
                             <input type="text" id="pdf_aluno_nome" class="modal-input" value="'.$_SESSION['user_nome'].'">
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px; text-align: left;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
                             
                             <div>
                                 <label class="input-label">Tema</label>

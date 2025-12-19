@@ -2981,6 +2981,17 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 }
 .btn-cancel:hover { border-color: #fff; color: #fff; }
 
+@media (max-width: 768px) {
+    
+    /* 1. Aumenta o tamanho do Modal para caber na tela pequena */
+    #modalPDFConfig .modal-content-premium {
+        width: 95% !important;
+        max-width: 95% !important;
+        padding: 20px !important;
+        max-height: 90vh; /* Evita cortar se for muito alto */
+        overflow-y: auto; /* Permite rolagem */
+    }
+}
 
 /* --- FOLHA A4 --- */
 .pdf-sheet {
@@ -3118,7 +3129,6 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     overflow-y: auto;
     padding: 40px;
     box-sizing: border-box;
-    display: flex !important;
     justify-content: center;
 }
 
@@ -3133,7 +3143,32 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
        Então estilizamos direto nas classes .sheet-table, etc. */
 }
 
-/* Botão de Fechar o Preview */
+/* Fundo Escuro que cobre a tela toda */
+.pdf-viewer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #2b2b2b; /* Cor cinza escuro de leitores de PDF */
+    z-index: 99999;
+    overflow: auto; /* Permite rolar se der zoom */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px; /* Espaço para o botão fechar */
+    padding-bottom: 40px;
+    box-sizing: border-box;
+    /* Suavidade no scroll do celular */
+    -webkit-overflow-scrolling: touch; 
+    display: block !important;
+    transform-origin: top center; /* O zoom acontece a partir do topo */
+    box-shadow: 0 0 30px rgba(0,0,0,0.5); /* Sombra realista de papel */
+    margin: 0 auto;
+    /* Garante que o mouse/dedo funcione para scroll */
+    pointer-events: auto;
+}
+
 .btn-fechar-preview {
     position: fixed;
     bottom: 20px;
@@ -3151,6 +3186,7 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
 
 
 
+
 /* =========================================
    CSS FEITO MANUAL DAS FICHAS EM PDF
    ========================================= */
@@ -3162,7 +3198,7 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     background-color: #dbdada00;
 }
 
-.sh-logo img { height: 60px; filter: drop-shadow(0 0 7px rgba(135, 38, 38, 0.3));}
+.sh-logo img { height: 60px;}
 
 #render-aluno-nome {
     font-family: "Lobster", sans-serif;

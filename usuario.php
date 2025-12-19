@@ -1061,8 +1061,9 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         });
     }
 
-    // --- AÇÃO 3: PREVIEW (CORRIGIDO) ---
+    // --- AÇÃO 3: PREVIEW (CORRIGIDO DEFINITIVAMENTE) ---
     function debugPreviewPDF() {
+        // 1. Pega os dados
         const nomeAluno = document.getElementById('pdf_aluno_nome').value;
         const nomePlano = document.getElementById('plano-nome-atual').value;
         
@@ -1075,30 +1076,66 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         const jsonRaw = document.getElementById('json-dados-treinos').value;
         const dados = JSON.parse(jsonRaw);
 
+        // 2. Renderiza a ficha
         const template = renderizarTemplateTreino(dados, nomeAluno, nomePlano, configCores);
 
+        // 3. LIMPEZA GERAL (Remove lixos de previews anteriores)
+        // Se já tiver uma overlay ou botão travado, remove agora antes de criar novos
+        const oldOverlay = document.getElementById('pdf-viewer-overlay');
+        if (oldOverlay) oldOverlay.remove();
+
+        const oldBtn = document.getElementById('btn-close-preview');
+        if (oldBtn) oldBtn.remove();
+
+        // 4. Esconde o Modal
         document.getElementById('modalPDFConfig').style.display = 'none';
+
+        // 5. Cria a Nova Overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'pdf-viewer-overlay';
+        overlay.className = 'pdf-viewer-overlay'; // Usa sua classe CSS que criamos antes
+        document.body.appendChild(overlay);
+
+        // 6. Configura e Mostra a Folha
         template.style.display = 'block';
         template.classList.add('preview-mode-active');
+        
+        // Move a folha para dentro da overlay (para o zoom funcionar junto com o scroll)
+        overlay.appendChild(template);
 
-        // Remove botão antigo se existir (para não acumular)
-        const existingBtn = document.getElementById('btn-close-preview');
-        if (existingBtn) existingBtn.remove();
+        // 7. CÁLCULO DE ZOOM (Sua responsividade)
+        const a4Width = 794; 
+        const screenWidth = window.innerWidth;
+        const margin = 20; 
+        let scaleFactor = 1;
+        
+        if (screenWidth < (a4Width + margin)) {
+            scaleFactor = (screenWidth - margin) / a4Width;
+        }
+        template.style.transform = `scale(${scaleFactor})`;
 
-        // Cria o botão novo
+        // 8. CRIA O BOTÃO DE FECHAR (SEMPRE NOVO)
         const btn = document.createElement('button');
         btn.id = 'btn-close-preview';
+        // Mantive suas classes e ícones originais
         btn.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
-        btn.className = 'btn-fechar-preview';
+        btn.className = 'btn-fechar-preview'; 
         
-        // AQUI ESTÁ A CORREÇÃO:
         btn.onclick = function() {
+            // Devolve o template para o corpo do site (escondido)
+            document.body.appendChild(template);
             template.style.display = 'none';
+            template.style.transform = 'none'; // Tira o zoom
             template.classList.remove('preview-mode-active');
-            document.getElementById('modalPDFConfig').style.display = 'flex';
             
-            // Remove o botão da tela
+            // Remove a Overlay da tela
+            overlay.remove();
+            
+            // REMOVE O PRÓPRIO BOTÃO (Essencial para não travar na próxima)
             this.remove(); 
+            
+            // Reabre o modal
+            document.getElementById('modalPDFConfig').style.display = 'flex';
         };
         
         document.body.appendChild(btn);
