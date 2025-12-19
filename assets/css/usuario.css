@@ -3118,70 +3118,94 @@ width:100%; background:rgba(255,66,66,0.1); color:#ff4242; border:1px solid #ff4
     border-top: 1px solid #ccc;
     padding-top: 10px;
 }
-/* --- MODO PREVIEW (DEV) --- */
-.preview-mode-active {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #555; /* Fundo escuro do "software" */
-    z-index: 99999;
-    overflow-y: auto;
-    padding: 40px;
-    box-sizing: border-box;
-    justify-content: center;
-}
+/* =========================================
+   PREVIEW DE PDF (ESTILO LEITOR NATIVO)
+   ========================================= */
 
-/* Transforma a div .pdf-sheet numa folha A4 visual */
-.preview-mode-active .pdf-sheet {
-    width: 210mm; /* Largura A4 Real */
-    min-height: 297mm; /* Altura A4 Real */
-    background: #000000;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    margin: 0 auto;
-    /* Importante: para o html2pdf funcionar depois, ele precisa "ver" o CSS. 
-       Então estilizamos direto nas classes .sheet-table, etc. */
-}
-
-/* Fundo Escuro que cobre a tela toda */
+/* Fundo do Leitor (Overlay) */
 .pdf-viewer-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #2b2b2b; /* Cor cinza escuro de leitores de PDF */
+    background-color: #2e2e2e; /* Cinza escuro padrão Adobe */
     z-index: 99999;
-    overflow: auto; /* Permite rolar se der zoom */
+    overflow: auto; /* Permite rolagem total quando der zoom */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding-top: 60px; /* Espaço para o botão fechar */
-    padding-bottom: 40px;
+    align-items: center; /* Centraliza a folha */
+    padding: 80px 20px 40px 20px; /* Espaço para barra superior e folga */
     box-sizing: border-box;
-    /* Suavidade no scroll do celular */
+    /* Melhora rolagem no iOS */
     -webkit-overflow-scrolling: touch; 
-    display: block !important;
-    transform-origin: top center; /* O zoom acontece a partir do topo */
-    box-shadow: 0 0 30px rgba(0,0,0,0.5); /* Sombra realista de papel */
-    margin: 0 auto;
-    /* Garante que o mouse/dedo funcione para scroll */
-    pointer-events: auto;
 }
 
-.btn-fechar-preview {
+/* Barra de Ferramentas Flutuante */
+.pdf-toolbar {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ff4444;
-    color: #fff;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
     z-index: 100000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.pdf-toolbar-title {
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.pdf-toolbar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botões do Preview */
+.btn-preview-action {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-preview-action:active {
+    transform: scale(0.95);
+    background: rgba(255,255,255,0.2);
+}
+
+.btn-preview-close {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: white;
+}
+
+/* A Mágica: Força a largura A4 real */
+.preview-mode-active {
+    width: 794px !important;  /* Largura A4 em pixels (96dpi) */
+    min-width: 794px !important;
+    max-width: 794px !important;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    transform-origin: top center; /* O Zoom acontece a partir do topo */
+    transition: transform 0.3s ease; /* Animação suave do zoom */
 }
 
 

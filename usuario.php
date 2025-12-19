@@ -1061,7 +1061,7 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         });
     }
 
-    // --- AÇÃO 3: PREVIEW (CORRIGIDO DEFINITIVAMENTE) ---
+    // --- AÇÃO 3: PREVIEW ROBUSTO (COM ZOOM E SCROLL) ---
     function debugPreviewPDF() {
         // 1. Pega os dados
         const nomeAluno = document.getElementById('pdf_aluno_nome').value;
@@ -1079,66 +1079,106 @@ if (empty($user_data['data_expiracao']) || $user_data['data_expiracao'] < $hoje)
         // 2. Renderiza a ficha
         const template = renderizarTemplateTreino(dados, nomeAluno, nomePlano, configCores);
 
-        // 3. LIMPEZA GERAL (Remove lixos de previews anteriores)
-        // Se já tiver uma overlay ou botão travado, remove agora antes de criar novos
-        const oldOverlay = document.getElementById('pdf-viewer-overlay');
-        if (oldOverlay) oldOverlay.remove();
-
-        const oldBtn = document.getElementById('btn-close-preview');
-        if (oldBtn) oldBtn.remove();
+        // 3. LIMPEZA GERAL
+        if (document.getElementById('pdf-viewer-overlay')) {
+            document.getElementById('pdf-viewer-overlay').remove();
+        }
 
         // 4. Esconde o Modal
         document.getElementById('modalPDFConfig').style.display = 'none';
 
-        // 5. Cria a Nova Overlay
+        // 5. CRIA O OVERLAY COM TOOLBAR
         const overlay = document.createElement('div');
         overlay.id = 'pdf-viewer-overlay';
-        overlay.className = 'pdf-viewer-overlay'; // Usa sua classe CSS que criamos antes
+        overlay.className = 'pdf-viewer-overlay';
+        
+        // Toolbar HTML
+        overlay.innerHTML = `
+            <div class="pdf-toolbar">
+                <div class="pdf-toolbar-title">
+                    <i class="fa-solid fa-file-pdf"></i> Visualização
+                </div>
+                <div class="pdf-toolbar-actions">
+                    <button class="btn-preview-action" id="btn-toggle-zoom" onclick="togglePdfZoom()">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i> <span style="display:none;" id="zoom-text">Zoom</span>
+                    </button>
+                    <button class="btn-preview-action btn-preview-close" id="btn-close-final">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="pdf-content-wrapper" style="transition: all 0.3s ease;">
+                </div>
+        `;
+        
         document.body.appendChild(overlay);
 
-        // 6. Configura e Mostra a Folha
+        // 6. Configura a Folha
+        const wrapper = document.getElementById('pdf-content-wrapper');
         template.style.display = 'block';
         template.classList.add('preview-mode-active');
-        
-        // Move a folha para dentro da overlay (para o zoom funcionar junto com o scroll)
-        overlay.appendChild(template);
+        wrapper.appendChild(template); // Move a ficha para dentro do wrapper
 
-        // 7. CÁLCULO DE ZOOM (Sua responsividade)
+        // 7. LÓGICA DE ZOOM (FIT vs 100%)
+        let isZoomed = false;
         const a4Width = 794; 
         const screenWidth = window.innerWidth;
-        const margin = 20; 
-        let scaleFactor = 1;
         
-        if (screenWidth < (a4Width + margin)) {
-            scaleFactor = (screenWidth - margin) / a4Width;
-        }
-        template.style.transform = `scale(${scaleFactor})`;
+        // Calcula o scale para "Caber na Tela"
+        // Subtraímos 40px das margens laterais
+        let fitScale = (screenWidth - 40) / a4Width;
+        if (fitScale > 1) fitScale = 1; // Se a tela for grande, mantém 100%
 
-        // 8. CRIA O BOTÃO DE FECHAR (SEMPRE NOVO)
-        const btn = document.createElement('button');
-        btn.id = 'btn-close-preview';
-        // Mantive suas classes e ícones originais
-        btn.innerHTML = '<i class="fa-solid fa-times"></i> FECHAR PREVIEW';
-        btn.className = 'btn-fechar-preview'; 
+        // Aplica o Zoom Inicial (Ajustado à tela)
+        template.style.transform = `scale(${fitScale})`;
         
-        btn.onclick = function() {
-            // Devolve o template para o corpo do site (escondido)
-            document.body.appendChild(template);
-            template.style.display = 'none';
-            template.style.transform = 'none'; // Tira o zoom
-            template.classList.remove('preview-mode-active');
-            
-            // Remove a Overlay da tela
-            overlay.remove();
-            
-            // REMOVE O PRÓPRIO BOTÃO (Essencial para não travar na próxima)
-            this.remove(); 
-            
-            // Reabre o modal
-            document.getElementById('modalPDFConfig').style.display = 'flex';
+        // Ajusta a altura do wrapper para não ficar espaço em branco gigante em baixo
+        // (Quando usamos scale, o elemento ocupa o espaço original no DOM, precisamos corrigir visualmente)
+        const updateWrapperHeight = (scale) => {
+            const originalHeight = template.offsetHeight;
+            const scaledHeight = originalHeight * scale;
+            // Define altura do wrapper e margem negativa para compensar o scale
+            wrapper.style.height = `${scaledHeight}px`;
+            wrapper.style.marginBottom = '50px'; // Um respiro no final
+            // Margin-bottom negativa no template se necessário, mas ajustar o wrapper costuma bastar
         };
         
-        document.body.appendChild(btn);
+        // Timeout para garantir que o render terminou antes de medir altura
+        setTimeout(() => updateWrapperHeight(fitScale), 100);
+
+        // --- FUNÇÃO DO BOTÃO DE ZOOM ---
+        window.togglePdfZoom = function() {
+            isZoomed = !isZoomed;
+            const btnIcon = document.querySelector('#btn-toggle-zoom i');
+            
+            if (isZoomed) {
+                // MODO 100% (Leitura detalhada)
+                template.style.transform = `scale(1)`;
+                btnIcon.className = 'fa-solid fa-compress'; // Ícone de diminuir
+                updateWrapperHeight(1);
+            } else {
+                // MODO AJUSTADO (Visão geral)
+                template.style.transform = `scale(${fitScale})`;
+                btnIcon.className = 'fa-solid fa-magnifying-glass-plus'; // Ícone de aumentar
+                updateWrapperHeight(fitScale);
+                overlay.scrollTop = 0; // Volta pro topo
+            }
+        };
+
+        // --- FUNÇÃO FECHAR (BOTÃO DA TOOLBAR) ---
+        document.getElementById('btn-close-final').onclick = function() {
+            // Devolve o template escondido pro body
+            document.body.appendChild(template);
+            template.style.display = 'none';
+            template.style.transform = 'none';
+            template.classList.remove('preview-mode-active');
+            
+            // Remove Overlay
+            overlay.remove();
+            
+            // Volta Modal
+            document.getElementById('modalPDFConfig').style.display = 'flex';
+        };
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
