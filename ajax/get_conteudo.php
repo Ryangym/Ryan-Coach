@@ -1376,14 +1376,61 @@ switch ($pagina) {
         $stmt_div->execute([$plano['id']]);
         $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. Monta os dados detalhados (Incluindo todas as séries)
+        // ... (código anterior de busca do plano e divisões) ...
+
+        // 1. Mapa de Dias da Semana
+        $mapa_dias = [
+            1 => 'Segunda-Feira',
+            2 => 'Terça-Feira',
+            3 => 'Quarta-Feira',
+            4 => 'Quinta-Feira',
+            5 => 'Sexta-Feira',
+            6 => 'Sábado',
+            7 => 'Domingo',
+            0 => 'Domingo' // Garantia
+        ];
+
+        // 2. Decodifica os dias do banco (que estão como JSON "[1,3,5]")
+        $dias_treino = [];
+        if (!empty($plano['dias_semana'])) {
+            $decoded = json_decode($plano['dias_semana'], true);
+            if (is_array($decoded)) {
+                $dias_treino = $decoded;
+            }
+        }
+
+        // 3. Monta o array gigante de dados
         $dados_treinos = [];
-        foreach ($divisoes as $div) {
+        $total_divisoes = count($divisoes);
+
+        // Percorre as divisões (A, B, C...) pelo índice numérico (0, 1, 2...)
+        foreach ($divisoes as $index_div => $div) {
+            
+            // --- LÓGICA DE ASSOCIAÇÃO (A MESMA DO REALIZAR TREINO) ---
+            // Descobre quais dias da semana caem nesta divisão
+            $dias_desta_divisao = [];
+            
+            if ($total_divisoes > 0 && !empty($dias_treino)) {
+                // Percorre todos os dias que o aluno treina (ex: Seg, Qua, Sex)
+                foreach ($dias_treino as $k => $dia_num) {
+                    // Se o resto da divisão bater com o índice atual, esse dia é deste treino
+                    if (($k % $total_divisoes) == $index_div) {
+                        if (isset($mapa_dias[$dia_num])) {
+                            $dias_desta_divisao[] = $mapa_dias[$dia_num];
+                        }
+                    }
+                }
+            }
+
+            // Cria a string final (ex: "Segunda-Feira / Sexta-Feira")
+            // Se não tiver dia calculado, usa um fallback
+            $dia_exibicao = !empty($dias_desta_divisao) ? implode(' / ', $dias_desta_divisao) : 'TREINO ' . $div['letra'];
+
+            // Busca Exercícios e Séries
             $stmt_ex = $pdo->prepare("SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC");
             $stmt_ex->execute([$div['id']]);
             $exercicios = $stmt_ex->fetchAll(PDO::FETCH_ASSOC);
 
-            // Busca as séries detalhadas para cada exercício
             foreach ($exercicios as &$ex) {
                 $stmt_s = $pdo->prepare("SELECT * FROM series WHERE exercicio_id = ? ORDER BY id ASC");
                 $stmt_s->execute([$ex['id']]);
@@ -1393,6 +1440,7 @@ switch ($pagina) {
             $dados_treinos[$div['letra']] = [
                 'nome' => $div['nome'],
                 'letra' => $div['letra'],
+                'dia_real' => $dia_exibicao, // <--- Aqui vai o dia certo (ex: Segunda-Feira)
                 'exercicios' => $exercicios
             ];
         }

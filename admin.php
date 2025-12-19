@@ -854,6 +854,44 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_nivel'] !== 'admin') {
             document.getElementById("modalEditarAluno").style.display = "none";
         }
 
+        
+        function renomearDivisao(idDivisao, letra, nomeAtual) {
+    // Pergunta o novo nome (Pode usar SweetAlert se tiver, aqui uso prompt nativo pra ser simples)
+    const novoNome = prompt(`Qual o foco do TREINO ${letra}? (Ex: Peito e Tríceps)`, nomeAtual);
+
+    if (novoNome !== null) { // Se não cancelou
+        // Mostra carregando (opcional)
+        const label = document.getElementById(`label_nome_div_${idDivisao}`);
+        const textoOriginal = label.innerText;
+        label.innerText = "Salvando...";
+
+        fetch('actions/treino_rename_divisao.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: idDivisao, nome: novoNome })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualiza na tela imediatamente
+                label.innerText = novoNome ? novoNome.toUpperCase() : "SEM NOME DEFINIDO";
+                
+                // Feedback visual rápido
+                label.style.color = "#28a745"; // Verde
+                setTimeout(() => label.style.color = "#666", 1000);
+            } else {
+                alert("Erro ao salvar: " + (data.message || "Erro desconhecido"));
+                label.innerText = textoOriginal;
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert("Erro de conexão.");
+            label.innerText = textoOriginal;
+        });
+    }
+}
+
 
         // ---------------------------------------------------------------
         // 5. MODAL DE NOVA AVALIAÇÃO FÍSICA

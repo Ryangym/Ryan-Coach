@@ -1199,7 +1199,7 @@ switch ($pagina) {
         $stmt_div->execute(['id' => $treino_id]);
         $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. BUSCAR PERIODIZAÇÃO E MICROCICLOS (Lógica Adicionada)
+        // 3. BUSCAR PERIODIZAÇÃO E MICROCICLOS
         $microciclos = [];
         if ($treino['nivel_plano'] !== 'basico') {
             $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
@@ -1233,11 +1233,9 @@ switch ($pagina) {
                         $inicio = date('d/m', strtotime($m['data_inicio_semana']));
                         $fim = date('d/m', strtotime($m['data_fim_semana']));
                         
-                        // Marca a semana atual
                         $hoje = date('Y-m-d');
                         $activeClass = ($hoje >= $m['data_inicio_semana'] && $hoje <= $m['data_fim_semana']) ? 'active' : '';
                         
-                        // JSON para o modal
                         $m_json = htmlspecialchars(json_encode($m), ENT_QUOTES, 'UTF-8');
 
                         echo '
@@ -1266,7 +1264,6 @@ switch ($pagina) {
                     foreach ($divisoes as $div) {
                         $display = $firstContent ? 'active' : '';
                         
-                        // Busca exercícios desta divisão
                         $sqlEx = "SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC";
                         $stmtEx = $pdo->prepare($sqlEx);
                         $stmtEx->execute([$div['id']]);
@@ -1275,8 +1272,25 @@ switch ($pagina) {
                         echo '
                         <div id="div_'.$div['letra'].'" class="division-content '.$display.'">
                             
-                            <div class="div-header">
-                                <div><h3 style="color:#fff; margin:0;">Ficha '.$div['letra'].'</h3></div>
+                            <div class="div-header" id="div-treino">
+                                <div>
+                                    <div style="display:flex; align-items:center; gap: 10px;">
+                                        <h3 style="color:#fff; margin:0; font-size: 1.2rem;">TREINO '.$div['letra'].'</h3>
+                                        
+                                        <button onclick="renomearDivisao('.$div['id'].', \''.$div['letra'].'\', \''.($div['nome'] ?? '').'\')" 
+                                                style="background: transparent; border: none; color: #666; cursor: pointer; font-size: 0.9rem; transition: color 0.3s;"
+                                                onmouseover="this.style.color=\'var(--gold)\'" 
+                                                onmouseout="this.style.color=\'#666\'"
+                                                title="Editar Nome do Treino">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <span id="label_nome_div_'.$div['id'].'" style="color:var(--gold); font-size: 0.9rem; font-weight: bold; text-transform: uppercase; display: block; margin-top: 2px;">
+                                        '.($div['nome'] ? $div['nome'] : 'SEM NOME DEFINIDO').'
+                                    </span>
+                                </div>
+
                                 <button class="btn-gerenciar" onclick="openExercicioModal('.$div['id'].', '.$treino_id.')">
                                     <i class="fa-solid fa-plus"></i> ADD EXERCÍCIO
                                 </button>
@@ -1286,11 +1300,11 @@ switch ($pagina) {
                                 
                                 if (count($exercicios) > 0) {
                                     foreach ($exercicios as $ex) {
-                                        // Busca as séries
                                         $sqlSeries = "SELECT * FROM series WHERE exercicio_id = ?";
                                         $stmtSeries = $pdo->prepare($sqlSeries);
                                         $stmtSeries->execute([$ex['id']]);
                                         $series = $stmtSeries->fetchAll(PDO::FETCH_ASSOC);
+                                        
                                         $ex_data = $ex;
                                         $ex_data['series'] = $series;
                                         $ex_json = htmlspecialchars(json_encode($ex_data), ENT_QUOTES, 'UTF-8');
@@ -1305,7 +1319,7 @@ switch ($pagina) {
                                                         $infoReps = $s['reps_fixas'] ? "(".$s['reps_fixas'].")" : "";
                                                         echo '<span class="set-tag '.$s['categoria'].'">'.$s['quantidade'].'x '.strtoupper($s['categoria']).' '.$infoReps.'</span>';
                                                     }
-                                        echo '  </div>
+                                            echo '  </div>
                                             </div>
                                             <div class="ex-actions">
                                                 <button class="btn-action-icon" onclick=\'editarExercicio('.$ex_json.', '.$treino_id.', '.$div['id'].')\'>
@@ -1335,9 +1349,7 @@ switch ($pagina) {
             <div id="modalExercicio" class="modal-overlay">
                 <div class="modal-content" style="max-width: 700px;">
                     <button class="modal-close" onclick="closeExercicioModal()">&times;</button>
-                    
                     <h3 class="section-title" style="color:var(--gold); margin-bottom:20px;">Novo Exercício</h3>
-                    
                     <form action="actions/treino_add_exercicio.php" method="POST" id="formExercicio">
                         <input type="hidden" name="divisao_id" id="modal_divisao_id">
                         <input type="hidden" name="treino_id" id="modal_treino_id">
@@ -1375,16 +1387,13 @@ switch ($pagina) {
                         <h4 style="color:#fff; font-size:0.9rem; margin-bottom:10px;">Configuração de Séries</h4>
                         
                         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-    
                             <label class="input-label" style="color:var(--gold); margin-bottom:10px; display:block;">Adicionar Série</label>
                             
                             <div class="set-inputs-row" style="display:flex; gap:10px; align-items:flex-end;">
-                                
                                 <div style="flex:0 0 60px;">
                                     <label class="input-label" style="font-size:0.7rem;">Qtd</label>
                                     <input type="number" id="set_qtd" class="admin-input" value="1" style="padding:8px;">
                                 </div>
-                                
                                 <div style="flex:1; min-width:100px;">
                                     <label class="input-label" style="font-size:0.7rem;">Tipo</label>
                                     <select id="set_tipo" class="admin-input" style="padding:8px;">
@@ -1396,22 +1405,18 @@ switch ($pagina) {
                                         <option value="falha">Falha</option>
                                     </select>
                                 </div>
-                                
                                 <div style="flex:1; min-width:70px;">
                                     <label class="input-label" style="font-size:0.7rem;">Reps</label>
                                     <input type="text" id="set_reps" class="admin-input" placeholder="Ex: 10" style="padding:8px;">
                                 </div>
-                                
                                 <div style="flex:1; min-width:70px;">
                                     <label class="input-label" style="font-size:0.7rem;">Descanso</label>
                                     <input type="text" id="set_desc" class="admin-input" placeholder="90s" style="padding:8px;">
                                 </div>
-                                
                                 <div style="flex:0 0 60px;">
                                     <label class="input-label" style="font-size:0.7rem;">RPE</label>
                                     <input type="number" id="set_rpe" class="admin-input" placeholder="-" style="padding:8px;">
                                 </div>
-
                                 <button type="button" class="btn-gold btn-add-set-mobile" onclick="addSetToList()" style="padding:8px 15px; height:38px;">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
@@ -1433,11 +1438,9 @@ switch ($pagina) {
             <div id="modalMicro" class="modal-overlay">
                 <div class="modal-content">
                     <button class="modal-close" onclick="closeMicroModal()">&times;</button>
-                    
                     <h3 class="section-title" style="color:var(--gold); margin-bottom:20px;">
                         <i class="fa-solid fa-calendar-week"></i> Configurar Semana <span id="span_semana_num"></span>
                     </h3>
-                    
                     <form action="actions/treino_edit_micro.php" method="POST">
                         <input type="hidden" name="micro_id" id="micro_id">
                         <input type="hidden" name="treino_id" id="micro_treino_id">
@@ -1480,7 +1483,6 @@ switch ($pagina) {
                     </form>
                 </div>
             </div>
-
         ';
         break;
 

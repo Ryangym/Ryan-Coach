@@ -616,6 +616,22 @@
     border-radius: 10px;
     border-left: 4px solid var(--gold);
 }
+#div-treino{
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    gap: 5px;
+    border-radius: 8px;
+    margin-bottom: 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+@media (max-width: 400px) {
+    #div-treino {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
 /* =========================================
    MÓDULO: LISTA DE EXERCÍCIOS
    ========================================= */
