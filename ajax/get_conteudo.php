@@ -60,46 +60,70 @@ switch ($pagina) {
             else if ($i > 0) break; 
         }
 
-        // 4. Próximo Treino
-        $stmt_ativo = $pdo->prepare("SELECT id, nivel_plano FROM treinos WHERE aluno_id = ? ORDER BY criado_em DESC LIMIT 1");
+        // --- 4. LÓGICA DO "TREINO DE HOJE" (Igual ao realizar_treino) ---
+        $hoje_dia_num = date('N'); // 1 (Seg) a 7 (Dom)
+        $stmt_ativo = $pdo->prepare("SELECT * FROM treinos WHERE aluno_id = ? ORDER BY criado_em DESC LIMIT 1");
         $stmt_ativo->execute([$aluno_id]);
-        $plano = $stmt_ativo->fetch(PDO::FETCH_ASSOC);
+        $treino_ativo = $stmt_ativo->fetch(PDO::FETCH_ASSOC);
 
-        $prox_letra = "A";
-        $fase = "Geral";
-        
-        if ($plano) {
-            $stmt_last = $pdo->prepare("SELECT td.letra FROM treino_historico th JOIN treino_divisoes td ON th.divisao_id = td.id WHERE th.aluno_id = ? ORDER BY th.data_treino DESC LIMIT 1");
-            $stmt_last->execute([$aluno_id]);
-            $last = $stmt_last->fetchColumn();
+        $card_titulo = "SEM TREINO";
+        $card_subtitulo = "Nenhum plano ativo";
+        $card_badge = "Off";
+        $card_letra = "-";
+        $is_rest_day = false;
+        $divisao_hoje_id = ''; // Se vazio, vai pra lista geral
 
-            $stmt_divs = $pdo->prepare("SELECT letra FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
-            $stmt_divs->execute([$plano['id']]);
-            $divs = $stmt_divs->fetchAll(PDO::FETCH_COLUMN);
+        if ($treino_ativo) {
+            $dias_treino = json_decode($treino_ativo['dias_semana']);
+            if (!is_array($dias_treino)) $dias_treino = [];
 
-            if ($divs) {
-                if ($last) {
-                    $key = array_search($last, $divs);
-                    $prox_letra = ($key !== false && isset($divs[$key+1])) ? $divs[$key+1] : $divs[0];
-                } else {
-                    $prox_letra = $divs[0];
+            // Verifica se hoje é dia de treino
+            if (in_array($hoje_dia_num, $dias_treino)) {
+                // É dia de treino! Calcula qual divisão (A, B, C...)
+                $stmt_divs = $pdo->prepare("SELECT * FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
+                $stmt_divs->execute([$treino_ativo['id']]);
+                $divisoes = $stmt_divs->fetchAll(PDO::FETCH_ASSOC);
+
+                if (count($divisoes) > 0) {
+                    $indice_hoje = array_search($hoje_dia_num, $dias_treino);
+                    $indice_divisao = $indice_hoje % count($divisoes);
+                    $div_hoje = $divisoes[$indice_divisao];
+
+                    $card_letra = $div_hoje['letra'];
+                    $card_titulo = "Treino " . $div_hoje['letra'];
+                    $card_subtitulo = $div_hoje['nome'] ? $div_hoje['nome'] : 'Toque para iniciar';
+                    $divisao_hoje_id = '&divisao_id=' . $div_hoje['id']; // Parâmetro para abrir direto
+                    
+                    // Pega a fase da periodização se houver
+                    if ($treino_ativo['nivel_plano'] !== 'basico') {
+                        $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
+                        $stmt_per->execute([$treino_ativo['id']]);
+                        $pid = $stmt_per->fetchColumn();
+                        if($pid) {
+                            $hoje_date = date('Y-m-d');
+                            $stmt_m = $pdo->prepare("SELECT nome_fase FROM microciclos WHERE periodizacao_id = ? AND data_inicio_semana <= ? AND data_fim_semana >= ? LIMIT 1");
+                            $stmt_m->execute([$pid, $hoje_date, $hoje_date]);
+                            $m = $stmt_m->fetch(PDO::FETCH_ASSOC);
+                            if($m) $card_badge = $m['nome_fase'];
+                            else $card_badge = "Periodizado";
+                        } else {
+                            $card_badge = "Geral";
+                        }
+                    } else {
+                        $card_badge = "Básico";
+                    }
                 }
-            }
-            
-            if ($plano['nivel_plano'] !== 'basico') {
-                $stmt_per = $pdo->prepare("SELECT id FROM periodizacoes WHERE treino_id = ?");
-                $stmt_per->execute([$plano['id']]);
-                $pid = $stmt_per->fetchColumn();
-                if($pid) {
-                    $stmt_m = $pdo->prepare("SELECT nome_fase FROM microciclos WHERE periodizacao_id = ? AND data_inicio_semana <= ? AND data_fim_semana >= ? LIMIT 1");
-                    $stmt_m->execute([$pid, $hoje, $hoje]);
-                    $m = $stmt_m->fetch(PDO::FETCH_ASSOC);
-                    if($m) $fase = $m['nome_fase'];
-                }
+            } else {
+                // Hoje NÃO é dia de treino (Descanso)
+                $is_rest_day = true;
+                $card_titulo = "Descanso";
+                $card_subtitulo = "Recuperação ativa";
+                $card_letra = "<i class='fa-solid fa-bed' style='font-size:0.6em; color:black;'></i>";
+                $card_badge = "Off";
             }
         }
 
-        // --- RENDERIZAÇÃO LIMPA ---
+        // --- RENDERIZAÇÃO ---
         echo '<section id="dashboard" class="fade-in">
                 
                 <div class="clean-header-bg">
@@ -134,22 +158,31 @@ switch ($pagina) {
 
                 <div class="dash-content-padded">
                     
-                    <h3 class="section-label">TREINO DE HOJE</h3>
-                    <div class="today-card" onclick="carregarConteudo(\'realizar_treino\')">
+                    <h3 class="section-label">HOJE</h3>
+                    
+                    <div class="today-card ' . ($is_rest_day ? 'rest-day-card' : '') . '" onclick="carregarConteudo(\'realizar_treino'.$divisao_hoje_id.'\')">
                         <div class="today-left">
-                            <span class="today-letter">'.$prox_letra.'</span>
+                            <span class="today-letter" style="' . ($is_rest_day ? 'background:rgba(255,255,255,0.1); color:#888;' : '') . '">
+                                '.$card_letra.'
+                            </span>
                             <div class="today-info">
-                                <span class="badge-phase">'.$fase.'</span>
-                                <h2>Treino '.$prox_letra.'</h2>
-                                <p>Toque para iniciar a sessão</p>
+                                <span class="badge-phase" style="' . ($is_rest_day ? 'background:#444; color:#aaa;' : '') . '">'.$card_badge.'</span>
+                                <h2 style="' . ($is_rest_day ? : '') . '">'.$card_titulo.'</h2>
+                                <p>'.$card_subtitulo.'</p>
                             </div>
                         </div>
                         <div class="today-action">
-                            <i class="fa-solid fa-play"></i>
+                            <i class="fa-solid ' . ($is_rest_day ? 'fa-list-ul' : 'fa-play') . '"></i>
                         </div>
-                    </div>
+                    </div>';
 
-                    <h3 class="section-label">ACESSO RÁPIDO</h3>
+                    if ($is_rest_day) {
+                        echo '<p style="text-align:center; font-size:0.8rem; color:#666; margin-top:5px; margin-bottom:20px;">
+                                <i class="fa-solid fa-info-circle"></i> Toque no card acima se quiser treinar mesmo assim.
+                              </p>';
+                    }
+
+        echo '      <h3 class="section-label">ACESSO RÁPIDO</h3>
                     <div class="quick-grid">
                         <div class="quick-card" onclick="carregarConteudo(\'historico\')">
                             <div class="qc-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -196,7 +229,6 @@ switch ($pagina) {
               </section>';
         break;
 
-    // --- NOVA TELA: REALIZAR TREINO ---
     case 'realizar_treino':
         // 1. Busca o Treino Ativo
         $hoje = date('Y-m-d');
@@ -210,20 +242,22 @@ switch ($pagina) {
             break;
         }
 
-        // 2. Lógica de Seleção Automática do Dia (Mantida igual)
+        // 2. Lógica de Seleção Automática do Dia
         if (!$divisao_req) {
             $dia_semana_hoje = date('N'); 
             $dias_treino = json_decode($treino_ativo['dias_semana']); 
-            
+            if (!is_array($dias_treino)) $dias_treino = [];
+
             $stmt_div = $pdo->prepare("SELECT * FROM treino_divisoes WHERE treino_id = ? ORDER BY letra ASC");
             $stmt_div->execute([$treino_ativo['id']]);
             $divisoes = $stmt_div->fetchAll(PDO::FETCH_ASSOC);
             
             $divisao_sugerida = null;
             $indice_hoje = array_search($dia_semana_hoje, $dias_treino);
+            $qtd_divisoes = count($divisoes);
             
-            if ($indice_hoje !== false) {
-                $indice_divisao = $indice_hoje % count($divisoes);
+            if ($indice_hoje !== false && $qtd_divisoes > 0) {
+                $indice_divisao = $indice_hoje % $qtd_divisoes;
                 $divisao_sugerida = $divisoes[$indice_divisao];
                 
                 echo '<section class="fade-in" style="padding-top:20px;">
@@ -248,8 +282,12 @@ switch ($pagina) {
                 echo '<section class="fade-in">
                         <h2 class="workout-title">QUAL O TREINO DE HOJE?</h2>
                         <div class="workout-selection-grid">';
-                        foreach($divisoes as $d) {
-                            echo '<button class="select-workout-btn" onclick="carregarConteudo(\'realizar_treino&divisao_id='.$d['id'].'\')">'.$d['letra'].'</button>';
+                        if ($qtd_divisoes > 0) {
+                            foreach($divisoes as $d) {
+                                echo '<button class="select-workout-btn" onclick="carregarConteudo(\'realizar_treino&divisao_id='.$d['id'].'\')">'.$d['letra'].'</button>';
+                            }
+                        } else {
+                            echo '<p style="color:#888;">Nenhuma divisão encontrada.</p>';
                         }
                 echo   '</div></section>';
                 break;
@@ -262,6 +300,8 @@ switch ($pagina) {
         $stmt_d = $pdo->prepare("SELECT * FROM treino_divisoes WHERE id = ?");
         $stmt_d->execute([$divisao_id]);
         $div_atual = $stmt_d->fetch(PDO::FETCH_ASSOC);
+
+        if (!$div_atual) { echo '<p>Erro: Divisão não encontrada.</p>'; break; }
 
         $stmt_ex = $pdo->prepare("SELECT * FROM exercicios WHERE divisao_id = ? ORDER BY ordem ASC");
         $stmt_ex->execute([$divisao_id]);
@@ -285,6 +325,8 @@ switch ($pagina) {
              }
         }
 
+        $nome_fase = $micro_atual ? 'Fase: '.$micro_atual['nome_fase'] : 'Treino Livre';
+
         echo '<form action="actions/treino_registrar.php" method="POST" id="form-execucao">
                 <input type="hidden" name="treino_id" value="'.$treino_ativo['id'].'">
                 <input type="hidden" name="divisao_id" value="'.$divisao_id.'">
@@ -294,7 +336,7 @@ switch ($pagina) {
                         <h2 style="color:#fff; margin:0; font-size:1.2rem;">TREINO '.$div_atual['letra'].'</h2>
                         <button type="button" onclick="carregarConteudo(\'realizar_treino\')" style="background:none; border:none; color:#888;">Trocar</button>
                     </div>
-                    <p style="padding:0 15px; color:#666; font-size:0.8rem; margin-top:5px;">'.($micro_atual ? 'Fase: '.$micro_atual['nome_fase'] : 'Treino Livre').'</p>
+                    <p style="padding:0 15px; color:#666; font-size:0.8rem; margin-top:5px;">'.$nome_fase.'</p>
                 </div>
 
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -305,98 +347,134 @@ switch ($pagina) {
 
                 <div style="padding-bottom: 160px;">'; 
 
-        foreach ($exercicios as $ex) {
-            $stmt_s = $pdo->prepare("SELECT * FROM series WHERE exercicio_id = ?");
-            $stmt_s->execute([$ex['id']]);
-            $series = $stmt_s->fetchAll(PDO::FETCH_ASSOC);
+        if (count($exercicios) > 0) {
+            foreach ($exercicios as $ex) {
+                $stmt_s = $pdo->prepare("SELECT * FROM series WHERE exercicio_id = ?");
+                $stmt_s->execute([$ex['id']]);
+                $series = $stmt_s->fetchAll(PDO::FETCH_ASSOC);
 
-            // Busca Histórico (Corrigido)
-            $stmt_hist = $pdo->prepare("SELECT carga_kg, reps_realizadas FROM treino_historico WHERE aluno_id = ? AND exercicio_id = ? ORDER BY data_treino DESC LIMIT 1");
-            $stmt_hist->execute([$aluno_id, $ex['id']]);
-            $historico = $stmt_hist->fetch(PDO::FETCH_ASSOC);
-            
-            $ultima_carga = $historico ? $historico['carga_kg'] : '';
-            $ultimas_reps = $historico ? $historico['reps_realizadas'] : '';
+                // --- BUSCA HISTÓRICO AVANÇADA (POR SÉRIE E ORDEM) ---
+                // 1. Descobre qual foi a ÚLTIMA data que esse exercício foi treinado
+                $stmt_last_date = $pdo->prepare("SELECT MAX(data_treino) FROM treino_historico WHERE aluno_id = ? AND exercicio_id = ?");
+                $stmt_last_date->execute([$aluno_id, $ex['id']]);
+                $ultima_data = $stmt_last_date->fetchColumn();
 
-            // Mapeamento histórico por série
-            $stmt_last_date = $pdo->prepare("SELECT MAX(data_treino) FROM treino_historico WHERE aluno_id = ? AND exercicio_id = ?");
-            $stmt_last_date->execute([$aluno_id, $ex['id']]);
-            $ultima_data = $stmt_last_date->fetchColumn();
-            $historico_map = [];
-            if ($ultima_data) {
-                $stmt_h = $pdo->prepare("SELECT serie_numero, carga_kg, reps_realizadas FROM treino_historico WHERE aluno_id = ? AND exercicio_id = ? AND data_treino = ?");
-                $stmt_h->execute([$aluno_id, $ex['id'], $ultima_data]);
-                $regs = $stmt_h->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($regs as $r) $historico_map[$r['serie_numero']] = $r;
-            }
-
-            echo '
-            <div class="exec-card">
-                <div class="exec-header">
-                    <span class="exec-title">'.$ex['nome_exercicio'].'</span>
-                    '.($ex['video_url'] ? '<a href="'.$ex['video_url'].'" target="_blank" class="exec-video"><i class="fa-solid fa-circle-play"></i></a>' : '').'
-                </div>
-
-                <div class="set-row-header">
-                    <span>SÉRIE</span>
-                    <span>META</span>
-                    <span>CARGA (KG)</span>
-                    <span>REPS</span>
-                </div>';
-
-                foreach ($series as $s) {
-                    $meta_reps = $s['reps_fixas'];
-                    $meta_desc = $s['descanso_fixo'];
-
-                    if ($s['categoria'] === 'warmup') { $meta_desc = '30s'; }
-                    elseif ($s['categoria'] === 'feeder') { $meta_desc = '60s'; }
-                    elseif ($micro_atual) {
-                        if ($ex['tipo_mecanica'] == 'composto') {
-                            if($micro_atual['reps_compostos']) $meta_reps = $micro_atual['reps_compostos'];
-                            if($micro_atual['descanso_compostos']) $meta_desc = $micro_atual['descanso_compostos'].'s';
-                        } else {
-                            if($micro_atual['reps_isoladores']) $meta_reps = $micro_atual['reps_isoladores'];
-                            if($micro_atual['descanso_isoladores']) $meta_desc = $micro_atual['descanso_isoladores'].'s';
-                        }
-                    }
-                    if(!$meta_reps) $meta_reps = "-";
-
-                    // Dados Antigos
-                    $dados_ant = isset($historico_map[$s['id']]) ? $historico_map[$s['id']] : null; // Nota: idealmente usar serie_numero se for sequencial, mas id serve se não deletar series
-                    // Melhoria: Usar contador $i no loop se preferir, mas vamos manter simples por enquanto
+                // 2. Se achou data, busca TODOS os registros desse dia para mapear
+                $historico_map = []; // Vai guardar: [serie_id][numero_ordem] => dados
+                if ($ultima_data) {
+                    // Tenta buscar usando serie_id (novo padrão)
+                    $stmt_h = $pdo->prepare("SELECT serie_id, numero_serie, serie_numero, carga_kg, reps_realizadas 
+                                             FROM treino_historico 
+                                             WHERE aluno_id = ? AND exercicio_id = ? AND data_treino = ?");
+                    $stmt_h->execute([$aluno_id, $ex['id'], $ultima_data]);
+                    $regs = $stmt_h->fetchAll(PDO::FETCH_ASSOC);
                     
-                    // Fallback para placeholder
-                    $ph_carga = ($dados_ant && is_numeric($dados_ant['carga_kg'])) ? ($dados_ant['carga_kg']*1) : '-';
-                    $ph_reps  = ($dados_ant && $dados_ant['reps_realizadas']) ? $dados_ant['reps_realizadas'] : '-';
-
-                    $input_base = "treino[".$ex['id']."][".$s['id']."]";
-
-                    echo '
-                    <div class="set-row-input '.$s['categoria'].'">
-                        <div class="set-num">
-                            <span style="font-size:1.1rem;">'.$s['quantidade'].'</span>
-                            
-                            <span class="set-type-label">'.strtoupper($s['categoria']).'</span>
-                            
-                            <div style="font-size:0.6rem; color:#666;">'.$meta_desc.'</div>
-                        </div>
+                    foreach ($regs as $r) {
+                        // Se tiver serie_id (novo), usa ele. Se não, tenta usar serie_numero (legado) como ID
+                        $s_key = $r['serie_id'] ? $r['serie_id'] : $r['serie_numero'];
+                        $n_key = $r['numero_serie'] ? $r['numero_serie'] : 1;
                         
-                        <div style="text-align:center;">
-                            <span style="color:#fff; font-size:0.9rem; font-weight:bold;">'.$meta_reps.'</span>
-                            <span style="display:block; font-size:0.6rem; color:#aaa;">ALVO</span>
-                        </div>
-
-                        <div>
-                            <input type="tel" name="'.$input_base.'[carga]" class="input-exec" placeholder="Ant: '.$ph_carga.'">
-                        </div>
-
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <input type="tel" name="'.$input_base.'[reps]" class="input-exec" placeholder="Ant: '.$ph_reps.'">
-                        </div>
-                    </div>';
+                        $historico_map[$s_key][$n_key] = $r;
+                    }
                 }
 
-            echo '</div>';
+                $video_html = $ex['video_url'] ? '<a href="'.$ex['video_url'].'" target="_blank" class="exec-video"><i class="fa-solid fa-circle-play"></i></a>' : '';
+
+                echo '
+                <div class="exec-card">
+                    <div class="exec-header">
+                        <span class="exec-title">'.$ex['nome_exercicio'].'</span>
+                        '.$video_html.'
+                    </div>
+
+                    <div class="set-row-header">
+                        <span>SÉRIE</span>
+                        <span>META</span>
+                        <span>CARGA (KG)</span>
+                        <span>REPS</span>
+                    </div>';
+
+                    if (count($series) > 0) {
+                        foreach ($series as $s) {
+                            $meta_reps = $s['reps_fixas'];
+                            $meta_desc = $s['descanso_fixo'];
+
+                            if ($s['categoria'] === 'warmup') { $meta_desc = '30s'; }
+                            elseif ($s['categoria'] === 'feeder') { $meta_desc = '60s'; }
+                            elseif ($micro_atual) {
+                                if ($ex['tipo_mecanica'] == 'composto') {
+                                    if($micro_atual['reps_compostos']) $meta_reps = $micro_atual['reps_compostos'];
+                                    if($micro_atual['descanso_compostos']) $meta_desc = $micro_atual['descanso_compostos'].'s';
+                                } else {
+                                    if($micro_atual['reps_isoladores']) $meta_reps = $micro_atual['reps_isoladores'];
+                                    if($micro_atual['descanso_isoladores']) $meta_desc = $micro_atual['descanso_isoladores'].'s';
+                                }
+                            }
+                            if(!$meta_reps) $meta_reps = "-";
+
+                            $qtd_series = (int)$s['quantidade'];
+                            if ($qtd_series < 1) $qtd_series = 1;
+
+                            // LOOP DE INPUTS (Gera 1 linha para cada repetição da série)
+                            for ($i = 1; $i <= $qtd_series; $i++) {
+                                
+                                // Tenta encontrar o histórico específico desta repetição ($i) desta série ($s['id'])
+                                $ph_carga = '-';
+                                $ph_reps = '-';
+                                
+                                if (isset($historico_map[$s['id']][$i])) {
+                                    $dado_ant = $historico_map[$s['id']][$i];
+                                    $ph_carga = ($dado_ant['carga_kg'] * 1); // *1 remove zeros extras decimais
+                                    $ph_reps  = $dado_ant['reps_realizadas'];
+                                } elseif (isset($historico_map[$s['id']][1])) {
+                                    // Fallback: Se não achou a repetição 2, tenta mostrar a 1 só pra ter referência
+                                    $dado_ant = $historico_map[$s['id']][1];
+                                    $ph_carga = ($dado_ant['carga_kg'] * 1);
+                                    $ph_reps  = $dado_ant['reps_realizadas'];
+                                }
+
+                                $input_name_carga = "carga[".$s['id']."][".$i."]";
+                                $input_name_reps = "reps[".$s['id']."][".$i."]";
+
+                                $label_serie = strtoupper($s['categoria']);
+                                $indicador_num = '1';
+                                
+                                if ($qtd_series > 1) {
+                                    $indicador_num = '#'.$i;
+                                    $label_serie .= " <small style='font-size:0.6rem; color:#888;'>(".$i."/".$qtd_series.")</small>";
+                                }
+
+                                echo '
+                                <div class="set-row-input '.$s['categoria'].'" style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="set-num">
+                                        <span style="font-size:1.1rem;">'.$indicador_num.'</span>
+                                        <span class="set-type-label">'.$label_serie.'</span>
+                                        <div style="font-size:0.6rem; color:#666;">'.$meta_desc.'</div>
+                                    </div>
+                                    
+                                    <div style="text-align:center;">
+                                        <span style="color:#fff; font-size:0.9rem; font-weight:bold;">'.$meta_reps.'</span>
+                                        <span style="display:block; font-size:0.6rem; color:#aaa;">ALVO</span>
+                                    </div>
+
+                                    <div>
+                                        <input type="number" step="0.5" name="'.$input_name_carga.'" class="input-exec" placeholder="Ant: '.$ph_carga.'" inputmode="decimal">
+                                    </div>
+
+                                    <div style="display:flex; align-items:center; gap:5px;">
+                                        <input type="number" name="'.$input_name_reps.'" class="input-exec" placeholder="Ant: '.$ph_reps.'" inputmode="numeric">
+                                    </div>
+                                </div>';
+                            }
+                        }
+                    } else {
+                        echo '<p style="color:#666; padding:10px;">Sem séries cadastradas.</p>';
+                    }
+
+                echo '</div>'; // Fim exec-card
+            }
+        } else {
+            echo '<p style="text-align:center; margin-top:20px; color:#888;">Nenhum exercício encontrado nesta divisão.</p>';
         }
 
         echo '  </div> 
@@ -656,7 +734,6 @@ switch ($pagina) {
         $data_ref = $_GET['data_ref'] ?? null;
 
         // --- MODO 1: DETALHES DO TREINO (QUANDO CLICA) ---
-        // --- MODO 1: DETALHES DO TREINO (AGRUPADO) ---
         if ($data_ref) {
             // 1. Infos Gerais
             $sql_info = "SELECT DISTINCT t.nome as nome_treino, td.letra 
@@ -668,22 +745,24 @@ switch ($pagina) {
             $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
             $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // 2. Busca Detalhes (JOIN com SERIES para pegar a categoria)
-            // Ordenamos por exercício (ordem) e depois pela série
+            // 2. Busca Detalhes Completos (CORREÇÃO AQUI)
+            // Usamos COALESCE para priorizar th.serie_id. Se for nulo, tenta th.serie_numero
             $sql_detalhes = "SELECT th.*, e.nome_exercicio, s.categoria 
                              FROM treino_historico th
                              JOIN exercicios e ON th.exercicio_id = e.id
-                             LEFT JOIN series s ON th.serie_numero = s.id 
+                             LEFT JOIN series s ON COALESCE(th.serie_id, th.serie_numero) = s.id 
                              WHERE th.aluno_id = :uid AND th.data_treino = :dt
                              ORDER BY e.ordem ASC, th.id ASC";
+                             
             $stmt = $pdo->prepare($sql_detalhes);
             $stmt->execute(['uid' => $aluno_id, 'dt' => $data_ref]);
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // 3. AGRUPAMENTO POR EXERCÍCIO
+            // 3. AGRUPAMENTO
             $treino_agrupado = [];
             foreach ($registros as $reg) {
                 $id_ex = $reg['exercicio_id'];
+                
                 if (!isset($treino_agrupado[$id_ex])) {
                     $treino_agrupado[$id_ex] = [
                         'nome' => $reg['nome_exercicio'],
@@ -701,13 +780,13 @@ switch ($pagina) {
                         </button>
                         <div>
                             <span style="color:#888; font-size:0.8rem; text-transform:uppercase;">Visualizando</span>
-                            <h2 style="margin:0; color:#fff; font-size:1.2rem;">TREINO '.$info['letra'].'</h2>
+                            <h2 style="margin:0; color:#fff; font-size:1.2rem;">TREINO '.($info['letra'] ?? '?').'</h2>
                         </div>
                     </div>
 
                     <div style="margin-bottom:20px; padding:15px; background:rgba(255,186,66,0.1); border-radius:8px; border:1px solid var(--gold); display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <strong style="color:var(--gold); display:block;">'.$info['nome_treino'].'</strong>
+                            <strong style="color:var(--gold); display:block;">'.($info['nome_treino'] ?? 'Treino').'</strong>
                             <span style="color:#ccc; font-size:0.8rem;">'.date('d/m/Y \à\s H:i', strtotime($data_ref)).'</span>
                         </div>
                         <i class="fa-solid fa-calendar-check" style="color:var(--gold); font-size:1.5rem;"></i>
@@ -716,7 +795,7 @@ switch ($pagina) {
                     <div class="history-details-list">';
                     
                     if (empty($treino_agrupado)) {
-                        echo '<p style="text-align:center; color:#666;">Nenhum dado encontrado para este registro.</p>';
+                        echo '<p style="text-align:center; color:#666;">Nenhum dado detalhado encontrado.</p>';
                     }
 
                     foreach ($treino_agrupado as $ex_id => $dados) {
@@ -737,18 +816,19 @@ switch ($pagina) {
                                     </thead>
                                     <tbody>';
                                     
-                                    $contador_serie = 1;
                                     foreach ($dados['series'] as $serie) {
-                                        // Fallback se categoria vier vazia
-                                        $cat = $serie['categoria'] ? $serie['categoria'] : 'work';
+                                        // Categoria
+                                        $cat = $serie['categoria'] ? strtolower($serie['categoria']) : 'work';
                                         
+                                        // Ordem (Usa numero_serie se existir, senão usa contador manual)
+                                        $num_ordem = $serie['numero_serie'] > 0 ? $serie['numero_serie'] : '-';
+
                                         echo '<tr>
-                                                <td style="color:#666; font-weight:bold;">'.$contador_serie.'</td>
+                                                <td style="color:#666; font-weight:bold;">#'.$num_ordem.'</td>
                                                 <td><span class="badge-set-type '.$cat.'">'.strtoupper($cat).'</span></td>
                                                 <td style="color:#fff; font-weight:bold;">'.($serie['carga_kg']*1).'</td>
                                                 <td style="color:#fff;">'.$serie['reps_realizadas'].'</td>
                                               </tr>';
-                                        $contador_serie++;
                                     }
 
                         echo '      </tbody>
@@ -762,13 +842,11 @@ switch ($pagina) {
             break;
         }
 
-        // --- MODO 2: LISTA DE DATAS (VISÃO GERAL) ---
-        
-        // Agrupa por data para não repetir o mesmo treino 20x (uma vez por série)
+        // --- MODO 2: LISTA (IGUAL AO ANTERIOR) ---
         $sql_lista = "SELECT th.data_treino, t.nome as nome_treino, td.letra
                       FROM treino_historico th
-                      JOIN treinos t ON th.treino_id = t.id
-                      JOIN treino_divisoes td ON th.divisao_id = td.id
+                      LEFT JOIN treinos t ON th.treino_id = t.id
+                      LEFT JOIN treino_divisoes td ON th.divisao_id = td.id
                       WHERE th.aluno_id = :uid
                       GROUP BY th.data_treino
                       ORDER BY th.data_treino DESC";
@@ -790,35 +868,29 @@ switch ($pagina) {
                   </div>';
         } else {
             echo '<div class="history-list">';
-            
             foreach ($historico as $h) {
                 $data_obj = new DateTime($h['data_treino']);
                 $dia = $data_obj->format('d');
-                $mes = strftime('%b', $data_obj->getTimestamp()); // %b para mês abrev (Jan, Fev)
-                
-                // Formatação manual de mês em PT-BR caso servidor não esteja configurado
                 $meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
                 $mes_txt = $meses[(int)$data_obj->format('m') - 1];
-
                 $hora = $data_obj->format('H:i');
+                $treino_nome = $h['nome_treino'] ? $h['nome_treino'] : 'Treino Arquivado';
+                $letra = $h['letra'] ? $h['letra'] : '?';
 
-                // Passamos a data completa como parâmetro na URL
                 echo '<div class="history-card" onclick="carregarConteudo(\'historico&data_ref='.$h['data_treino'].'\')">
                         <div class="hist-date-box">
                             <span class="hist-day">'.$dia.'</span>
                             <span class="hist-month">'.$mes_txt.'</span>
                         </div>
                         <div class="hist-info">
-                            <span class="hist-title">Treino '.$h['letra'].'</span>
-                            <span class="hist-sub">'.$h['nome_treino'].' • '.$hora.'</span>
+                            <span class="hist-title">Treino '.$letra.'</span>
+                            <span class="hist-sub">'.$treino_nome.' • '.$hora.'</span>
                         </div>
                         <i class="fa-solid fa-chevron-right hist-arrow"></i>
                       </div>';
             }
-            
             echo '</div>';
         }
-        
         echo '</section>';
         break;
 
@@ -1493,7 +1565,7 @@ switch ($pagina) {
                             <div>
                                 <label class="input-label">Fundo</label>
                                 <div style="display:flex; align-items:center; gap:10px;">
-                                    <input type="color" id="pdf_bg_color" value="#ffffff" style="width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;">
+                                    <input type="color" id="pdf_bg_color" value="#000000ff" style="width:40px; height:40px; border:none; border-radius:5px; cursor:pointer;">
                                     <span style="font-size:0.8rem; color:#888;">Folha</span>
                                 </div>
                             </div>
